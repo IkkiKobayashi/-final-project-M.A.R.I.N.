@@ -1,1 +1,1 @@
-# -final-project--groupname-
+MARIN – Management & Automation for Resourceful Inventory Navigation
