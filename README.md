@@ -1,6 +1,7 @@
 <div align="center">
   <img src="assets/images/logo.png" alt="Inventory Management Logo" width="200" height="auto" />
-  <h1>Final-Project-[M.A.R.I.N</h1>
+  <h1>Final-Project-[M.A.R.I.N}</h1>
+  <h3> M.A.R.I.N – Management & Automation for Resourceful Inventory Navigation </h3>
   <p>Efficient inventory sorting and sales tracking solution for businesses.</p>
 
   <!-- languages -->
