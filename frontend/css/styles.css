@@ -1,0 +1,307 @@
+@font-face {
+  font-family: "Lexend";
+  src: local("Lexend");
+}
+
+.login {
+  background-color: #ffffff;
+  padding: 30px 80px 30px 30px;
+  overflow: hidden;
+  font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.layout-container {
+  gap: 20px;
+  display: flex;
+}
+
+.background-column {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+}
+
+.background-content {
+  max-height: fixed; /* Ensure content fits within the viewport */
+  border-radius: 30px;
+  background-color: rgba(3, 136, 238, 0.111);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 300px; /* Adjust width if necessary */
+  height: 30px; /* Adjust height to fit content */
+  padding: 294px;
+  max-width: 100%;
+  transform: translateX(
+    -10px
+  ); /* Reduce the left shift to keep it inside the viewport */
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  width: 35%;
+  margin-left: 20px;
+}
+
+.form-wrapper {
+  margin: auto 0;
+  margin-top: 40px;
+  width: 100%;
+  height: 70%;
+}
+
+.brand-header {
+  display: flex;
+  width: 249px;
+  max-width: 100%;
+  align-items: stretch;
+  margin-bottom: -5px;
+}
+
+.brand-logo {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 100px;
+  overflow: hidden;
+}
+
+.brand-name {
+  align-self: start;
+  margin-top: 31px;
+  font-size: 32px;
+  color: #16151c;
+  font-weight: 600;
+  line-height: 1;
+  flex-grow: 1;
+}
+
+.login-content {
+  margin-top: 10px;
+  max-width: 100%;
+  width: 445px;
+}
+
+.welcome-section {
+  width: 100%;
+}
+
+.welcome-title {
+  color: #16151c;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.welcome-subtitle {
+  color: #a2a1a8;
+  font-size: 16px;
+  font-weight: 300;
+  margin-top: 5px;
+}
+
+.login-form {
+  margin-top: 30px;
+  width: 100%;
+  max-width: 445px; /* Ensure consistent width for the form */
+  font-weight: 300;
+}
+
+.form-fields {
+  display: flex;
+  width: 100%; /* Match the width of the login button */
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid #006ec4;
+  display: flex;
+  align-items: center; /* Align input and toggle button vertically */
+  width: 100%; /* Match the width of the login button */
+  padding: 0 16px; /* Adjust padding to avoid excessive height */
+  height: 56px; /* Set a fixed height for consistency */
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  /* Removed animation and transition properties */
+}
+
+.form-input {
+  width: 100%; /* Ensure the input field spans the full width of the input group */
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+  height: 100%; /* Ensure the input field fills the height of the container */
+  line-height: 1.5; /* Adjust line height for better text alignment */
+  padding: 0; /* Remove extra padding */
+  box-sizing: border-box; /* Include padding and border in the width/height */
+  /* Removed animation and transition properties */
+}
+
+.toggle-password {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.toggle-password:hover {
+  opacity: 0.8;
+}
+
+.toggle-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.form-options {
+  display: flex;
+  margin-top: 16px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #16151c;
+  cursor: pointer;
+}
+
+.checkbox-icon {
+  width: 24px;
+  height: 24px;
+  fill: #006ec4;
+}
+
+.checkbox-input {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #006ec4;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+.checkbox-input:checked {
+  background-color: #006ec4;
+}
+
+.checkbox-input:checked::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 12px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+}
+
+.forgot-password {
+  color: #006ec4;
+  font-size: 14px;
+  text-decoration: none;
+  line-height: 2;
+}
+
+.login-button {
+  width: 100%; /* Match the width of the input fields */
+  border-radius: 10px;
+  background-color: #006ec4;
+  margin-top: 30px;
+  min-height: 56px;
+  padding: 16px 20px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box; /* Ensure padding is included in the width */
+}
+
+.signup-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #16151c;
+  text-align: center;
+}
+
+.signup-link {
+  color: #006ec4;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 991px) {
+  .login {
+    padding: 20px;
+  }
+
+  .layout-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .background-column {
+    width: 100%;
+  }
+
+  .background-content {
+    margin-top: 40px;
+  }
+
+  .form-column {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .form-wrapper {
+    margin-top: 40px;
+  }
+
+  .brand-header {
+    white-space: initial;
+  }
+
+  .welcome-title,
+  .welcome-subtitle {
+    max-width: 100%;
+  }
+
+  .login-form,
+  .form-fields,
+  .input-group {
+    max-width: 100%;
+  }
+
+  .login-button {
+    white-space: initial;
+  }
+}
