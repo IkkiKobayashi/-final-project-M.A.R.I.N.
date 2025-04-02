@@ -5,6 +5,7 @@
 
 body {
   font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+  overflow: hidden;
 }
 
 .login {
@@ -392,8 +393,19 @@ body {
     stroke: #16151c;
   }
 
+  .forgot-password__back-icon:hover {
+    color: #007bff;
+    transform: scale(1.1);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
   .forgot-password__back-icon:hover svg {
-    stroke: #006ec4;
+    stroke: #007bff;
+    transition: stroke 0.2s ease;
+  }
+
+  .forgot-password__back-icon:hover + .forgot-password__back-text {
+    color: inherit;
   }
 
   .forgot-password__back-icon img {
@@ -410,6 +422,9 @@ body {
 
   .forgot-password__back-text {
     margin: auto 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #16151c;
   }
 
   .forgot-password__header {
@@ -574,22 +589,26 @@ body {
 
 .back-button {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  align-items: center; /* Align arrow and text vertically */
+  gap: 5px; /* Adjust spacing between arrow and text */
   cursor: pointer;
   background: none;
   border: none;
-  padding: 0;
-  color: #000; /* Set the color to black */
-}
-
-.back-button:hover,
-.back-button:focus {
-  color: #000; /* Ensure it stays black on hover and focus */
+  padding: 0; /* Remove extra padding */
+  margin-left: 0; /* Adjust this value to align with the red line */
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .back-button svg {
-  stroke: #000; /* Set the arrow icon color to black */
+  stroke: #000;
+  vertical-align: middle; /* Ensure the arrow aligns with the text */
+  transition: stroke 0.3s ease;
+}
+
+.back-button:hover svg {
+  stroke: #006ec4;
 }
 
 .back-text {
@@ -597,7 +616,7 @@ body {
   font-family: "Lexend", sans-serif;
   font-size: 16px;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 1; /* Ensure proper alignment with the arrow */
 }
 
 .header-content {

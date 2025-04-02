@@ -3,13 +3,28 @@
   <head>
     <title>Login - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/login.css" />
-    <script src="js/script.js" defer></script>
-    <style>
-      body {
-        font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
-        overflow: hidden;
-      }
-    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const passwordInput = document.getElementById("password-input");
+        const passwordToggleIcon = document.getElementById(
+          "password-toggle-icon"
+        );
+
+        const togglePasswordVisibility = () => {
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordToggleIcon.src = "img/Show pass.png"; // Change to "show" icon
+          } else {
+            passwordInput.type = "password";
+            passwordToggleIcon.src = "img/Hide pass.png"; // Change to "hide" icon
+          }
+        };
+
+        document
+          .querySelector(".toggle-password")
+          .addEventListener("click", togglePasswordVisibility);
+      });
+    </script>
   </head>
   <body>
     <main class="login">
