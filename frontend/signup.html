@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sign Up - M.A.R.I.N</title>
+    <link rel="stylesheet" href="css/login.css" />
+    <style>
+      body {
+        font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="login">
+      <div class="layout-container">
+        <section class="background-column">
+          <div class="background-content"></div>
+        </section>
+
+        <section class="form-column">
+          <div class="form-wrapper">
+            <div class="login-content">
+              <div class="welcome-section">
+                <h2 class="welcome-title">Create Account</h2>
+                <p class="welcome-subtitle">Sign up to get started</p>
+              </div>
+
+              <form class="login-form">
+                <div class="form-fields">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      class="form-input"
+                      aria-label="Full Name"
+                      id="name-input"
+                      required
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      class="form-input"
+                      aria-label="Email Address"
+                      id="email-input"
+                      required
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      class="form-input"
+                      aria-label="Password"
+                      id="password-input"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password"
+                      aria-label="Toggle password visibility"
+                    >
+                      <img
+                        src="img/Hide pass.png"
+                        alt=""
+                        class="toggle-icon"
+                        id="password-toggle-icon"
+                      />
+                    </button>
+                  </div>
+
+                  <div class="input-group">
+                    <input
+                      type="password"
+                      placeholder="Confirm Password"
+                      class="form-input"
+                      aria-label="Confirm Password"
+                      id="confirm-password-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" class="login-button">Sign Up</button>
+
+                <p class="signup-text">
+                  Already have an account?
+                  <a href="login.html" class="signup-link">Login</a>
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script>
+      const passwordInput = document.getElementById("password-input");
+      const passwordToggleIcon = document.getElementById(
+        "password-toggle-icon"
+      );
+
+      const togglePasswordVisibility = (inputField, icon) => {
+        if (inputField.type === "password") {
+          inputField.type = "text";
+          icon.src = "img/Show pass.png"; // Change to "show" icon
+        } else {
+          inputField.type = "password";
+          icon.src = "img/Hide pass.png"; // Change to "hide" icon
+        }
+      };
+
+      passwordToggleIcon.addEventListener("click", () => {
+        togglePasswordVisibility(passwordInput, passwordToggleIcon);
+      });
+    </script>
+  </body>
+</html>
