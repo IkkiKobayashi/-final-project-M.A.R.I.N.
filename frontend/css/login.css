@@ -1,0 +1,728 @@
+@font-face {
+  font-family: "Lexend";
+  src: local("Lexend");
+}
+
+body {
+  font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.login {
+  background-color: #ffffff;
+  padding: 30px 80px 30px 30px;
+  overflow: hidden;
+  font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.layout-container {
+  gap: 20px;
+  display: flex;
+}
+
+.background-column {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+}
+
+.background-content {
+  max-height: none; /* Replaced invalid value with 'none' */
+  border-radius: 30px;
+  background-color: rgba(3, 136, 238, 0.111);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 300px; /* Adjust width if necessary */
+  height: 30px; /* Adjust height to fit content */
+  padding: 294px;
+  max-width: 100%;
+  transform: translateX(
+    -10px
+  ); /* Reduce the left shift to keep it inside the viewport */
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  width: 35%;
+  margin-left: 20px;
+}
+
+.form-wrapper {
+  margin: auto 0;
+  margin-top: 40px;
+  width: 100%;
+  height: 70%;
+}
+
+.brand-header {
+  display: flex;
+  width: 249px;
+  max-width: 100%;
+  align-items: stretch;
+  margin-bottom: -5px;
+}
+
+.brand-logo {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 100px;
+  overflow: hidden;
+}
+
+.brand-name {
+  align-self: start;
+  margin-top: 32px;
+  font-size: 32px;
+  color: #16151c;
+  font-weight: 600;
+  line-height: 1;
+  flex-grow: 0;
+}
+
+.login-content {
+  margin-top: 10px;
+  max-width: 100%;
+  width: 445px;
+}
+
+.welcome-section {
+  width: 100%;
+}
+
+.welcome-title {
+  color: #16151c;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.welcome-subtitle {
+  color: #a2a1a8;
+  font-size: 16px;
+  font-weight: 300;
+  margin-top: 5px;
+}
+
+.login-form {
+  margin-top: 30px;
+  width: 100%;
+  max-width: 445px; /* Ensure consistent width for the form */
+  font-weight: 300;
+}
+
+.form-fields {
+  display: flex;
+  width: 100%; /* Match the width of the login button */
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid #006ec4;
+  display: flex;
+  align-items: center; /* Align input and toggle button vertically */
+  width: 100%; /* Match the width of the login button */
+  padding: 0 16px; /* Adjust padding to avoid excessive height */
+  height: 56px; /* Set a fixed height for consistency */
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  /* Removed animation and transition properties */
+}
+
+.form-input {
+  width: 100%; /* Ensure the input field spans the full width of the input group */
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+  height: 100%; /* Ensure the input field fills the height of the container */
+  line-height: 1.5; /* Adjust line height for better text alignment */
+  padding: 0; /* Remove extra padding */
+  box-sizing: border-box; /* Include padding and border in the width/height */
+  /* Removed animation and transition properties */
+}
+
+.toggle-password {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.toggle-password:hover {
+  opacity: 0.8;
+}
+
+.toggle-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.form-options {
+  display: flex;
+  margin-top: 16px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #16151c;
+  cursor: pointer;
+}
+
+.checkbox-icon {
+  width: 24px;
+  height: 24px;
+  fill: #006ec4;
+}
+
+.checkbox-input {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #006ec4;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+.checkbox-input:checked {
+  background-color: #006ec4;
+}
+
+.checkbox-input:checked::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 12px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+}
+
+.forgot-password {
+  color: #006ec4;
+  font-size: 14px;
+  text-decoration: none;
+  line-height: 2;
+}
+
+.login-button {
+  width: 100%; /* Match the width of the input fields */
+  border-radius: 10px;
+  background-color: #006ec4;
+  margin-top: 30px;
+  min-height: 56px;
+  padding: 16px 20px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box; /* Ensure padding is included in the width */
+}
+
+.signup-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #16151c;
+  text-align: center;
+}
+
+.signup-link {
+  color: #006ec4;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 991px) {
+  .login {
+    padding: 20px;
+  }
+
+  .layout-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .background-column {
+    width: 100%;
+  }
+
+  .background-content {
+    margin-top: 40px;
+  }
+
+  .form-column {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .form-wrapper {
+    margin-top: 40px;
+  }
+
+  .brand-header {
+    white-space: initial;
+  }
+
+  .welcome-title,
+  .welcome-subtitle {
+    max-width: 100%;
+  }
+
+  .login-form,
+  .form-fields,
+  .input-group {
+    max-width: 100%;
+  }
+
+  .login-button {
+    white-space: initial;
+  }
+}
+
+.forgot-password-page {
+  @font-face {
+    font-family: "Lexend";
+    src: local("Lexend");
+  }
+
+  body {
+    font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+  }
+
+  .forgot-password {
+    background-color: #ffffff;
+    padding: 30px 80px 30px 30px;
+    overflow: hidden;
+    font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+  }
+
+  .forgot-password__container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .forgot-password__left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 65%;
+  }
+
+  .forgot-password__background {
+    border-radius: 30px;
+    background-color: rgba(3, 136, 238, 0.111);
+    display: flex;
+    margin: 0 auto;
+    width: 300px;
+    height: 30px;
+    padding: 294px;
+    max-width: 100%;
+    transform: translateX(-10px);
+  }
+
+  .forgot-password__right-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 35%;
+    margin-left: 20px;
+  }
+
+  .forgot-password__content {
+    display: flex;
+    margin: auto 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .forgot-password__back {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    color: #16151c;
+    font-weight: 300;
+  }
+
+  .forgot-password__back-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16151c;
+  }
+
+  .forgot-password__back-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: #16151c;
+  }
+
+  .forgot-password__back-icon:hover svg {
+    stroke: #006ec4;
+  }
+
+  .forgot-password__back-icon img {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  .forgot-password__back-icon:link,
+  .forgot-password__back-icon:visited {
+    color: inherit; /* Use the inherited color */
+    text-decoration: none; /* Remove underline if present */
+  }
+
+  .forgot-password__back-text {
+    margin: auto 0;
+  }
+
+  .forgot-password__header {
+    margin-top: 30px;
+    max-width: 445px;
+    width: 100%;
+  }
+
+  .forgot-password__title {
+    color: #16151c;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .forgot-password__description {
+    color: #a2a1a8;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    margin: 5px 0 0;
+  }
+
+  .forgot-password__form {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 445px;
+    font-weight: 300;
+  }
+
+  .forgot-password__input-group {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 11px;
+    color: #006ec4;
+    line-height: 1;
+  }
+
+  .forgot-password__input-wrapper {
+    width: 100%;
+  }
+
+  .forgot-password__input {
+    width: 100%; /* Match input width */
+    padding: 15px; /* Reduce padding to make the input smaller */
+    font-size: 14px; /* Reduce font size to make the input smaller */
+    border: 1px solid #006ec4; /* Match border color */
+    border-radius: 8px; /* Maintain border radius */
+    box-sizing: border-box;
+    outline: none; /* Remove default outline */
+  }
+
+  .forgot-password__input:focus {
+    border-color: #006ec4; /* Ensure border color remains consistent on focus */
+    box-shadow: 0 0 5px rgba(0, 110, 196, 0.5); /* Add subtle shadow on focus */
+  }
+
+  .forgot-password__submit {
+    border-radius: 10px;
+    background-color: #006ec4;
+    margin-top: 30px;
+    min-height: 56px;
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 16px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+
+  .forgot-password__submit:focus {
+    outline: 2px solid #004a99;
+    outline-offset: 2px;
+  }
+
+  .forgot-password__submit:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 991px) {
+    .forgot-password {
+      padding: 20px;
+    }
+
+    .forgot-password__container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .forgot-password__left-column {
+      width: 100%;
+    }
+
+    .forgot-password__background {
+      margin-top: 40px;
+    }
+
+    .forgot-password__right-column {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .forgot-password__content {
+      margin-top: 40px;
+      max-width: 100%;
+    }
+
+    .forgot-password__back {
+      white-space: normal;
+    }
+
+    .forgot-password__title,
+    .forgot-password__description {
+      max-width: 100%;
+    }
+
+    .forgot-password__form {
+      max-width: 100%;
+    }
+
+    .forgot-password__input {
+      max-width: 100%;
+    }
+  }
+}
+
+.page-container {
+  display: flex;
+  width: 90%;
+  min-height: 100vh;
+  padding: 30px;
+  background-color: #fff;
+}
+
+.left-panel {
+  width: 60%; /* Match the width of other sections like .background-column */
+  height: 520px; /* Lower the height for better fit */
+  border-radius: 30px;
+  background-color: rgba(3, 136, 238, 0.111); /* Match the background color */
+  padding: 50px; /* Ensure consistent padding */
+  max-width: 100%; /* Allow it to scale responsively */
+  margin: 0 auto; /* Center the panel */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-wrapper {
+  margin-left: -10px; /* Reduced margin to move OTP section to the left */
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding-top: 100px; /* Move the OTP section up */
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #000; /* Set the color to black */
+}
+
+.back-button:hover,
+.back-button:focus {
+  color: #000; /* Ensure it stays black on hover and focus */
+}
+
+.back-button svg {
+  stroke: #000; /* Set the arrow icon color to black */
+}
+
+.back-text {
+  color: #16151c;
+  font-family: "Lexend", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 445px;
+}
+
+.title {
+  color: #16151c;
+  font-family: "Lexend", sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 40px;
+  margin: 0;
+}
+
+.description {
+  color: #a2a1a8;
+  font-family: "Lexend", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+.verification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%; /* Corrected invalid value to '100%' */
+}
+
+.otp-container {
+  display: flex;
+  gap: 10px; /* Reduced gap between OTP boxes */
+  justify-content: right;
+  align-items: right;
+  width: 100%;
+  padding: 0px; /* Add padding for better spacing */
+  margin-left: 0px; /* Further increased left margin to move it more to the right */
+}
+
+.otp-input {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  border: 1px solid #006ec4;
+  text-align: center;
+  font-family: "Lexend", sans-serif;
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.otp-input:hover,
+.otp-input:focus {
+  box-shadow: 0 0 15px rgba(0, 110, 196, 0.3);
+  border-color: #0086f0;
+  background: rgba(0, 110, 196, 0.05);
+  outline: none;
+}
+
+.verify-button {
+  height: 56px;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-family: "Lexend", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  cursor: pointer;
+  background-color: #006ec4;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 991px) {
+  .page-container {
+    max-width: 991px;
+    padding: 20px;
+  }
+
+  .left-panel {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    min-height: 500px;
+  }
+
+  .content-wrapper {
+    margin-left: 30px;
+    padding-top: 50px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    max-width: 640px;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .left-panel {
+    display: none;
+  }
+
+  .content-wrapper {
+    padding-top: 20px;
+    width: 100%;
+  }
+
+  .verification-form {
+    width: 100%;
+  }
+
+  .otp-container {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .otp-input {
+    width: calc((100% - 50px) / 6);
+  }
+}

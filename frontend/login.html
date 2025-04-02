@@ -2,8 +2,14 @@
 <html lang="en">
   <head>
     <title>Login - M.A.R.I.N</title>
-    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/login.css" />
     <script src="js/script.js" defer></script>
+    <style>
+      body {
+        font-family: Lexend, -apple-system, Roboto, Helvetica, sans-serif;
+        overflow: hidden;
+      }
+    </style>
   </head>
   <body>
     <main class="login">
@@ -34,7 +40,7 @@
                   <div class="input-group">
                     <input
                       type="email"
-                      placeholder="Enter email address"
+                      placeholder="Email Address"
                       class="form-input"
                       aria-label="Email address"
                       id="email-input"
@@ -45,7 +51,7 @@
                   <div class="input-group">
                     <input
                       type="password"
-                      placeholder="Enter password"
+                      placeholder="Password"
                       class="form-input"
                       aria-label="Password"
                       id="password-input"
@@ -71,7 +77,9 @@
                     <input type="checkbox" class="checkbox-input" />
                     <span class="checkbox-label">Remember Me</span>
                   </label>
-                  <a href="#" class="forgot-password">Forgot Password?</a>
+                  <a href="forgot-password.html" class="forgot-password"
+                    >Forgot Password?</a
+                  >
                 </div>
 
                 <button type="submit" class="login-button">Login</button>
