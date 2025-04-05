@@ -263,6 +263,10 @@ body {
   text-decoration: underline;
 }
 
+a {
+  text-decoration: none; /* Remove underline from all links */
+}
+
 @media (max-width: 991px) {
   .login {
     padding: 20px;
