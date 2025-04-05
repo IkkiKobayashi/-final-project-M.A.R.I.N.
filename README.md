@@ -23,7 +23,7 @@ This system helps businesses efficiently manage inventory and track sales perfor
 - **Automated Stock Updates**: Prevents shortages and overstocking.
 - **Report Generation**: Provides sales analysis and inventory insights.
 - **Product Organization**: Enables easy searching and retrieval.
-- **Data-Driven Decision Making**: Offers smart recommendations.
+
 
 ---
 
