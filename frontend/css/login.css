@@ -27,7 +27,7 @@ body {
 }
 
 .background-content {
-  max-height: none; /* Replaced invalid value with 'none' */
+  max-height: none;
   border-radius: 30px;
   background-color: rgba(3, 136, 238, 0.111);
   display: flex;
@@ -35,13 +35,11 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  width: 300px; /* Adjust width if necessary */
-  height: 30px; /* Adjust height to fit content */
+  width: 300px;
+  height: 30px;
   padding: 294px;
   max-width: 100%;
-  transform: translateX(
-    -10px
-  ); /* Reduce the left shift to keep it inside the viewport */
+  transform: translateX(-10px);
 }
 
 .form-column {
@@ -111,13 +109,13 @@ body {
 .login-form {
   margin-top: 30px;
   width: 100%;
-  max-width: 445px; /* Ensure consistent width for the form */
+  max-width: 445px;
   font-weight: 300;
 }
 
 .form-fields {
   display: flex;
-  width: 100%; /* Match the width of the login button */
+  width: 100%;
   flex-direction: column;
   gap: 20px;
 }
@@ -127,25 +125,23 @@ body {
   border-radius: 10px;
   border: 1px solid #006ec4;
   display: flex;
-  align-items: center; /* Align input and toggle button vertically */
-  width: 100%; /* Match the width of the login button */
-  padding: 0 16px; /* Adjust padding to avoid excessive height */
-  height: 56px; /* Set a fixed height for consistency */
-  box-sizing: border-box; /* Ensure padding is included in the width */
-  /* Removed animation and transition properties */
+  align-items: center;
+  width: 100%;
+  padding: 0 16px;
+  height: 56px;
+  box-sizing: border-box;
 }
 
 .form-input {
-  width: 100%; /* Ensure the input field spans the full width of the input group */
+  width: 100%;
   border: none;
   outline: none;
   font-size: 14px;
   background: transparent;
-  height: 100%; /* Ensure the input field fills the height of the container */
-  line-height: 1.5; /* Adjust line height for better text alignment */
-  padding: 0; /* Remove extra padding */
-  box-sizing: border-box; /* Include padding and border in the width/height */
-  /* Removed animation and transition properties */
+  height: 100%;
+  line-height: 1.5;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .toggle-password {
@@ -204,8 +200,8 @@ body {
   cursor: pointer;
   position: relative;
   display: flex;
-  align-items: center; /* Center content vertically */
-  justify-content: center; /* Center content horizontally */
+  align-items: center;
+  justify-content: center;
 }
 
 .checkbox-input:checked {
@@ -219,10 +215,9 @@ body {
   height: 12px;
   border: solid #fff;
   border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-  top: 50%; /* Center vertically */
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+  transform: translate(-50%, -50%) rotate(45deg);
+  top: 50%;
+  left: 50%;
 }
 
 .forgot-password {
@@ -233,7 +228,7 @@ body {
 }
 
 .login-button {
-  width: 100%; /* Match the width of the input fields */
+  width: 100%;
   border-radius: 10px;
   background-color: #006ec4;
   margin-top: 30px;
@@ -243,7 +238,7 @@ body {
   color: #fff;
   border: none;
   cursor: pointer;
-  box-sizing: border-box; /* Ensure padding is included in the width */
+  box-sizing: border-box;
 }
 
 .signup-text {
@@ -264,7 +259,7 @@ body {
 }
 
 a {
-  text-decoration: none; /* Remove underline from all links */
+  text-decoration: none;
 }
 
 @media (max-width: 991px) {
@@ -420,8 +415,8 @@ a {
 
   .forgot-password__back-icon:link,
   .forgot-password__back-icon:visited {
-    color: inherit; /* Use the inherited color */
-    text-decoration: none; /* Remove underline if present */
+    color: inherit;
+    text-decoration: none;
   }
 
   .forgot-password__back-text {
@@ -475,18 +470,18 @@ a {
   }
 
   .forgot-password__input {
-    width: 100%; /* Match input width */
-    padding: 15px; /* Reduce padding to make the input smaller */
-    font-size: 14px; /* Reduce font size to make the input smaller */
-    border: 1px solid #006ec4; /* Match border color */
-    border-radius: 8px; /* Maintain border radius */
+    width: 100%;
+    padding: 15px;
+    font-size: 14px;
+    border: 1px solid #006ec4;
+    border-radius: 8px;
     box-sizing: border-box;
-    outline: none; /* Remove default outline */
+    outline: none;
   }
 
   .forgot-password__input:focus {
-    border-color: #006ec4; /* Ensure border color remains consistent on focus */
-    box-shadow: 0 0 5px rgba(0, 110, 196, 0.5); /* Add subtle shadow on focus */
+    border-color: #006ec4;
+    box-shadow: 0 0 5px rgba(0, 110, 196, 0.5);
   }
 
   .forgot-password__submit {
@@ -570,13 +565,13 @@ a {
 }
 
 .left-panel {
-  width: 60%; /* Match the width of other sections like .background-column */
-  height: 520px; /* Lower the height for better fit */
+  width: 60%;
+  height: 520px;
   border-radius: 30px;
-  background-color: rgba(3, 136, 238, 0.111); /* Match the background color */
-  padding: 50px; /* Ensure consistent padding */
-  max-width: 100%; /* Allow it to scale responsively */
-  margin: 0 auto; /* Center the panel */
+  background-color: rgba(3, 136, 238, 0.111);
+  padding: 50px;
+  max-width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -584,22 +579,22 @@ a {
 }
 
 .content-wrapper {
-  margin-left: -10px; /* Reduced margin to move OTP section to the left */
+  margin-left: -10px;
   display: flex;
   flex-direction: column;
   gap: 30px;
-  padding-top: 100px; /* Move the OTP section up */
+  padding-top: 100px;
 }
 
 .back-button {
   display: flex;
-  align-items: center; /* Align arrow and text vertically */
-  gap: 5px; /* Adjust spacing between arrow and text */
+  align-items: center;
+  gap: 5px;
   cursor: pointer;
   background: none;
   border: none;
-  padding: 0; /* Remove extra padding */
-  margin-left: 0; /* Adjust this value to align with the red line */
+  padding: 0;
+  margin-left: 0;
   color: #000;
   font-size: 16px;
   font-weight: 500;
@@ -607,7 +602,7 @@ a {
 
 .back-button svg {
   stroke: #000;
-  vertical-align: middle; /* Ensure the arrow aligns with the text */
+  vertical-align: middle;
   transition: stroke 0.3s ease;
 }
 
@@ -620,7 +615,7 @@ a {
   font-family: "Lexend", sans-serif;
   font-size: 16px;
   font-weight: 400;
-  line-height: 1; /* Ensure proper alignment with the arrow */
+  line-height: 1;
 }
 
 .header-content {
@@ -652,17 +647,17 @@ a {
   display: flex;
   flex-direction: column;
   gap: 30px;
-  width: 100%; /* Corrected invalid value to '100%' */
+  width: 100%;
 }
 
 .otp-container {
   display: flex;
-  gap: 10px; /* Reduced gap between OTP boxes */
+  gap: 10px;
   justify-content: right;
   align-items: right;
   width: 100%;
-  padding: 0px; /* Add padding for better spacing */
-  margin-left: 0px; /* Further increased left margin to move it more to the right */
+  padding: 0px;
+  margin-left: 0px;
 }
 
 .otp-input {
