@@ -44,7 +44,7 @@ This system helps businesses efficiently manage inventory and track sales perfor
 
 ### 📝 Updates
 
-- **Phase 1 (Week 11)**:
+- **Phase 1 (Week 11)**: - 100% 🚩
 - **Phase 2 (Week 12)**:
 - **Phase 3 (Week 13)**:
 - **Phase 4 (Week 14)**:
