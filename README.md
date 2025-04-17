@@ -21,8 +21,8 @@ This system is designed to simplify inventory management by providing real-time 
 **Product Indexing**
   - Organized product listings with filters and search functionality to quickly locate items.
 
-- **Inventory Categorization**
-Groups products by type, status, and location for better tracking and organization.
+**Inventory Categorization**
+  - Groups products by type, status, and location for better tracking and organization.
 
 - **Automated Stock Updates**
 Real-time inventory adjustments based on product additions, removals, and changes.
