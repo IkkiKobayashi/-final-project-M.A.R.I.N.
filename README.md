@@ -24,29 +24,29 @@ This system is designed to simplify inventory management by providing real-time 
 **Inventory Categorization**
   - Groups products by type, status, and location for better tracking and organization.
 
-- **Automated Stock Updates**
-Real-time inventory adjustments based on product additions, removals, and changes.
+**Automated Stock Updates**
+  - Real-time inventory adjustments based on product additions, removals, and changes.
 
-Low Stock & Expiry Alerts
-Notifies users when stock falls below set thresholds or when items are near expiration.
+**Low Stock & Expiry Alerts**
+  - Notifies users when stock falls below set thresholds or when items are near expiration.
 
-Report Generation
-Provides downloadable inventory summaries, usage trends, and restocking recommendations.
+**Report Generation**
+  - Provides downloadable inventory summaries, usage trends, and restocking recommendations.
 
-Activity Logging
-Records all user actions (add/edit/delete) with timestamps for accountability and auditing.
+**Activity Logging**
+  - Records all user actions (add/edit/delete) with timestamps for accountability and auditing.
 
-Role-Based Access Control
-Assigns permissions based on user roles (Admin, Manager, Staff) to limit access and editing rights.
+**Role-Based Access Control**
+  - Assigns permissions based on user roles (Admin, Manager, Staff) to limit access and editing rights.
 
-Multi-Store Management
-Allows management of multiple stores, each with its own inventory, employees, and activity logs.
+**Multi-Store Management**
+  - Allows management of multiple stores, each with its own inventory, employees, and activity logs.
 
-Data Backup & Restore
-Enables secure backup and restoration of system data to prevent loss and support recovery.
+**Data Backup & Restore**
+  - Enables secure backup and restoration of system data to prevent loss and support recovery.
 
-User Profile & Settings
-Customizable user profiles, account settings, and app preferences such as dark mode and language.
+**User Profile & Settings**
+  - Customizable user profiles, account settings, and app preferences such as dark mode and language.
 
 ---
 
