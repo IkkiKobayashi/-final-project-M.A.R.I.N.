@@ -19,7 +19,7 @@ This system is designed to simplify inventory management by providing real-time 
 ### 📌 Features
 
 **Product Indexing**
-  -- Organized product listings with filters and search functionality to quickly locate items.
+  - Organized product listings with filters and search functionality to quickly locate items.
 
 **Inventory Categorization**
   - Groups products by type, status, and location for better tracking and organization.
