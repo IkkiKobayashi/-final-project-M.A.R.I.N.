@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.A.R.I.N - Dashboard</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="logo">M.A.R.I.N</h2>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="inventory.html">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html">
+                            <i class="fas fa-box"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="employees.html">
+                            <i class="fas fa-users"></i>
+                            <span>Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="activity-log.html">
+                            <i class="fas fa-history"></i>
+                            <span>Activity Log</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                        <div class="notification-dropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <a href="#">Mark all as read</a>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <i class="fas fa-exclamation-circle warning"></i>
+                                    <div class="notification-content">
+                                        <p>5 items are low in stock</p>
+                                        <span class="notification-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <i class="fas fa-exclamation-circle danger"></i>
+                                    <div class="notification-content">
+                                        <p>3 items have expired</p>
+                                        <span class="notification-time">3 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <i class="fas fa-user-plus success"></i>
+                                    <div class="notification-content">
+                                        <p>New employee added: John Doe</p>
+                                        <span class="notification-time">5 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="store-selector">
+                        <button id="store-selector-btn">
+                            <span id="current-store-name">Downtown Store</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="profile-dropdown">
+                        <button id="profile-dropdown-btn" class="profile-btn">
+                            <img src="https://via.placeholder.com/40" alt="Profile" class="profile-img">
+                            <span class="profile-name">Admin User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i> View Profile
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="login.html" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <h1>Dashboard</h1>
+                </div>
+                
+                <div class="dashboard-content">
+                    <!-- Store Info Header -->
+                    <div class="store-info">
+                        <h2 id="store-info-name">Downtown Store</h2>
+                        <p id="store-info-location">Main Street, Downtown</p>
+                    </div>
+                    
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="summary-details">
+                                <h3>Total Products</h3>
+                                <p class="summary-value">124</p>
+                            </div>
+                            <a href="products.html" class="summary-link">See more <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="summary-details">
+                                <h3>Current Inventory</h3>
+                                <p class="summary-value">1,568</p>
+                            </div>
+                            <a href="inventory.html" class="summary-link">See more <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="summary-details">
+                                <h3>Near Expiry</h3>
+                                <p class="summary-value">12</p>
+                            </div>
+                            <a href="inventory.html" class="summary-link">See more <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-icon danger">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="summary-details">
+                                <h3>Out of Stock</h3>
+                                <p class="summary-value">8</p>
+                            </div>
+                            <a href="inventory.html" class="summary-link">See more <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="summary-details">
+                                <h3>Total Employees</h3>
+                                <p class="summary-value">15</p>
+                            </div>
+                            <a href="employees.html" class="summary-link">See more <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Widgets -->
+                    <div class="dashboard-widgets">
+                        <!-- Inventory Alerts -->
+                        <div class="widget">
+                            <div class="widget-header">
+                                <h3>Inventory Alerts</h3>
+                                <a href="inventory.html" class="widget-link">View in Inventory</a>
+                            </div>
+                            <div class="widget-content">
+                                <div class="alert-list">
+                                    <div class="alert-item warning">
+                                        <div class="alert-icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="alert-details">
+                                            <h4>Near Expiry (within 7 days)</h4>
+                                            <p>Fresh Milk (12 units) - Expires in 3 days</p>
+                                            <p>Yogurt (24 units) - Expires in 5 days</p>
+                                            <p>Bread (8 units) - Expires in 2 days</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-item danger">
+                                        <div class="alert-icon">
+                                            <i class="fas fa-times-circle"></i>
+                                        </div>
+                                        <div class="alert-details">
+                                            <h4>Expired Items</h4>
+                                            <p>Cheese (5 units) - Expired 1 day ago</p>
+                                            <p>Juice (3 units) - Expired 2 days ago</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-item info">
+                                        <div class="alert-icon">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <div class="alert-details">
+                                            <h4>Low Stock Items</h4>
+                                            <p>Bottled Water (10 units) - Below threshold (20)</p>
+                                            <p>Rice (5 units) - Below threshold (15)</p>
+                                            <p>Sugar (3 units) - Below threshold (10)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <div class="widget">
+                            <div class="widget-header">
+                                <h3>Recent Activity</h3>
+                                <a href="activity-log.html" class="widget-link">View Full Log</a>
+                            </div>
+                            <div class="widget-content">
+                                <div class="activity-list">
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-plus-circle"></i>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p>Added new product: <strong>Organic Apples</strong></p>
+                                            <span class="activity-time">Today, 10:30 AM</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-edit"></i>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p>Updated inventory: <strong>Bottled Water</strong> (-20 units)</p>
+                                            <span class="activity-time">Today, 9:15 AM</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p>Added new employee: <strong>John Doe</strong></p>
+                                            <span class="activity-time">Yesterday, 3:45 PM</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p>Deleted product: <strong>Canned Soup</strong></p>
+                                            <span class="activity-time">Yesterday, 1:20 PM</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-edit"></i>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p>Updated product price: <strong>Whole Wheat Bread</strong> ($2.99 to $3.49)</p>
+                                            <span class="activity-time">Yesterday, 11:10 AM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Inventory Overview</h3>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="inventoryChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Products by Category</h3>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Access Buttons -->
+                    <div class="quick-access">
+                        <h3>Quick Access</h3>
+                        <div class="quick-access-buttons">
+                            <a href="products.html" class="quick-access-btn">
+                                <i class="fas fa-plus"></i>
+                                <span>Add Product</span>
+                            </a>
+                            <a href="employees.html" class="quick-access-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Add Employee</span>
+                            </a>
+                            <a href="inventory.html" class="quick-access-btn">
+                                <i class="fas fa-boxes"></i>
+                                <span>Manage Inventory</span>
+                            </a>
+                            <a href="#" class="quick-access-btn">
+                                <i class="fas fa-cog"></i>
+                                <span>Go to Settings</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>M.A.R.I.N</h3>
+                        <p>&copy; 2023 BSIT 2A - Bicol University Polangui</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">FAQs</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Team</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Legal</h3>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

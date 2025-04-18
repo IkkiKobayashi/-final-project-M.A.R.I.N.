@@ -1,114 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Login - M.A.R.I.N</title>
-    <link rel="stylesheet" href="css/login.css" />
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const passwordInput = document.getElementById("password-input");
-        const passwordToggleIcon = document.getElementById(
-          "password-toggle-icon"
-        );
-
-        const togglePasswordVisibility = () => {
-          if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            passwordToggleIcon.src = "img/Show pass.png"; // Change to "show" icon
-          } else {
-            passwordInput.type = "password";
-            passwordToggleIcon.src = "img/Hide pass.png"; // Change to "hide" icon
-          }
-        };
-
-        document
-          .querySelector(".toggle-password")
-          .addEventListener("click", togglePasswordVisibility);
-      });
-      [p];
-    </script>
-  </head>
-  <body>
-    <main class="login">
-      <div class="layout-container">
-        <section class="background-column">
-          <div class="background-content"></div>
-        </section>
-
-        <section class="form-column">
-          <div class="form-wrapper">
-            <header class="brand-header">
-              <img
-                src="img/MARIN Logo.png"
-                alt="Brand Logo"
-                class="brand-logo"
-              />
-              <h1 class="brand-name">M.A.R.I.N</h1>
-            </header>
-
-            <div class="login-content">
-              <div class="welcome-section">
-                <h2 class="welcome-title">Welcome</h2>
-                <p class="welcome-subtitle">Please login here</p>
-              </div>
-
-              <form class="login-form">
-                <div class="form-fields">
-                  <div class="input-group">
-                    <input
-                      type="email"
-                      placeholder="Email Address"
-                      class="form-input"
-                      aria-label="Email address"
-                      id="email-input"
-                      required
-                    />
-                  </div>
-
-                  <div class="input-group">
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      class="form-input"
-                      aria-label="Password"
-                      id="password-input"
-                      required
-                    />
-                    <button
-                      type="button"
-                      class="toggle-password"
-                      aria-label="Toggle password visibility"
-                    >
-                      <img
-                        src="img/Hide pass.png"
-                        alt=""
-                        class="toggle-icon"
-                        id="password-toggle-icon"
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                <div class="form-options">
-                  <label class="remember-me">
-                    <input type="checkbox" class="checkbox-input" />
-                    <span class="checkbox-label">Remember Me</span>
-                  </label>
-                  <a href="forgot-password.html" class="forgot-password"
-                    >Forgot Password?</a
-                  >
-                </div>
-
-                <button type="submit" class="login-button">Login</button>
-
-                <p class="signup-text">
-                  Don't have an account?
-                  <a href="signup.html" class="signup-link">Sign Up</a>
-                </p>
-              </form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.A.R.I.N - Login</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>M.A.R.I.N</h1>
+                <p>Inventory Management System</p>
             </div>
-          </div>
-        </section>
-      </div>
-    </main>
-  </body>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required>
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                </div>
+                <div class="remember-forgot">
+                    <div>
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/login.js"></script>
+</body>
 </html>

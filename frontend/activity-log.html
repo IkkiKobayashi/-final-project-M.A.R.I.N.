@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.A.R.I.N - Activity Log</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/activity-log.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="logo">M.A.R.I.N</h2>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="inventory.html">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html">
+                            <i class="fas fa-box"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="employees.html">
+                            <i class="fas fa-users"></i>
+                            <span>Employees</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="activity-log.html">
+                            <i class="fas fa-history"></i>
+                            <span>Activity Log</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search activities...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="store-selector">
+                        <button id="store-selector-btn">
+                            <span id="current-store-name">Downtown Store</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="profile-dropdown">
+                        <button id="profile-dropdown-btn" class="profile-btn">
+                            <img src="https://via.placeholder.com/40" alt="Profile" class="profile-img">
+                            <span class="profile-name">Admin User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i> View Profile
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="login.html" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Activity Log Content -->
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <h1>Activity Log</h1>
+                </div>
+                
+                <div class="activity-log-content">
+                    <!-- Activity Log Controls -->
+                    <div class="activity-log-controls">
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="user-filter">User:</label>
+                                <select id="user-filter">
+                                    <option value="all">All Users</option>
+                                    <option value="admin">Admin User</option>
+                                    <option value="john">John Doe</option>
+                                    <option value="jane">Jane Smith</option>
+                                    <option value="robert">Robert Johnson</option>
+                                    <option value="emily">Emily Davis</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="action-filter">Action:</label>
+                                <select id="action-filter">
+                                    <option value="all">All Actions</option>
+                                    <option value="add">Add</option>
+                                    <option value="edit">Edit</option>
+                                    <option value="delete">Delete</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="date-filter">Date:</label>
+                                <input type="date" id="date-filter">
+                            </div>
+                        </div>
+                        
+                        <button id="clear-filters-btn" class="clear-filters-btn">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    </div>
+                    
+                    <!-- Activity Log Table -->
+                    <div class="activity-log-table-container">
+                        <table class="activity-log-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">Today</span>
+                                            <span class="time">10:30 AM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Admin User</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag add">Added</span></td>
+                                    <td>Added new product: <strong>Organic Apples</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">Today</span>
+                                            <span class="time">9:15 AM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>John Doe</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag edit">Updated</span></td>
+                                    <td>Updated inventory: <strong>Bottled Water</strong> (-20 units)</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">Yesterday</span>
+                                            <span class="time">3:45 PM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Admin User</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag add">Added</span></td>
+                                    <td>Added new employee: <strong>John Doe</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">Yesterday</span>
+                                            <span class="time">1:20 PM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Jane Smith</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag delete">Deleted</span></td>
+                                    <td>Deleted product: <strong>Canned Soup</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">Yesterday</span>
+                                            <span class="time">11:10 AM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Emily Davis</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag edit">Updated</span></td>
+                                    <td>Updated product price: <strong>Whole Wheat Bread</strong> ($2.99 to $3.49)</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">2 days ago</span>
+                                            <span class="time">4:30 PM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Robert Johnson</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag add">Added</span></td>
+                                    <td>Added inventory: <strong>Fresh Milk</strong> (+50 units)</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">2 days ago</span>
+                                            <span class="time">2:15 PM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Admin User</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag edit">Updated</span></td>
+                                    <td>Updated employee role: <strong>Jane Smith</strong> (Staff to Manager)</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="timestamp">
+                                            <span class="date">3 days ago</span>
+                                            <span class="time">10:45 AM</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="https://via.placeholder.com/40" alt="User">
+                                            <span>Admin User</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="action-tag add">Added</span></td>
+                                    <td>Added new store: <strong>Mall Branch</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>M.A.R.I.N</h3>
+                        <p>&copy; 2023 BSIT 2A - Bicol University Polangui</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">FAQs</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Team</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Legal</h3>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/activity-log.js"></script>
+</body>
+</html>
