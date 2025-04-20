@@ -1,209 +1,355 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Sample store data (in a real app, this would come from a database)
-  let stores = [
-    { id: 1, name: "Downtown Store", location: "Main Street, Downtown" },
-    { id: 2, name: "Mall Branch", location: "Central Mall, 2nd Floor" },
-    { id: 3, name: "East Side Store", location: "East Boulevard, Suite 101" },
-  ]
+// Store Data Management
+let stores = [];
 
-  // DOM elements
-  const storesGrid = document.getElementById("stores-grid")
-  const addStoreBtn = document.getElementById("add-store-btn")
-  const addStoreModal = document.getElementById("add-store-modal")
-  const editStoreModal = document.getElementById("edit-store-modal")
-  const deleteConfirmModal = document.getElementById("delete-confirm-modal")
-  const addStoreForm = document.getElementById("add-store-form")
-  const editStoreForm = document.getElementById("edit-store-form")
-  const closeModalBtns = document.querySelectorAll(".close-modal")
-  const cancelDeleteBtn = document.getElementById("cancel-delete")
-  const confirmDeleteBtn = document.getElementById("confirm-delete")
+// DOM Elements
+const storeGrid = document.querySelector(".store-grid");
+const searchInput = document.querySelector(".search-box input");
+const filterButtons = document.querySelectorAll(".filter-btn");
+const addStoreBtn = document.querySelector(".add-store-btn");
+const emptyState = document.querySelector(".empty-state");
 
-  // Render stores
-  function renderStores() {
-    storesGrid.innerHTML = ""
+// Add Modal Elements
+const addModal = document.querySelector("#addStoreModal");
+const closeAddModalBtn = addModal.querySelector(".close-modal-btn");
+const addStoreForm = document.querySelector("#addStoreForm");
+const cancelAddStoreBtn = document.querySelector("#cancelAddStore");
+const submitAddStoreBtn = document.querySelector("#submitAddStore");
+const imageInput = document.querySelector("#storeImage");
+const imagePreview = document.querySelector("#imagePreview");
 
-    if (stores.length === 0) {
-      storesGrid.innerHTML = '<p class="no-stores">No stores found. Add your first store to get started.</p>'
-      return
+// Edit Modal Elements
+const editModal = document.querySelector("#editStoreModal");
+const closeEditModalBtn = editModal.querySelector(".close-modal-btn");
+const editStoreForm = document.querySelector("#editStoreForm");
+const cancelEditStoreBtn = document.querySelector("#cancelEditStore");
+const submitEditStoreBtn = document.querySelector("#submitEditStore");
+const editImageInput = document.querySelector("#editStoreImage");
+const editImagePreview = document.querySelector("#editImagePreview");
+
+// Current States
+let currentFilter = "all stores";
+let searchQuery = "";
+let selectedImage = null;
+let editingStoreId = null;
+
+// Utility Functions
+const formatTimeAgo = (date) => {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+  };
+
+  for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+    const interval = Math.floor(seconds / secondsInUnit);
+    if (interval >= 1) {
+      return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
     }
+  }
+  return "Just now";
+};
 
-    stores.forEach((store) => {
-      const storeCard = document.createElement("div")
-      storeCard.className = "store-card"
-      storeCard.innerHTML = `
-                <h3>${store.name}</h3>
-                <p><i class="fas fa-map-marker-alt"></i> ${store.location}</p>
-                <div class="store-options">
-                    <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
-                    <div class="options-dropdown">
-                        <div class="dropdown-item edit-store" data-id="${store.id}">
-                            <i class="fas fa-edit"></i> Edit
-                        </div>
-                        <div class="dropdown-item delete delete-store" data-id="${store.id}">
-                            <i class="fas fa-trash-alt"></i> Delete
-                        </div>
-                    </div>
+// Store Card Creation
+const createStoreCard = (store) => {
+  const card = document.createElement("div");
+  card.className = "store-card";
+  card.innerHTML = `
+        <div class="store-actions">
+            <button class="action-btn edit-btn" title="Edit Store" data-id="${
+              store.id
+            }">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete-btn" title="Delete Store" data-id="${
+              store.id
+            }">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+        <div class="store-status status-${store.status}">
+            <i class="fas fa-circle"></i>
+            ${store.status.charAt(0).toUpperCase() + store.status.slice(1)}
+        </div>
+        <img src="${store.image}" alt="${store.name}" class="store-image">
+        <div class="store-content">
+            <h3 class="store-title">${store.name}</h3>
+            <div class="store-details">
+                <div class="store-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${store.address}</span>
                 </div>
-            `
+                <div class="store-info">
+                    <i class="fas fa-user"></i>
+                    <span>${store.manager}</span>
+                </div>
+                <div class="store-info">
+                    <i class="fas fa-clock"></i>
+                    <span>Last updated: ${formatTimeAgo(
+                      store.lastUpdated
+                    )}</span>
+                </div>
+            </div>
+        </div>
+    `;
 
-      // Add click event to select store
-      storeCard.addEventListener("click", (e) => {
-        // Prevent triggering when clicking on options
-        if (!e.target.closest(".store-options")) {
-          selectStore(store)
-        }
-      })
-
-      storesGrid.appendChild(storeCard)
-    })
-
-    // Add event listeners for options buttons
-    document.querySelectorAll(".options-btn").forEach((btn) => {
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation()
-        const dropdown = this.nextElementSibling
-
-        // Close all other dropdowns
-        document.querySelectorAll(".options-dropdown.show").forEach((d) => {
-          if (d !== dropdown) d.classList.remove("show")
-        })
-
-        dropdown.classList.toggle("show")
-      })
-    })
-
-    // Add event listeners for edit and delete buttons
-    document.querySelectorAll(".edit-store").forEach((btn) => {
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation()
-        const storeId = Number.parseInt(this.getAttribute("data-id"))
-        openEditModal(storeId)
-      })
-    })
-
-    document.querySelectorAll(".delete-store").forEach((btn) => {
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation()
-        const storeId = Number.parseInt(this.getAttribute("data-id"))
-        openDeleteModal(storeId)
-      })
-    })
-  }
-
-  // Select store and redirect to dashboard
-  function selectStore(store) {
-    // In a real app, you might save the selected store ID in localStorage or a cookie
-    localStorage.setItem("selectedStore", JSON.stringify(store))
-    window.location.href = "dashboard.html"
-  }
-
-  // Open add store modal
-  addStoreBtn.addEventListener("click", () => {
-    addStoreModal.classList.add("show")
-  })
-
-  // Open edit store modal
-  function openEditModal(storeId) {
-    const store = stores.find((s) => s.id === storeId)
-    if (store) {
-      document.getElementById("edit-store-id").value = store.id
-      document.getElementById("edit-store-name").value = store.name
-      document.getElementById("edit-store-location").value = store.location
-      editStoreModal.classList.add("show")
+  // Add Event Listeners
+  card.addEventListener("click", (e) => {
+    if (!e.target.closest(".action-btn")) {
+      navigateToStore(store.id);
     }
+  });
+
+  const editBtn = card.querySelector(".edit-btn");
+  const deleteBtn = card.querySelector(".delete-btn");
+
+  editBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    editStore(store.id);
+  });
+
+  deleteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    deleteStore(store.id);
+  });
+
+  return card;
+};
+
+// Render Functions
+const renderStores = () => {
+  const filteredStores = stores.filter((store) => {
+    const matchesFilter =
+      currentFilter === "all stores" || store.status === currentFilter;
+    const matchesSearch =
+      store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.manager.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  storeGrid.innerHTML = "";
+
+  if (filteredStores.length === 0) {
+    emptyState.style.display = "block";
+    storeGrid.style.display = "none";
+  } else {
+    emptyState.style.display = "none";
+    storeGrid.style.display = "grid";
+    filteredStores.forEach((store) => {
+      storeGrid.appendChild(createStoreCard(store));
+    });
   }
+};
 
-  // Open delete confirmation modal
-  function openDeleteModal(storeId) {
-    document.getElementById("delete-store-id").value = storeId
-    deleteConfirmModal.classList.add("show")
+// Event Handlers
+const navigateToStore = (storeId) => {
+  // Navigate to store dashboard
+  console.log(`Navigating to store ${storeId}`);
+};
+
+const editStore = (storeId) => {
+  openEditModal(storeId);
+};
+
+const deleteStore = (storeId) => {
+  if (confirm("Are you sure you want to delete this store?")) {
+    stores = stores.filter((store) => store.id !== storeId);
+    renderStores();
   }
+};
 
-  // Close modals
-  closeModalBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      addStoreModal.classList.remove("show")
-      editStoreModal.classList.remove("show")
-      deleteConfirmModal.classList.remove("show")
-    })
-  })
+// Modal Functions
+const openAddModal = () => {
+  addModal.classList.add("active");
+  document.body.style.overflow = "hidden";
+};
 
-  // Cancel delete
-  cancelDeleteBtn.addEventListener("click", () => {
-    deleteConfirmModal.classList.remove("show")
-  })
+const closeAddModal = () => {
+  addModal.classList.remove("active");
+  document.body.style.overflow = "";
+  resetAddForm();
+};
 
-  // Add store form submission
-  addStoreForm.addEventListener("submit", (e) => {
-    e.preventDefault()
+const openEditModal = (storeId) => {
+  editingStoreId = storeId;
+  const store = stores.find((s) => s.id === storeId);
+  if (!store) return;
 
-    const name = document.getElementById("store-name").value
-    const location = document.getElementById("store-location").value
+  // Populate form fields
+  editStoreForm.elements.storeId.value = store.id;
+  editStoreForm.elements.storeName.value = store.name;
+  editStoreForm.elements.storeAddress.value = store.address;
+  editStoreForm.elements.storeManager.value = store.manager;
+  editStoreForm.elements.storeStatus.value = store.status;
 
-    // Generate a new ID (in a real app, this would be handled by the backend)
-    const newId = stores.length > 0 ? Math.max(...stores.map((s) => s.id)) + 1 : 1
+  // Show current image
+  editImagePreview.innerHTML = `<img src="${store.image}" alt="${store.name}">`;
+  selectedImage = store.image;
 
-    stores.push({
-      id: newId,
-      name: name,
-      location: location,
-    })
+  editModal.classList.add("active");
+  document.body.style.overflow = "hidden";
+};
 
-    // Reset form and close modal
-    addStoreForm.reset()
-    addStoreModal.classList.remove("show")
+const closeEditModal = () => {
+  editModal.classList.remove("active");
+  document.body.style.overflow = "";
+  resetEditForm();
+};
 
-    // Re-render stores
-    renderStores()
-  })
+const resetAddForm = () => {
+  addStoreForm.reset();
+  imagePreview.innerHTML = `
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Click to upload image</span>
+    `;
+  selectedImage = null;
+};
 
-  // Edit store form submission
-  editStoreForm.addEventListener("submit", (e) => {
-    e.preventDefault()
+const resetEditForm = () => {
+  editStoreForm.reset();
+  editImagePreview.innerHTML = `
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Click to upload new image</span>
+    `;
+  selectedImage = null;
+  editingStoreId = null;
+};
 
-    const id = Number.parseInt(document.getElementById("edit-store-id").value)
-    const name = document.getElementById("edit-store-name").value
-    const location = document.getElementById("edit-store-location").value
+// Image Preview Handlers
+const handleImageUpload = (e, previewElement) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImage = e.target.result;
+      previewElement.innerHTML = `<img src="${selectedImage}" alt="Store Preview">`;
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
-    // Update store
-    const storeIndex = stores.findIndex((s) => s.id === id)
-    if (storeIndex !== -1) {
-      stores[storeIndex] = {
-        ...stores[storeIndex],
-        name: name,
-        location: location,
-      }
+// Form Submission Handlers
+const handleAddStore = (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(addStoreForm);
+  const newStore = {
+    id: Date.now(),
+    name: formData.get("storeName"),
+    address: formData.get("storeAddress"),
+    manager: formData.get("storeManager"),
+    status: formData.get("storeStatus"),
+    lastUpdated: new Date(),
+    image: selectedImage || "https://via.placeholder.com/400x200",
+  };
+
+  stores.unshift(newStore);
+  closeAddModal();
+  renderStores();
+  showNotification("Store added successfully!");
+};
+
+const handleEditStore = (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(editStoreForm);
+  const updatedStore = {
+    id: parseInt(formData.get("storeId")),
+    name: formData.get("storeName"),
+    address: formData.get("storeAddress"),
+    manager: formData.get("storeManager"),
+    status: formData.get("storeStatus"),
+    lastUpdated: new Date(),
+    image: selectedImage || stores.find((s) => s.id === editingStoreId).image,
+  };
+
+  // Update store in array
+  stores = stores.map((store) =>
+    store.id === updatedStore.id ? updatedStore : store
+  );
+
+  closeEditModal();
+  renderStores();
+  showNotification("Store updated successfully!");
+};
+
+// Notification Function
+const showNotification = (message) => {
+  const notification = document.createElement("div");
+  notification.className = "notification";
+  notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+    `;
+  document.body.appendChild(notification);
+
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+};
+
+// Event Listeners
+searchInput.addEventListener("input", (e) => {
+  searchQuery = e.target.value;
+  renderStores();
+});
+
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    filterButtons.forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+    currentFilter = button.textContent.trim().toLowerCase();
+    renderStores();
+  });
+});
+
+// Add Modal Event Listeners
+addStoreBtn.addEventListener("click", openAddModal);
+closeAddModalBtn.addEventListener("click", closeAddModal);
+cancelAddStoreBtn.addEventListener("click", closeAddModal);
+imageInput.addEventListener("change", (e) =>
+  handleImageUpload(e, imagePreview)
+);
+addStoreForm.addEventListener("submit", handleAddStore);
+submitAddStoreBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (addStoreForm.checkValidity()) {
+    handleAddStore(e);
+  } else {
+    addStoreForm.reportValidity();
+  }
+});
+
+// Edit Modal Event Listeners
+closeEditModalBtn.addEventListener("click", closeEditModal);
+cancelEditStoreBtn.addEventListener("click", closeEditModal);
+editImageInput.addEventListener("change", (e) =>
+  handleImageUpload(e, editImagePreview)
+);
+editStoreForm.addEventListener("submit", handleEditStore);
+submitEditStoreBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (editStoreForm.checkValidity()) {
+    handleEditStore(e);
+  } else {
+    editStoreForm.reportValidity();
+  }
+});
+
+// Close modals when clicking outside
+[addModal, editModal].forEach((modal) => {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.classList.contains("active") &&
+        (modal === addModal ? closeAddModal() : closeEditModal());
     }
+  });
+});
 
-    // Reset form and close modal
-    editStoreForm.reset()
-    editStoreModal.classList.remove("show")
-
-    // Re-render stores
-    renderStores()
-  })
-
-  // Confirm delete
-  confirmDeleteBtn.addEventListener("click", () => {
-    const storeId = Number.parseInt(document.getElementById("delete-store-id").value)
-
-    // Remove store
-    stores = stores.filter((s) => s.id !== storeId)
-
-    // Close modal
-    deleteConfirmModal.classList.remove("show")
-
-    // Re-render stores
-    renderStores()
-  })
-
-  // Close dropdowns when clicking outside
-  document.addEventListener("click", () => {
-    document.querySelectorAll(".options-dropdown.show").forEach((dropdown) => {
-      dropdown.classList.remove("show")
-    })
-  })
-
-  // Initial render
-  renderStores()
-})
+// Initial Render
+renderStores();

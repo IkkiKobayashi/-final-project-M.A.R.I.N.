@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M.A.R.I.N</title>
+    <link rel="stylesheet" href="css/layout.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>M.A.R.I.N</h1>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="products.html" class="nav-link">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Products</span>
+              </a>
+            </li>
+            <li>
+              <a href="employees.html" class="nav-link">
+                <i class="fas fa-users"></i>
+                <span>Employees</span>
+              </a>
+            </li>
+            <li>
+              <a href="activity-log.html" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>Activity Log</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="search-container">
+            <div class="search-wrapper">
+              <select class="search-category">
+                <option value="products">Products</option>
+                <option value="inventory">Inventory</option>
+                <option value="employees">Employees</option>
+              </select>
+              <input type="text" class="search-input" placeholder="Search..." />
+              <button class="search-button">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="notification-btn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+              <div class="notification-dropdown">
+                <div class="notification-header">
+                  <h3>Recent Activity</h3>
+                </div>
+                <div class="activity-list">
+                  <!-- Activities will be dynamically added here -->
+                </div>
+                <div class="notification-footer">
+                  <a href="activity-log.html" class="see-all-btn">See All</a>
+                </div>
+              </div>
+            </button>
+            <button class="manage-store-btn">
+              <i class="fas fa-store"></i>
+              <span>Manage Store</span>
+            </button>
+            <div class="profile-dropdown">
+              <button class="profile-btn">
+                <img
+                  src="assets/profile-placeholder.jpg"
+                  alt="Profile"
+                  class="profile-img"
+                />
+                <span>Admin</span>
+              </button>
+              <div class="dropdown-menu">
+                <a href="profile.html" class="dropdown-item">
+                  <i class="fas fa-user"></i>
+                  <span>View Profile</span>
+                </a>
+                <a href="settings.html" class="dropdown-item">
+                  <i class="fas fa-cog"></i>
+                  <span>Settings</span>
+                </a>
+                <a href="login.html" class="dropdown-item">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Logout</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="content-wrapper">
+          <!-- Page content will be loaded here -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="footer-content">
+            <div class="footer-section logo-section">
+              <h2>M.A.R.I.N</h2>
+              <p>Management & Analytics Resource Inventory Network</p>
+              <p class="copyright">
+                &copy; 2024 M.A.R.I.N. All rights reserved.
+              </p>
+            </div>
+
+            <div class="footer-section support-section">
+              <h3>Support</h3>
+              <ul>
+                <li><a href="help-center.html">Help Center</a></li>
+                <li><a href="faq.html">FAQs</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section company-section">
+              <h3>Company</h3>
+              <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="team.html">Our Team</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section legal-section">
+              <h3>Legal</h3>
+              <ul>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="terms-of-service.html">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script src="js/layout.js"></script>
+  </body>
+</html>

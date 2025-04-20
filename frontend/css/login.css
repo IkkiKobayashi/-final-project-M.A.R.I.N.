@@ -1,30 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #1e40af;
+  --text-color: #1f2937;
+  --light-gray: #f3f4f6;
+  --border-color: #e5e7eb;
+  --error-color: #dc2626;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-
-:root {
-  --primary-color: #3a7bd5;
-  --secondary-color: #00d2ff;
-  --dark-color: #333;
-  --light-color: #f4f7fc;
-  --danger-color: #ff6b6b;
-  --success-color: #51cf66;
-  --warning-color: #fcc419;
-  --text-color: #333;
-  --border-color: #e1e5eb;
 }
 
 body {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-color);
 }
 
 .login-container {
@@ -33,112 +29,92 @@ body {
   padding: 20px;
 }
 
-.login-card {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+.login-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.login-header {
+.logo {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 2rem;
 }
 
-.login-header h1 {
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 600;
   color: var(--primary-color);
-  font-size: 32px;
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
 }
 
-.login-header p {
-  color: var(--text-color);
-  opacity: 0.7;
+.logo p {
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
-.input-group {
-  margin-bottom: 20px;
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 8px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-color);
 }
 
-.input-with-icon {
-  position: relative;
-}
-
-.input-with-icon i {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-}
-
-.input-with-icon .toggle-password {
-  left: auto;
-  right: 15px;
-  cursor: pointer;
-}
-
-.input-with-icon input {
-  width: 100%;
-  padding: 12px 15px 12px 40px;
+.form-group input {
+  padding: 0.75rem;
   border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 14px;
-  transition: border-color 0.3s;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
-.input-with-icon input:focus {
-  border-color: var(--primary-color);
+.form-group input:focus {
   outline: none;
-}
-
-.remember-forgot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.remember-forgot input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-.forgot-password {
-  color: var(--primary-color);
-  text-decoration: none;
-}
-
-.forgot-password:hover {
-  text-decoration: underline;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .login-btn {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border: none;
-  border-radius: 5px;
+  background-color: var(--primary-color);
   color: white;
-  font-weight: 600;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: background-color 0.2s;
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background-color: var(--secondary-color);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
 }
 
 @media (max-width: 480px) {
-  .login-card {
-    padding: 30px 20px;
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-box {
+    padding: 1.5rem;
   }
 }

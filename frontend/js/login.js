@@ -1,33 +1,49 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("login-form")
-  const togglePassword = document.querySelector(".toggle-password")
-  const passwordInput = document.getElementById("password")
+  const loginForm = document.getElementById("loginForm");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
 
-  // Toggle password visibility
-  togglePassword.addEventListener("click", function () {
-    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password"
-    passwordInput.setAttribute("type", type)
-    this.classList.toggle("fa-eye")
-    this.classList.toggle("fa-eye-slash")
-  })
+  // Create error message elements
+  const usernameError = document.createElement("div");
+  usernameError.className = "error-message";
+  usernameInput.parentNode.appendChild(usernameError);
+
+  const passwordError = document.createElement("div");
+  passwordError.className = "error-message";
+  passwordInput.parentNode.appendChild(passwordError);
+
+  // Input validation
+  function validateInput(input, errorElement, minLength = 3) {
+    const value = input.value.trim();
+    if (value.length < minLength) {
+      errorElement.textContent = `Must be at least ${minLength} characters`;
+      errorElement.style.display = "block";
+      return false;
+    }
+    errorElement.style.display = "none";
+    return true;
+  }
 
   // Form submission
   loginForm.addEventListener("submit", (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const username = document.getElementById("username").value
-    const password = document.getElementById("password").value
+    const isUsernameValid = validateInput(usernameInput, usernameError);
+    const isPasswordValid = validateInput(passwordInput, passwordError);
 
-    // Client-side validation
-    if (!username || !password) {
-      alert("Please enter both username and password")
-      return
+    if (isUsernameValid && isPasswordValid) {
+      // Simulate successful login
+      // In a real application, this would make an API call
+      window.location.href = "store-selection.html";
     }
+  });
 
-    // Simulate login (in a real app, this would be an API call)
-    console.log("Login attempt:", { username, password })
+  // Real-time validation
+  usernameInput.addEventListener("input", () => {
+    validateInput(usernameInput, usernameError);
+  });
 
-    // Redirect to store selection page after successful login
-    window.location.href = "store-selection.html"
-  })
-})
+  passwordInput.addEventListener("input", () => {
+    validateInput(passwordInput, passwordError);
+  });
+});
