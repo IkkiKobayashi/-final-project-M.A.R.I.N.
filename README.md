@@ -45,9 +45,6 @@ This system is designed to simplify inventory management by providing real-time 
 **Data Backup & Restore**
   - Enables secure backup and restoration of system data to prevent loss and support recovery.
 
-**User Profile & Settings**
-  - Customizable user profiles, account settings, and app preferences such as dark mode and language.
-
 ---
 
 ## 👥 Members
