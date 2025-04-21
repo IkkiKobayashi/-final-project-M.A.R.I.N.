@@ -147,8 +147,20 @@ const renderStores = () => {
 
 // Event Handlers
 const navigateToStore = (storeId) => {
-  // Navigate to store dashboard
-  console.log(`Navigating to store ${storeId}`);
+  const store = stores.find((s) => s.id === storeId);
+  if (store) {
+    // Store the selected store information in localStorage
+    localStorage.setItem(
+      "selectedStore",
+      JSON.stringify({
+        id: store.id,
+        name: store.name,
+        address: store.address,
+      })
+    );
+    // Redirect to dashboard
+    window.location.href = "dashboard.html";
+  }
 };
 
 const editStore = (storeId) => {

@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>M.A.R.I.N</title>
+    <title>Dashboard - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -29,7 +30,7 @@
         <nav class="sidebar-nav">
           <ul>
             <li>
-              <a href="dashboard.html" class="nav-link">
+              <a href="dashboard.html" class="nav-link active">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
               </a>
@@ -129,7 +130,90 @@
 
         <!-- Page Content -->
         <div class="content-wrapper">
-          <!-- Page content will be loaded here -->
+          <!-- Dashboard Content -->
+          <div class="dashboard-container">
+            <!-- Store Info Header -->
+            <div class="store-info">
+              <h1>Store Name</h1>
+              <p class="store-location">Location: Store Address</p>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+              <div class="card">
+                <i class="fas fa-box"></i>
+                <div class="card-content">
+                  <h3>Total Products</h3>
+                  <p class="count">0</p>
+                </div>
+              </div>
+              <div class="card">
+                <i class="fas fa-warehouse"></i>
+                <div class="card-content">
+                  <h3>Current Inventory</h3>
+                  <p class="count">0</p>
+                </div>
+              </div>
+              <div class="card">
+                <i class="fas fa-clock"></i>
+                <div class="card-content">
+                  <h3>Items Near Expiry</h3>
+                  <p class="count">0</p>
+                </div>
+              </div>
+              <div class="card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="card-content">
+                  <h3>Out of Stock</h3>
+                  <p class="count">0</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory Alerts -->
+            <div class="inventory-alerts">
+              <h2>Inventory Alerts</h2>
+              <div class="alerts-container">
+                <!-- Alerts will be populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+              <h2>Recent Activity</h2>
+              <div class="activity-feed">
+                <!-- Activity items will be populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Quick Access Buttons -->
+            <div class="quick-access">
+              <h2>Quick Access</h2>
+              <div class="quick-access-buttons">
+                <button
+                  class="quick-btn"
+                  onclick="location.href='products.html'"
+                >
+                  <i class="fas fa-box"></i>
+                  <span>Manage Products</span>
+                </button>
+                <button
+                  class="quick-btn"
+                  onclick="location.href='inventory.html'"
+                >
+                  <i class="fas fa-warehouse"></i>
+                  <span>View Inventory</span>
+                </button>
+                <button
+                  class="quick-btn"
+                  onclick="location.href='employees.html'"
+                >
+                  <i class="fas fa-users"></i>
+                  <span>Manage Employees</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Footer -->
@@ -170,6 +254,8 @@
         </footer>
       </main>
     </div>
+
     <script src="js/layout.js"></script>
+    <script src="js/dashboard.js"></script>
   </body>
 </html>
