@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>M.A.R.I.N</title>
+    <title>Products - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/products.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -41,7 +42,7 @@
               </a>
             </li>
             <li>
-              <a href="products.html" class="nav-link">
+              <a href="products.html" class="nav-link active">
                 <i class="fas fa-shopping-bag"></i>
                 <span>Products</span>
               </a>
@@ -68,12 +69,11 @@
         <header class="header">
           <div class="search-container">
             <div class="search-wrapper">
-              <select class="search-category">
-                <option value="products">Products</option>
-                <option value="inventory">Inventory</option>
-                <option value="employees">Employees</option>
-              </select>
-              <input type="text" class="search-input" placeholder="Search..." />
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search products..."
+              />
               <button class="search-button">
                 <i class="fas fa-search"></i>
               </button>
@@ -117,7 +117,115 @@
 
         <!-- Page Content -->
         <div class="content-wrapper">
-          <!-- Page content will be loaded here -->
+          <div class="products-container">
+            <!-- View Toggle and Add Button -->
+            <div class="products-header">
+              <div class="view-toggle">
+                <button class="toggle-btn active" data-view="grid">
+                  <i class="fas fa-th-large"></i>
+                  Grid
+                </button>
+                <button class="toggle-btn" data-view="list">
+                  <i class="fas fa-list"></i>
+                  List
+                </button>
+              </div>
+              <button class="add-product-btn" id="addProductBtn">
+                <i class="fas fa-plus"></i>
+                Add New Product
+              </button>
+            </div>
+
+            <!-- Products Grid/List -->
+            <div class="products-view grid-view" id="productsView">
+              <!-- Products will be added here dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div class="modal" id="productModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 id="modalTitle">Add New Product</h2>
+              <button class="close-modal-btn" id="closeModalBtn">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="productForm">
+                <input type="hidden" id="productId" />
+                <div class="form-group">
+                  <label for="productName">Product Name</label>
+                  <input
+                    type="text"
+                    id="productName"
+                    name="productName"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="productPrice">Price (₱)</label>
+                  <input
+                    type="number"
+                    id="productPrice"
+                    name="productPrice"
+                    step="0.01"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="productQuantity">Quantity</label>
+                  <input
+                    type="number"
+                    id="productQuantity"
+                    name="productQuantity"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="productExpiry">Expiry Date</label>
+                  <input
+                    type="date"
+                    id="productExpiry"
+                    name="productExpiry"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="productType">Product Type</label>
+                  <select id="productType" name="productType" required>
+                    <option value="">Select Type</option>
+                    <option value="food">Food</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="household">Household</option>
+                    <option value="personal-care">Personal Care</option>
+                  </select>
+                  <div id="typeIndicator" class="type-indicator"></div>
+                </div>
+                <div class="form-group">
+                  <label for="productImage">Product Image</label>
+                  <div class="image-upload">
+                    <div class="upload-preview" id="imagePreview">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <span>Click to upload image</span>
+                    </div>
+                    <input
+                      type="file"
+                      id="productImage"
+                      name="productImage"
+                      accept="image/*"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-actions">
+              <button class="cancel-btn" id="cancelBtn">Cancel</button>
+              <button class="submit-btn" id="submitBtn">Save Product</button>
+            </div>
+          </div>
         </div>
 
         <!-- Footer -->
@@ -158,7 +266,9 @@
         </footer>
       </main>
     </div>
+
     <script src="js/layout.js"></script>
+    <script src="js/products.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));

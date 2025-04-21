@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>M.A.R.I.N</title>
+    <title>Inventory - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/inventory.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -35,7 +36,7 @@
               </a>
             </li>
             <li>
-              <a href="inventory.html" class="nav-link">
+              <a href="inventory.html" class="nav-link active">
                 <i class="fas fa-boxes"></i>
                 <span>Inventory</span>
               </a>
@@ -68,12 +69,11 @@
         <header class="header">
           <div class="search-container">
             <div class="search-wrapper">
-              <select class="search-category">
-                <option value="products">Products</option>
-                <option value="inventory">Inventory</option>
-                <option value="employees">Employees</option>
-              </select>
-              <input type="text" class="search-input" placeholder="Search..." />
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search products..."
+              />
               <button class="search-button">
                 <i class="fas fa-search"></i>
               </button>
@@ -117,7 +117,30 @@
 
         <!-- Page Content -->
         <div class="content-wrapper">
-          <!-- Page content will be loaded here -->
+          <div class="inventory-container">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+              <button class="toggle-btn active" data-view="grid">
+                <i class="fas fa-th-large"></i>
+                Grid
+              </button>
+              <button class="toggle-btn" data-view="list">
+                <i class="fas fa-list"></i>
+                List
+              </button>
+            </div>
+
+            <!-- Inventory Grid/List -->
+            <div class="inventory-view grid-view">
+              <!-- Add Product Button -->
+              <div class="inventory-item add-product">
+                <a href="products.html">
+                  <i class="fas fa-plus"></i>
+                  <span>Add Product</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Footer -->
@@ -158,7 +181,9 @@
         </footer>
       </main>
     </div>
+
     <script src="js/layout.js"></script>
+    <script src="js/inventory.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));

@@ -82,22 +82,10 @@
           </div>
 
           <div class="header-actions">
-            <button class="notification-btn">
-              <i class="fas fa-bell"></i>
-              <span class="notification-badge">3</span>
-              <div class="notification-dropdown">
-                <div class="notification-header">
-                  <h3>Recent Activity</h3>
-                </div>
-                <div class="activity-list">
-                  <!-- Activities will be dynamically added here -->
-                </div>
-                <div class="notification-footer">
-                  <a href="activity-log.html" class="see-all-btn">See All</a>
-                </div>
-              </div>
-            </button>
-            <button class="manage-store-btn">
+            <button
+              class="manage-store-btn"
+              onclick="window.location.href='store-selection.html'"
+            >
               <i class="fas fa-store"></i>
               <span>Manage Store</span>
             </button>
@@ -134,8 +122,10 @@
           <div class="dashboard-container">
             <!-- Store Info Header -->
             <div class="store-info">
-              <h1>Store Name</h1>
-              <p class="store-location">Location: Store Address</p>
+              <h1 class="store-name">Store Name</h1>
+              <p class="store-location">
+                Location: <span class="store-address">Store Address</span>
+              </p>
             </div>
 
             <!-- Summary Cards -->
@@ -227,27 +217,27 @@
               </p>
             </div>
 
-            <div class="footer-section support-section">
+            <div class="footer-section">
               <h3>Support</h3>
               <ul>
-                <li><a href="help-center.html">Help Center</a></li>
-                <li><a href="faq.html">FAQs</a></li>
+                <li><a href="support.html">User Guide</a></li>
+                <li><a href="support.html">FAQs</a></li>
               </ul>
             </div>
 
-            <div class="footer-section company-section">
+            <div class="footer-section">
               <h3>Company</h3>
               <ul>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="team.html">Our Team</a></li>
+                <li><a href="company.html">About Us</a></li>
+                <li><a href="company.html">Our Team</a></li>
               </ul>
             </div>
 
-            <div class="footer-section legal-section">
+            <div class="footer-section">
               <h3>Legal</h3>
               <ul>
-                <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="terms-of-service.html">Terms of Service</a></li>
+                <li><a href="legal.html">Privacy Policy</a></li>
+                <li><a href="legal.html">Terms of Service</a></li>
               </ul>
             </div>
           </div>
@@ -257,5 +247,15 @@
 
     <script src="js/layout.js"></script>
     <script src="js/dashboard.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+        if (storeInfo) {
+          document.querySelector(".store-name").textContent = storeInfo.name;
+          document.querySelector(".store-address").textContent =
+            storeInfo.address;
+        }
+      });
+    </script>
   </body>
 </html>

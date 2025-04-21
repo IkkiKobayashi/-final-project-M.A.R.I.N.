@@ -6,21 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Function to initialize dashboard data
 function initializeDashboard() {
-  // Get store information from localStorage
-  const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
-
-  if (storeInfo) {
-    // Update store information in the UI
-    document.querySelector(".store-info h1").textContent = storeInfo.name;
-    document.querySelector(
-      ".store-location"
-    ).textContent = `Location: ${storeInfo.address}`;
-  } else {
-    // If no store is selected, redirect back to store selection
-    window.location.href = "store-selection.html";
-    return;
-  }
-
   // In a real application, this would fetch data from an API
   // For now, we'll use sample data
   const sampleData = {

@@ -149,16 +149,12 @@ const renderStores = () => {
 const navigateToStore = (storeId) => {
   const store = stores.find((s) => s.id === storeId);
   if (store) {
-    // Store the selected store information in localStorage
-    localStorage.setItem(
-      "selectedStore",
-      JSON.stringify({
-        id: store.id,
-        name: store.name,
-        address: store.address,
-      })
-    );
-    // Redirect to dashboard
+    const storeData = {
+      id: store.id,
+      name: store.name,
+      address: store.address,
+    };
+    localStorage.setItem("selectedStore", JSON.stringify(storeData));
     window.location.href = "dashboard.html";
   }
 };

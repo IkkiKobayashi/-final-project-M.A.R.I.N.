@@ -1,32 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MARIN - Support Center</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/info-pages.css">
-</head>
-<body>
-  <header class="info-page-header">
-    <div class="container">
-      <div class="d-flex align-items-center py-3">
-        <img src="img/MARIN Logo.png" alt="MARIN Logo" class="logo" style="width: 90px; height: 90px; margin-right: -10px;">
-        <h1 class="m-0">M.A.R.I.N</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARIN - Support Center</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/info-pages.css" />
+  </head>
+  <body>
+    <header class="info-page-header">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <img
+            src="img/store logo/Marin LOGO.png"
+            alt="MARIN Logo"
+            class="logo"
+          />
+          <h1>M.A.R.I.N</h1>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="container py-5">
-    <div class="support-section">
-      <div class="text-center mb-5">
-        <h1 class="display-4 mb-3">Support Center</h1>
-        <p class="lead">Find answers and get help with our inventory management system</p>
+    <main class="container">
+      <div class="section-title">
+        <h1>Support Center</h1>
+        <p>
+          Get help with M.A.R.I.N's inventory management system. Find answers to
+          common questions, learn how to use our features, and get in touch with
+          our support team.
+        </p>
       </div>
 
       <div class="row">
-        <div class="col-lg-12 mb-5">
-          <div class="card mb-5">
+        <div class="col-lg-12">
+          <!-- User Guide Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                  <i class="bi bi-journal-bookmark text-primary fs-3"></i>
+                </div>
+                <h2 class="mb-0">User Guide</h2>
+              </div>
+
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="guide-card">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                        <i class="bi bi-box-seam text-primary fs-4"></i>
+                      </div>
+                      <h3>Getting Started</h3>
+                    </div>
+                    <p>
+                      Begin by setting up your account and configuring your
+                      store settings. Add your products, set up categories, and
+                      define your inventory thresholds. The dashboard provides a
+                      comprehensive overview of your operations.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="guide-card">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                        <i class="bi bi-funnel text-primary fs-4"></i>
+                      </div>
+                      <h3>Inventory Management</h3>
+                    </div>
+                    <p>
+                      Inventory data is displayed in real-time, with each
+                      product tagged by expiration status: Fresh, Near
+                      Expiration, or Expired. The Inventory section is read-only
+                      and synced with product entries. Quantity adjustments and
+                      stock updates are handled via the Products page. Automatic
+                      alerts are triggered for low or expiring items.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="guide-card">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                        <i class="bi bi-graph-up text-primary fs-4"></i>
+                      </div>
+                      <h3>Activity & Insights</h3>
+                    </div>
+                    <p>
+                      The Dashboard offers at a glance summaries of key
+                      operational metrics, including total products, active
+                      inventory, and employee distribution. The Activity Log
+                      captures and timestamps all system actions such as add,
+                      edit, and delete events per store, filtered by user or
+                      date, enabling full traceability and monitoring.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="guide-card">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                        <i class="bi bi-people text-primary fs-4"></i>
+                      </div>
+                      <h3>Team Management</h3>
+                    </div>
+                    <p>
+                      Employee accounts are created and managed through the
+                      Employees page. Roles include Admin, Manager, and Staff,
+                      each with specific access levels. Profiles include contact
+                      details, department, and role assignments, with optional
+                      profile images. All user actions are automatically logged
+                      in the activity history.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ Section -->
+          <div class="card">
             <div class="card-body">
               <div class="d-flex align-items-center mb-4">
                 <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
@@ -37,192 +140,148 @@
               <div class="accordion" id="faqAccordion">
                 <div class="accordion-item">
                   <h3 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                      What is M.A.R.I.N and what does it do?
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faq1"
+                    >
+                      What is M.A.R.I.N and how can it help my business?
                     </button>
                   </h3>
                   <div id="faq1" class="accordion-collapse collapse show">
                     <div class="accordion-body">
-                      M.A.R.I.N stands for Management & Automation for Resourceful Inventory Navigation. It is a web-based inventory management and sales tracking system designed to help businesses streamline operations. The platform features tools for sorting inventory, automating stock updates, generating reports, and analyzing sales performance. M.A.R.I.N reduces human error, improves efficiency, and provides business owners with the insights needed to make smarter decisions.
+                      M.A.R.I.N (Management & Analytics Resource Inventory
+                      Network) is a comprehensive inventory management system
+                      designed to streamline your business operations. It helps
+                      you track inventory levels, manage products, analyze sales
+                      data, and automate stock updates. With real-time
+                      monitoring and automated alerts, you can maintain optimal
+                      stock levels and make data-driven decisions.
                     </div>
                   </div>
                 </div>
+
                 <div class="accordion-item">
                   <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                      Who can use M.A.R.I.N?
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faq2"
+                    >
+                      What role-based permissions are available in M.A.R.I.N?
                     </button>
                   </h3>
                   <div id="faq2" class="accordion-collapse collapse">
                     <div class="accordion-body">
-                      M.A.R.I.N is designed for small to medium-sized business owners, inventory managers, and store supervisors. Whether you manage a physical store, operate an online shop, or oversee stock for multiple branches, M.A.R.I.N adapts to your workflow. The system is intuitive and accessible even for users without technical expertise.
+                      M.A.R.I.N allows you to assign specific roles to
+                      employees, ensuring that each team member has appropriate
+                      access to the system. Roles include Admin, who has full
+                      control over store settings and data; Manager, who can
+                      manage products and inventory; and Staff, who can only
+                      view inventory and product details. This ensures secure,
+                      controlled access to the system based on each user's
+                      responsibilities.
                     </div>
                   </div>
                 </div>
+
                 <div class="accordion-item">
                   <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                      Is the system secure and reliable?
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faq3"
+                    >
+                      How does M.A.R.I.N help manage my store operations?
                     </button>
                   </h3>
                   <div id="faq3" class="accordion-collapse collapse">
                     <div class="accordion-body">
-                      Yes. M.A.R.I.N uses secure and up-to-date technologies to protect your business data. User information, inventory records, and sales transactions are encrypted and stored securely. The system is developed using Node.js, MongoDB, and Bootstrap, ensuring high performance, data integrity, and scalability. Only authorized users can access sensitive features.
+                      M.A.R.I.N provides an all-in-one solution for managing
+                      your store's inventory, employees, and activities. With
+                      features like real-time dashboards, automatic expiration
+                      alerts, and role-based access control, the platform
+                      streamlines store management. Everything from product
+                      setup to activity tracking is handled within the system,
+                      making it easier to keep your operations running smoothly.
                     </div>
                   </div>
                 </div>
+
                 <div class="accordion-item">
                   <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                      How does the system handle sales and stock updates?
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faq4"
+                    >
+                      How does inventory tracking work in M.A.R.I.N?
                     </button>
                   </h3>
                   <div id="faq4" class="accordion-collapse collapse">
                     <div class="accordion-body">
-                      All inventory changes and sales transactions are logged and reflected in real time. When a sale is recorded or stock is adjusted, M.A.R.I.N automatically updates inventory levels, helping you avoid overstocking, understocking, or discrepancies. The system is designed to maintain accuracy without the need for manual data entry.
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item">
-                  <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                      Is M.A.R.I.N beginner-friendly?
-                    </button>
-                  </h3>
-                  <div id="faq5" class="accordion-collapse collapse">
-                    <div class="accordion-body">
-                      Absolutely. M.A.R.I.N is built with usability in mind. The interface is clean, organized, and easy to navigate. Whether you're new to digital inventory systems or transitioning from spreadsheets, the platform provides clear instructions and intuitive controls, making it easy to manage day-to-day operations.
+                      M.A.R.I.N provides real-time inventory tracking,
+                      automatically updating product quantities when changes are
+                      made. You can set custom alerts for low stock or
+                      near-expiry items, ensuring you never run out of critical
+                      products. The system also organizes inventory by status
+                      (Fresh, Near Expiration, Expired), making it easy to
+                      manage product turnover and monitor stock levels at all
+                      times.
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
-                  <i class="bi bi-journal-bookmark text-primary fs-3"></i>
-                </div>
-                <h2 class="mb-0">User Guide</h2>
-              </div>
-              
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-box-seam text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Getting Started</h3>
-                    </div>
-                    <p>To begin, create an account and log in via the M.A.R.I.N dashboard. Once logged in, you can add your products, categorize them, define stock thresholds, and start monitoring your inventory and sales. The dashboard gives you a real-time overview of recent activities and performance indicators.</p>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-funnel text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Inventory Sorting</h3>
-                    </div>
-                    <p>Organize inventory by category, type, brand, or popularity. M.A.R.I.N automatically prioritizes listings based on stock availability and sales performance, highlighting items needing restocking or promotion.</p>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-graph-up text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Sales Tracking</h3>
-                    </div>
-                    <p>The system logs all sales details and analyzes patterns including top-performing products, seasonal trends, and slow-moving stock to help you make informed restocking and marketing decisions.</p>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-arrow-repeat text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Automated Stock Updates</h3>
-                    </div>
-                    <p>Stock levels update automatically when items are added, sold, or restocked. Configure alerts for low stock, overstock, or inactive products to maintain optimal inventory levels.</p>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-file-earmark-text text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Report Generation</h3>
-                    </div>
-                    <p>Generate detailed reports on inventory movement, sales performance, and product trends. Export reports or view them in real-time for audits, planning, and performance reviews.</p>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <div class="guide-card p-4 h-100 border rounded">
-                    <div class="d-flex align-items-center mb-3">
-                      <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                        <i class="bi bi-search text-primary fs-4"></i>
-                      </div>
-                      <h3 class="mb-0">Product Organization</h3>
-                    </div>
-                    <p>Quickly locate products using search filters by name, ID code, or category. Update, delete, or reorganize items efficiently with full control and visibility over your inventory.</p>
-                  </div>
-                </div>
-              </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="info-page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="footer-logo">
+              <img
+                src="img/store logo/Marin LOGO.png"
+                alt="MARIN Logo"
+                width="50"
+              />
+              <h2>M.A.R.I.N</h2>
             </div>
+            <p class="text-muted small">
+              Streamline your inventory management with our comprehensive
+              solution
+            </p>
+          </div>
+          <div class="col-md-4 mb-3 mb-md-0">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="support.html">Support</a></li>
+              <li><a href="company.html">Company</a></li>
+              <li><a href="legal.html">Legal</a></li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h3>Contact Us</h3>
+            <ul class="text-muted small">
+              <li>support@marin.com</li>
+              <li>+1 (555) 123-4567</li>
+              <li>Mon-Fri: 9AM-6PM EST</li>
+            </ul>
           </div>
         </div>
-        
-        <!-- Removed the entire Contact Support column -->
+        <div class="copyright">
+          <small>&copy; 2024 M.A.R.I.N. All rights reserved.</small>
+        </div>
       </div>
-    </div>
-  </main>
+    </footer>
 
-  <footer class="info-page-footer py-4 bg-light border-top">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 mb-3 mb-md-0">
-          <div class="footer-logo d-flex align-items-center">
-            <img src="img/MARIN Logo.png" alt="MARIN Logo" class="logo me-" width="60px">
-            <span class="fw-bold fs-4 text-center ms-0">M.A.R.I.N</span>
-          </div>
-          <p class="mt-2 text-muted small text-center">Inventory management system for modern businesses</p>
-        </div>
-        <div class="col-md-4 mb-3 mb-md-0">
-          <span class="fw-bold fs-4 text-center mb-3">Quick Links</span>
-          <ul class="list-unstyled mt-3">
-            <li class="mb-1"><a href="support.html" class="text-decoration-none">Support</a></li>
-            <li class="mb-1"><a href="company.html" class="text-decoration-none">Company</a></li>
-            <li class="mb-1"><a href="legal.html" class="text-decoration-none">Legal</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <span class="fw-bold fs-4 text-center mb-3">Contacts</span>
-          <ul class="list-unstyled text-muted small mt-3">
-            <li class="mb-2">contact.marin.project@gmail.com</li>
-            <li class="mb-2">+1 (555) 123-4567</li>
-          </ul>
-        </div>
-      </div>
-      <hr class="my-4">
-      <div class="text-center">
-        <small class="text-dark">© 2025 MARIN. All rights reserved.</small>
-      </div>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
