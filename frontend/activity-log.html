@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inventory - M.A.R.I.N</title>
+    <title>Activity Log - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/inventory.css" />
+    <link rel="stylesheet" href="css/activity-log.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -36,7 +36,7 @@
               </a>
             </li>
             <li>
-              <a href="inventory.html" class="nav-link active">
+              <a href="inventory.html" class="nav-link">
                 <i class="fas fa-boxes"></i>
                 <span>Inventory</span>
               </a>
@@ -54,7 +54,7 @@
               </a>
             </li>
             <li>
-              <a href="activity-log.html" class="nav-link">
+              <a href="activity-log.html" class="nav-link active">
                 <i class="fas fa-history"></i>
                 <span>Activity Log</span>
               </a>
@@ -69,11 +69,12 @@
         <header class="header">
           <div class="search-container">
             <div class="search-wrapper">
-              <input
-                type="text"
-                class="search-input"
-                placeholder="Search products..."
-              />
+              <select class="search-category">
+                <option value="products">Products</option>
+                <option value="inventory">Inventory</option>
+                <option value="employees">Employees</option>
+              </select>
+              <input type="text" class="search-input" placeholder="Search..." />
               <button class="search-button">
                 <i class="fas fa-search"></i>
               </button>
@@ -117,29 +118,54 @@
 
         <!-- Page Content -->
         <div class="content-wrapper">
-          <div class="inventory-container">
-            <!-- View Toggle and Add Button -->
-            <div class="inventory-header">
-              <div class="view-toggle">
-                <button class="toggle-btn active" data-view="grid">
-                  <i class="fas fa-th-large"></i>
-                  <span>Grid</span>
-                </button>
-                <button class="toggle-btn" data-view="list">
-                  <i class="fas fa-list"></i>
-                  <span>List</span>
-                </button>
-              </div>
-              <button class="add-product-btn" id="addProductBtn">
-                <i class="fas fa-plus"></i>
-                <span>Add Product</span>
-              </button>
+          <div class="page-header">
+            <h1>Activity Log</h1>
+            <div class="store-info">
+              <span class="store-name">Store: </span>
+              <span class="store-address">Address: </span>
             </div>
+          </div>
 
-            <!-- Inventory Grid/List -->
-            <div class="inventory-view grid-view">
-              <!-- Inventory items will be added here dynamically -->
+          <!-- Filters -->
+          <div class="filters-container">
+            <div class="filter-group">
+              <label for="user-filter">Filter by User:</label>
+              <select id="user-filter" class="filter-select">
+                <option value="">All Users</option>
+                <!-- Users will be populated dynamically -->
+              </select>
             </div>
+            <div class="filter-group">
+              <label for="date-filter">Filter by Date:</label>
+              <input type="date" id="date-filter" class="filter-select" />
+            </div>
+            <div class="filter-group">
+              <label for="action-filter">Filter by Action:</label>
+              <select id="action-filter" class="filter-select">
+                <option value="">All Actions</option>
+                <option value="add">Add</option>
+                <option value="edit">Edit</option>
+                <option value="delete">Delete</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Activity Log Table -->
+          <div class="activity-log-container">
+            <table class="activity-log-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Entity Type</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="activity-log-body">
+                <!-- Activity log entries will be populated dynamically -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -181,50 +207,7 @@
         </footer>
       </main>
     </div>
-
     <script src="js/layout.js"></script>
-    <script src="js/inventory.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
-        if (storeInfo) {
-          document.querySelector(".store-name").textContent = storeInfo.name;
-          document.querySelector(".store-address").textContent =
-            storeInfo.address;
-        }
-      });
-    </script>
-
-    <!-- Stock Management Modal -->
-    <div id="stockModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2><span id="stockAction">Add</span> Stock</h2>
-          <button class="close-btn" onclick="closeStockModal()">&times;</button>
-        </div>
-        <form id="stockForm">
-          <div class="form-group">
-            <label for="stockQuantity">Quantity</label>
-            <input
-              type="number"
-              id="stockQuantity"
-              name="stockQuantity"
-              min="1"
-              required
-            />
-          </div>
-          <div class="form-actions">
-            <button
-              type="button"
-              class="cancel-btn"
-              onclick="closeStockModal()"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="submit-btn">Save</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <script src="js/activity-log.js"></script>
   </body>
 </html>

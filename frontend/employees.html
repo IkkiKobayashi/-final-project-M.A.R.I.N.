@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inventory - M.A.R.I.N</title>
+    <title>Employees - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/inventory.css" />
+    <link rel="stylesheet" href="css/employees.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -36,7 +36,7 @@
               </a>
             </li>
             <li>
-              <a href="inventory.html" class="nav-link active">
+              <a href="inventory.html" class="nav-link">
                 <i class="fas fa-boxes"></i>
                 <span>Inventory</span>
               </a>
@@ -48,7 +48,7 @@
               </a>
             </li>
             <li>
-              <a href="employees.html" class="nav-link">
+              <a href="employees.html" class="nav-link active">
                 <i class="fas fa-users"></i>
                 <span>Employees</span>
               </a>
@@ -69,10 +69,15 @@
         <header class="header">
           <div class="search-container">
             <div class="search-wrapper">
+              <select class="search-category">
+                <option value="employees" selected>Employees</option>
+                <option value="products">Products</option>
+                <option value="inventory">Inventory</option>
+              </select>
               <input
                 type="text"
                 class="search-input"
-                placeholder="Search products..."
+                placeholder="Search employees..."
               />
               <button class="search-button">
                 <i class="fas fa-search"></i>
@@ -115,11 +120,11 @@
           </div>
         </header>
 
-        <!-- Page Content -->
-        <div class="content-wrapper">
-          <div class="inventory-container">
+        <!-- Content Area -->
+        <div class="content">
+          <div class="employees-container">
             <!-- View Toggle and Add Button -->
-            <div class="inventory-header">
+            <div class="employees-header">
               <div class="view-toggle">
                 <button class="toggle-btn active" data-view="grid">
                   <i class="fas fa-th-large"></i>
@@ -130,101 +135,90 @@
                   <span>List</span>
                 </button>
               </div>
-              <button class="add-product-btn" id="addProductBtn">
+              <button class="add-employee-btn" id="addEmployeeBtn">
                 <i class="fas fa-plus"></i>
-                <span>Add Product</span>
+                Add Employee
               </button>
             </div>
 
-            <!-- Inventory Grid/List -->
-            <div class="inventory-view grid-view">
-              <!-- Inventory items will be added here dynamically -->
+            <!-- Employees Grid/List View -->
+            <div class="employees-view" id="employeesView">
+              <!-- Employee cards will be dynamically added here -->
             </div>
           </div>
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-          <div class="footer-content">
-            <div class="footer-section logo-section">
-              <h2>M.A.R.I.N</h2>
-              <p>Management & Analytics Resource Inventory Network</p>
-              <p class="copyright">
-                &copy; 2024 M.A.R.I.N. All rights reserved.
-              </p>
-            </div>
-
-            <div class="footer-section">
-              <h3>Support</h3>
-              <ul>
-                <li><a href="support.html">User Guide</a></li>
-                <li><a href="support.html">FAQs</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-section">
-              <h3>Company</h3>
-              <ul>
-                <li><a href="company.html">About Us</a></li>
-                <li><a href="company.html">Our Team</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-section">
-              <h3>Legal</h3>
-              <ul>
-                <li><a href="legal.html">Privacy Policy</a></li>
-                <li><a href="legal.html">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-        </footer>
       </main>
     </div>
 
-    <script src="js/layout.js"></script>
-    <script src="js/inventory.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
-        if (storeInfo) {
-          document.querySelector(".store-name").textContent = storeInfo.name;
-          document.querySelector(".store-address").textContent =
-            storeInfo.address;
-        }
-      });
-    </script>
-
-    <!-- Stock Management Modal -->
-    <div id="stockModal" class="modal">
+    <!-- Add/Edit Employee Modal -->
+    <div class="employee-modal" id="employeeModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2><span id="stockAction">Add</span> Stock</h2>
-          <button class="close-btn" onclick="closeStockModal()">&times;</button>
+          <h2 class="modal-title">Add New Employee</h2>
+          <button class="close-modal-btn">&times;</button>
         </div>
-        <form id="stockForm">
+        <form class="employee-form" id="employeeForm">
           <div class="form-group">
-            <label for="stockQuantity">Quantity</label>
+            <label for="employeeName">Full Name</label>
+            <input type="text" id="employeeName" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="employeeEmail">Email</label>
+            <input type="email" id="employeeEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="employeeRole">Role</label>
+            <select id="employeeRole" name="role" required>
+              <option value="">Select Role</option>
+              <option value="manager">Manager</option>
+              <option value="staff">Staff</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="employeePhone">Phone</label>
+            <input type="tel" id="employeePhone" name="phone" required />
+          </div>
+          <div class="form-group">
+            <label for="employeeDepartment">Department</label>
             <input
-              type="number"
-              id="stockQuantity"
-              name="stockQuantity"
-              min="1"
+              type="text"
+              id="employeeDepartment"
+              name="department"
               required
             />
           </div>
+          <div class="form-group">
+            <label for="employeeJoinedDate">Joined Date</label>
+            <input
+              type="date"
+              id="employeeJoinedDate"
+              name="joinedDate"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Profile Picture</label>
+            <div class="image-upload">
+              <div class="upload-preview" id="imagePreview">
+                <i class="fas fa-user"></i>
+              </div>
+              <input
+                type="file"
+                id="profileImage"
+                name="profileImage"
+                accept="image/*"
+                required
+              />
+            </div>
+          </div>
           <div class="form-actions">
-            <button
-              type="button"
-              class="cancel-btn"
-              onclick="closeStockModal()"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="submit-btn">Save</button>
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save Employee</button>
           </div>
         </form>
       </div>
     </div>
+
+    <script src="js/employees.js"></script>
   </body>
 </html>

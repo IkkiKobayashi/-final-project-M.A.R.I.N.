@@ -130,7 +130,14 @@ function saveProductWithImage(formData, imageData) {
     price: formData.get("productPrice"),
     quantity: formData.get("productQuantity"),
     expiry: formData.get("productExpiry"),
+    type: formData.get("productType"),
     image: imageData,
+  };
+
+  // Get current user from localStorage
+  const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
+    id: "system",
+    name: "System",
   };
 
   // Update or add product to view
@@ -144,6 +151,9 @@ function saveProductWithImage(formData, imageData) {
         <img src="${product.image}" alt="${product.name}" class="product-image">
         <div class="product-info">
           <h3 class="product-name">${product.name}</h3>
+          <div class="product-type">${
+            product.type.charAt(0).toUpperCase() + product.type.slice(1)
+          }</div>
           <div class="product-details">
             <span class="product-price">₱${product.price}</span>
             <span class="product-quantity">${product.quantity} in stock</span>
@@ -162,6 +172,15 @@ function saveProductWithImage(formData, imageData) {
         </div>
       `;
 
+      // Log edit activity
+      logActivity(
+        currentUser.id,
+        currentUser.name,
+        "edit",
+        "Product",
+        `Updated product: ${product.name}`
+      );
+
       // Reattach event listeners
       const editBtn = existingCard.querySelector(".edit-btn");
       const deleteBtn = existingCard.querySelector(".delete-btn");
@@ -170,8 +189,8 @@ function saveProductWithImage(formData, imageData) {
         editProduct(product);
       });
 
-      deleteBtn.addEventListener("click", () => {
-        if (deleteProduct(product.id)) {
+      deleteBtn.addEventListener("click", async () => {
+        if (await deleteProduct(product.id, product.name)) {
           existingCard.remove();
         }
       });
@@ -179,6 +198,14 @@ function saveProductWithImage(formData, imageData) {
   } else {
     // Add new product to view
     addProductToView(product);
+    // Log add activity
+    logActivity(
+      currentUser.id,
+      currentUser.name,
+      "add",
+      "Product",
+      `Added new product: ${product.name}`
+    );
   }
 
   // Save to localStorage
@@ -207,36 +234,37 @@ function saveProduct(product) {
 }
 
 // Delete Confirmation Modal
-function showDeleteConfirmation(productName) {
-  const confirmationModal = document.createElement("div");
-  confirmationModal.className = "modal delete-confirmation-modal";
-  confirmationModal.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Confirm Deletion</h2>
-        <button class="close-modal-btn">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete <strong>${productName}</strong>?</p>
-        <p class="warning-text">This action cannot be undone.</p>
-      </div>
-      <div class="modal-actions">
-        <button class="cancel-btn">Cancel</button>
-        <button class="confirm-delete-btn">Delete</button>
-      </div>
-    </div>
-  `;
+async function deleteProduct(productId, productName) {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
+    id: "system",
+    name: "System",
+  };
 
-  // Add to document
-  document.body.appendChild(confirmationModal);
-
-  // Show modal
-  confirmationModal.classList.add("active");
-
-  // Return a promise that resolves when user makes a choice
   return new Promise((resolve) => {
+    const confirmationModal = document.createElement("div");
+    confirmationModal.className = "modal delete-confirmation-modal";
+    confirmationModal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirm Deletion</h2>
+          <button class="close-modal-btn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong>${productName}</strong>?</p>
+          <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-actions">
+          <button class="cancel-btn">Cancel</button>
+          <button class="confirm-delete-btn">Delete</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(confirmationModal);
+    confirmationModal.classList.add("active");
+
     const closeModal = () => {
       confirmationModal.classList.remove("active");
       setTimeout(() => {
@@ -244,44 +272,132 @@ function showDeleteConfirmation(productName) {
       }, 300);
     };
 
-    // Handle close button
+    const confirmDelete = () => {
+      let products = JSON.parse(localStorage.getItem("products")) || [];
+      products = products.filter((p) => p.id !== productId);
+      localStorage.setItem("products", JSON.stringify(products));
+
+      // Log delete activity
+      logActivity(
+        currentUser.id,
+        currentUser.name,
+        "delete",
+        "Product",
+        `Deleted product: ${productName}`
+      );
+
+      closeModal();
+      resolve(true);
+    };
+
+    const cancelDelete = () => {
+      closeModal();
+      resolve(false);
+    };
+
     confirmationModal
       .querySelector(".close-modal-btn")
-      .addEventListener("click", () => {
-        closeModal();
-        resolve(false);
-      });
-
-    // Handle cancel button
+      .addEventListener("click", cancelDelete);
     confirmationModal
       .querySelector(".cancel-btn")
-      .addEventListener("click", () => {
-        closeModal();
-        resolve(false);
-      });
-
-    // Handle confirm button
+      .addEventListener("click", cancelDelete);
     confirmationModal
       .querySelector(".confirm-delete-btn")
-      .addEventListener("click", () => {
-        closeModal();
-        resolve(true);
-      });
+      .addEventListener("click", confirmDelete);
   });
 }
 
-// Delete Product
-async function deleteProduct(productId, productName) {
-  const confirmed = await showDeleteConfirmation(productName);
+// Sort functionality
+let currentSort = null;
 
-  if (confirmed) {
-    let products = JSON.parse(localStorage.getItem("products")) || [];
-    products = products.filter((p) => p.id !== productId);
-    localStorage.setItem("products", JSON.stringify(products));
-    return true;
-  }
-  return false;
+function sortProducts(sortBy) {
+  const productsView = document.querySelector(".products-view");
+  const products = Array.from(productsView.children);
+
+  products.sort((a, b) => {
+    switch (sortBy) {
+      case "name":
+        const nameA = a
+          .querySelector(".product-name")
+          .textContent.toLowerCase();
+        const nameB = b
+          .querySelector(".product-name")
+          .textContent.toLowerCase();
+        return nameA.localeCompare(nameB);
+
+      case "price":
+        const priceA = parseFloat(
+          a.querySelector(".product-price").textContent.replace("₱", "")
+        );
+        const priceB = parseFloat(
+          b.querySelector(".product-price").textContent.replace("₱", "")
+        );
+        return priceA - priceB;
+
+      case "type":
+        const typeA = a
+          .querySelector(".product-type")
+          .textContent.toLowerCase();
+        const typeB = b
+          .querySelector(".product-type")
+          .textContent.toLowerCase();
+        return typeA.localeCompare(typeB);
+
+      case "expiry":
+        const expiryA = new Date(
+          a.querySelector(".product-expiry").textContent.split(": ")[1]
+        );
+        const expiryB = new Date(
+          b.querySelector(".product-expiry").textContent.split(": ")[1]
+        );
+        return expiryA - expiryB;
+
+      case "quantity":
+        const quantityA = parseInt(
+          a.querySelector(".product-quantity").textContent
+        );
+        const quantityB = parseInt(
+          b.querySelector(".product-quantity").textContent
+        );
+        return quantityB - quantityA;
+
+      default:
+        return 0;
+    }
+  });
+
+  // Clear and re-append sorted products
+  productsView.innerHTML = "";
+  products.forEach((product) => productsView.appendChild(product));
+
+  // Update active sort option
+  document.querySelectorAll(".sort-option").forEach((option) => {
+    option.classList.remove("active");
+    if (option.dataset.sort === sortBy) {
+      option.classList.add("active");
+    }
+  });
+
+  currentSort = sortBy;
 }
+
+// Add event listeners for sort options
+document.querySelectorAll(".sort-option").forEach((option) => {
+  option.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const sortBy = option.dataset.sort;
+    sortProducts(sortBy);
+  });
+});
+
+// Modify the addProductToView function to maintain sort order
+const originalAddProductToView = addProductToView;
+addProductToView = function (product) {
+  originalAddProductToView(product);
+  if (currentSort) {
+    sortProducts(currentSort);
+  }
+};
 
 // Add Product to View
 function addProductToView(product) {
@@ -293,6 +409,9 @@ function addProductToView(product) {
     <img src="${product.image}" alt="${product.name}" class="product-image">
     <div class="product-info">
       <h3 class="product-name">${product.name}</h3>
+      <div class="product-type">${
+        product.type.charAt(0).toUpperCase() + product.type.slice(1)
+      }</div>
       <div class="product-details">
         <span class="product-price">₱${product.price}</span>
         <span class="product-quantity">${product.quantity} in stock</span>
