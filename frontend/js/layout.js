@@ -1,4 +1,56 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Profile picture synchronization functionality
+  function updateProfilePicture(imageUrl) {
+    // Update profile picture in the admin dropdown
+    const adminProfilePictures = document.querySelectorAll(".profile-img");
+    adminProfilePictures.forEach((img) => {
+      img.src = imageUrl;
+      img.onerror = function () {
+        // If image fails to load, use default placeholder
+        this.src = "assets/profile-placeholder.jpg";
+      };
+    });
+
+    // Update profile picture in the profile page if we're on that page
+    const profilePicture = document.getElementById("profilePicture");
+    if (profilePicture) {
+      profilePicture.src = imageUrl;
+      profilePicture.onerror = function () {
+        // If image fails to load, use default placeholder
+        this.src = "assets/profile-placeholder.jpg";
+      };
+    }
+
+    // Save the profile picture URL to localStorage
+    localStorage.setItem("profilePicture", imageUrl);
+  }
+
+  // Initialize profile picture from localStorage on page load
+  const savedProfilePicture = localStorage.getItem("profilePicture");
+  if (savedProfilePicture) {
+    updateProfilePicture(savedProfilePicture);
+  } else {
+    // If no saved profile picture, use the default placeholder
+    const defaultProfilePicture = "assets/profile-placeholder.jpg";
+    updateProfilePicture(defaultProfilePicture);
+  }
+
+  // Handle profile picture upload if we're on the profile page
+  const profilePictureInput = document.getElementById("profilePictureInput");
+  if (profilePictureInput) {
+    profilePictureInput.addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imageUrl = e.target.result;
+          updateProfilePicture(imageUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
   // Sidebar functionality
   const sidebar = document.querySelector(".sidebar");
   const navLinks = document.querySelectorAll(".nav-link");

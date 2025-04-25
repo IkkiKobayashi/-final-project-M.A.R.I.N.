@@ -117,51 +117,69 @@
 
         <!-- Page Content -->
         <div class="content-wrapper">
-          <div class="products-container">
-            <!-- View Toggle and Add Button -->
-            <div class="products-header">
-              <div class="view-toggle">
-                <button class="toggle-btn active" data-view="grid">
-                  <i class="fas fa-th-large"></i>
-                  <span>Grid</span>
-                </button>
-                <button class="toggle-btn" data-view="list">
-                  <i class="fas fa-list"></i>
-                  <span>List</span>
-                </button>
-                <div class="sort-container">
-                  <button class="sort-btn">
-                    <i class="fas fa-sort"></i>
-                    <span>Sort</span>
-                  </button>
-                  <div class="sort-dropdown">
-                    <button class="sort-option" data-sort="name">
-                      Sort by Name
-                    </button>
-                    <button class="sort-option" data-sort="price">
-                      Sort by Price
-                    </button>
-                    <button class="sort-option" data-sort="type">
-                      Sort by Type
-                    </button>
-                    <button class="sort-option" data-sort="expiry">
-                      Sort by Expiry
-                    </button>
-                    <button class="sort-option" data-sort="quantity">
-                      Sort by Quantity
-                    </button>
-                  </div>
+          <!-- Content Area -->
+          <div class="content">
+            <div class="products-container">
+              <!-- Page Header -->
+              <div class="page-header">
+                <h1>Products</h1>
+                <div class="store-info">
+                  <span>
+                    <i class="fas fa-store"></i>
+                    <span class="store-name">Store: Main Branch</span>
+                  </span>
+                  <span>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="store-address">Address: 123 Main St</span>
+                  </span>
                 </div>
               </div>
-              <button class="add-product-btn" id="addProductBtn">
-                <i class="fas fa-plus"></i>
-                Add New Product
-              </button>
-            </div>
 
-            <!-- Products Grid/List -->
-            <div class="products-view grid-view" id="productsView">
-              <!-- Products will be added here dynamically -->
+              <!-- View Toggle and Add Button -->
+              <div class="products-header">
+                <div class="view-toggle">
+                  <button class="toggle-btn active" data-view="grid">
+                    <i class="fas fa-th-large"></i>
+                    <span>Grid</span>
+                  </button>
+                  <button class="toggle-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                    <span>List</span>
+                  </button>
+                  <div class="sort-container">
+                    <button class="sort-btn">
+                      <i class="fas fa-sort"></i>
+                      <span>Sort</span>
+                    </button>
+                    <div class="sort-dropdown">
+                      <button class="sort-option" data-sort="name">
+                        Sort by Name
+                      </button>
+                      <button class="sort-option" data-sort="price">
+                        Sort by Price
+                      </button>
+                      <button class="sort-option" data-sort="type">
+                        Sort by Type
+                      </button>
+                      <button class="sort-option" data-sort="expiry">
+                        Sort by Expiry
+                      </button>
+                      <button class="sort-option" data-sort="quantity">
+                        Sort by Quantity
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button class="add-product-btn" id="addProductBtn">
+                  <i class="fas fa-plus"></i>
+                  Add New Product
+                </button>
+              </div>
+
+              <!-- Products Grid/List -->
+              <div class="products-view grid-view" id="productsView">
+                <!-- Products will be added here dynamically -->
+              </div>
             </div>
           </div>
         </div>

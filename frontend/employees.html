@@ -99,6 +99,7 @@
                   src="assets/profile-placeholder.jpg"
                   alt="Profile"
                   class="profile-img"
+                  id="adminProfileImg"
                 />
                 <span>Admin</span>
               </button>
@@ -123,6 +124,21 @@
         <!-- Content Area -->
         <div class="content">
           <div class="employees-container">
+            <!-- Page Header -->
+            <div class="page-header">
+              <h1>Employees</h1>
+              <div class="store-info">
+                <span>
+                  <i class="fas fa-store"></i>
+                  <span class="store-name">Store: Main Branch</span>
+                </span>
+                <span>
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span class="store-address">Address: 123 Main St</span>
+                </span>
+              </div>
+            </div>
+
             <!-- View Toggle and Add Button -->
             <div class="employees-header">
               <div class="view-toggle">
@@ -256,6 +272,8 @@
       </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="js/layout.js"></script>
     <script src="js/employees.js"></script>
   </body>
 </html>
