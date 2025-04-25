@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Activity Log - M.A.R.I.N</title>
+    <title>Profile - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/activity-log.css" />
+    <link rel="stylesheet" href="css/profile.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -54,7 +54,7 @@
               </a>
             </li>
             <li>
-              <a href="activity-log.html" class="nav-link active">
+              <a href="activity-log.html" class="nav-link">
                 <i class="fas fa-history"></i>
                 <span>Activity Log</span>
               </a>
@@ -116,56 +116,115 @@
           </div>
         </header>
 
-        <!-- Page Content -->
+        <!-- Profile Content -->
         <div class="content-wrapper">
-          <div class="page-header">
-            <h1>Activity Log</h1>
-            <div class="store-info">
-              <span class="store-name">Store: </span>
-              <span class="store-address">Address: </span>
+          <div class="profile-container">
+            <!-- Profile Header Section -->
+            <div class="profile-header">
+              <div class="profile-picture-container">
+                <img
+                  src="assets/profile-placeholder.jpg"
+                  alt="Profile Picture"
+                  class="profile-picture"
+                  id="profilePicture"
+                />
+                <div class="profile-picture-overlay">
+                  <label for="profilePictureInput" class="change-picture-btn">
+                    <i class="fas fa-camera"></i>
+                    <span>Change Picture</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="profilePictureInput"
+                    accept="image/*"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+              <div class="profile-info">
+                <div class="profile-name">
+                  <input
+                    type="text"
+                    value="John Doe"
+                    class="editable-field"
+                    id="profileName"
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div class="profile-status">
+                  <div class="status-badge status-active">Active</div>
+                </div>
+                <div class="profile-role">
+                  <span>Role: </span>
+                  <span class="role-value">Admin</span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Filters -->
-          <div class="filters-container">
-            <div class="filter-group">
-              <label for="user-filter">Filter by User:</label>
-              <select id="user-filter" class="filter-select">
-                <option value="">All Users</option>
-                <!-- Users will be populated dynamically -->
-              </select>
+            <!-- Contact & Work Details Section -->
+            <div class="profile-details">
+              <h2>Contact & Work Details</h2>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <label>Email</label>
+                  <div class="editable-field-container">
+                    <input
+                      type="email"
+                      value="john.doe@example.com"
+                      class="editable-field"
+                      id="profileEmail"
+                      placeholder="Enter your email"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <label>Phone</label>
+                  <div class="editable-field-container">
+                    <input
+                      type="tel"
+                      value="+1 (555) 123-4567"
+                      class="editable-field"
+                      id="profilePhone"
+                      placeholder="Enter your phone number"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <label>Department</label>
+                  <div class="editable-field-container">
+                    <input
+                      type="text"
+                      value="Management"
+                      class="editable-field"
+                      id="profileDepartment"
+                      placeholder="Enter your department"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <label>Location</label>
+                  <div class="editable-field-container">
+                    <input
+                      type="text"
+                      value="New York, USA"
+                      class="editable-field"
+                      id="profileLocation"
+                      placeholder="Enter your location"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <label>Joined Date</label>
+                  <div class="non-editable-field">
+                    <span>January 1, 2024</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="filter-group">
-              <label for="date-filter">Filter by Date:</label>
-              <input type="date" id="date-filter" class="filter-select" />
-            </div>
-            <div class="filter-group">
-              <label for="action-filter">Filter by Action:</label>
-              <select id="action-filter" class="filter-select">
-                <option value="">All Actions</option>
-                <option value="add">Add</option>
-                <option value="edit">Edit</option>
-                <option value="delete">Delete</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Activity Log Table -->
-          <div class="activity-log-container">
-            <table class="activity-log-table">
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Entity Type</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody id="activity-log-body">
-                <!-- Activity log entries will be populated dynamically -->
-              </tbody>
-            </table>
           </div>
         </div>
 
@@ -210,6 +269,6 @@
       </main>
     </div>
     <script src="js/layout.js"></script>
-    <script src="js/activity-log.js"></script>
+    <script src="js/profile.js"></script>
   </body>
 </html>

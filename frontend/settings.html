@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Activity Log - M.A.R.I.N</title>
+    <title>Settings - M.A.R.I.N</title>
     <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/activity-log.css" />
+    <link rel="stylesheet" href="css/settings.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -54,7 +54,7 @@
               </a>
             </li>
             <li>
-              <a href="activity-log.html" class="nav-link active">
+              <a href="activity-log.html" class="nav-link">
                 <i class="fas fa-history"></i>
                 <span>Activity Log</span>
               </a>
@@ -116,56 +116,106 @@
           </div>
         </header>
 
-        <!-- Page Content -->
+        <!-- Settings Content -->
         <div class="content-wrapper">
-          <div class="page-header">
-            <h1>Activity Log</h1>
-            <div class="store-info">
-              <span class="store-name">Store: </span>
-              <span class="store-address">Address: </span>
-            </div>
-          </div>
+          <div class="settings-container">
+            <h1 class="settings-title">Settings</h1>
 
-          <!-- Filters -->
-          <div class="filters-container">
-            <div class="filter-group">
-              <label for="user-filter">Filter by User:</label>
-              <select id="user-filter" class="filter-select">
-                <option value="">All Users</option>
-                <!-- Users will be populated dynamically -->
-              </select>
-            </div>
-            <div class="filter-group">
-              <label for="date-filter">Filter by Date:</label>
-              <input type="date" id="date-filter" class="filter-select" />
-            </div>
-            <div class="filter-group">
-              <label for="action-filter">Filter by Action:</label>
-              <select id="action-filter" class="filter-select">
-                <option value="">All Actions</option>
-                <option value="add">Add</option>
-                <option value="edit">Edit</option>
-                <option value="delete">Delete</option>
-              </select>
-            </div>
-          </div>
+            <!-- Account Settings Section -->
+            <section class="settings-section">
+              <h2 class="section-title">Account</h2>
+              <div class="settings-grid">
+                <!-- Change Password -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <i class="fas fa-lock"></i>
+                    <h3>Change Password</h3>
+                  </div>
+                  <form class="setting-form">
+                    <div class="form-group">
+                      <label for="currentPassword">Current Password</label>
+                      <input
+                        type="password"
+                        id="currentPassword"
+                        class="form-input"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="newPassword">New Password</label>
+                      <input
+                        type="password"
+                        id="newPassword"
+                        class="form-input"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="confirmPassword">Confirm New Password</label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        class="form-input"
+                      />
+                    </div>
+                    <button type="submit" class="save-btn">
+                      Update Password
+                    </button>
+                  </form>
+                </div>
 
-          <!-- Activity Log Table -->
-          <div class="activity-log-container">
-            <table class="activity-log-table">
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Entity Type</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody id="activity-log-body">
-                <!-- Activity log entries will be populated dynamically -->
-              </tbody>
-            </table>
+                <!-- Update Email -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Update Email</h3>
+                  </div>
+                  <form class="setting-form">
+                    <div class="form-group">
+                      <label for="newEmail">New Email Address</label>
+                      <input type="email" id="newEmail" class="form-input" />
+                    </div>
+                    <button type="submit" class="save-btn">Update Email</button>
+                  </form>
+                </div>
+
+                <!-- Update Phone -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <i class="fas fa-phone"></i>
+                    <h3>Update Phone</h3>
+                  </div>
+                  <form class="setting-form">
+                    <div class="form-group">
+                      <label for="newPhone">New Phone Number</label>
+                      <input type="tel" id="newPhone" class="form-input" />
+                    </div>
+                    <button type="submit" class="save-btn">Update Phone</button>
+                  </form>
+                </div>
+              </div>
+            </section>
+
+            <!-- Preferences Section -->
+            <section class="settings-section">
+              <h2 class="section-title">Preferences</h2>
+              <div class="settings-grid">
+                <!-- Notification Settings -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notification Settings</h3>
+                  </div>
+                  <div class="toggle-group">
+                    <label class="toggle-label">
+                      <span>Enable Notifications</span>
+                      <label class="switch">
+                        <input type="checkbox" checked />
+                        <span class="slider round"></span>
+                      </label>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
 
@@ -210,6 +260,6 @@
       </main>
     </div>
     <script src="js/layout.js"></script>
-    <script src="js/activity-log.js"></script>
+    <script src="js/settings.js"></script>
   </body>
 </html>
