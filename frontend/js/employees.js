@@ -28,6 +28,22 @@ document.addEventListener("DOMContentLoaded", function () {
   closeModalBtn.addEventListener("click", closeModal);
   cancelBtn.addEventListener("click", closeModal);
 
+  // Account creation toggle
+  const createAccountCheckbox = document.getElementById("createAccount");
+  const accountFields = document.querySelector(".account-fields");
+  createAccountCheckbox.addEventListener("change", function () {
+    accountFields.style.display = this.checked ? "block" : "none";
+    if (this.checked) {
+      document.getElementById("accountEmail").required = true;
+      document.getElementById("accountPassword").required = true;
+      document.getElementById("confirmPassword").required = true;
+    } else {
+      document.getElementById("accountEmail").required = false;
+      document.getElementById("accountPassword").required = false;
+      document.getElementById("confirmPassword").required = false;
+    }
+  });
+
   // Form submission handler
   employeeForm.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -67,20 +83,34 @@ document.addEventListener("DOMContentLoaded", function () {
       .getElementById("employeeDepartment")
       .value.trim();
     const joinedDate = document.getElementById("employeeJoinedDate").value;
-
-    console.log("Form values:", {
-      name,
-      email,
-      role,
-      phone,
-      department,
-      joinedDate,
-    });
+    const createAccount = document.getElementById("createAccount").checked;
+    const accountEmail = document.getElementById("accountEmail").value.trim();
+    const accountPassword = document.getElementById("accountPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
 
     // Validate required fields
     if (!name || !email || !role || !phone || !department || !joinedDate) {
       showNotification("Please fill in all required fields", "error");
       return;
+    }
+
+    // Validate account creation fields if account creation is checked
+    if (createAccount) {
+      if (!accountEmail || !accountPassword || !confirmPassword) {
+        showNotification("Please fill in all account creation fields", "error");
+        return;
+      }
+      if (accountPassword !== confirmPassword) {
+        showNotification("Passwords do not match", "error");
+        return;
+      }
+      if (accountPassword.length < 8) {
+        showNotification(
+          "Password must be at least 8 characters long",
+          "error"
+        );
+        return;
+      }
     }
 
     // Create employee object
@@ -95,7 +125,14 @@ document.addEventListener("DOMContentLoaded", function () {
       profileImage: currentImageData || "assets/profile-placeholder.jpg",
     };
 
-    console.log("Employee object:", employee);
+    // Add account information if account creation is checked
+    if (createAccount) {
+      employee.account = {
+        email: accountEmail,
+        password: accountPassword,
+        role: role,
+      };
+    }
 
     // Update or add employee
     if (editingEmployeeId) {
@@ -139,6 +176,8 @@ document.addEventListener("DOMContentLoaded", function () {
       employeeForm.reset();
       imagePreview.innerHTML = '<i class="fas fa-user"></i>';
       currentImageData = null;
+      document.getElementById("createAccount").checked = false;
+      document.querySelector(".account-fields").style.display = "none";
     }
   }
 
