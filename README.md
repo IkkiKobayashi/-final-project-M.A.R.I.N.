@@ -65,8 +65,8 @@ This system is designed to simplify inventory management by providing real-time 
 ### 📝 Updates
 
 - **Phase 1 (Week 11)**: - 100% 🚩
-- **Phase 2 (Week 12)**: - 70%
-- **Phase 3 (Week 13)**:
-- **Phase 4 (Week 14)**:
+- **Phase 2 (Week 12)**: - 100% 🚩
+- **Phase 3 (Week 13)**: - 100% 🚩
+- **Phase 4 (Week 14)**: - 80%
 - **Phase 5 (Week 15)**:
 - **Phase 6 (Week 16)**:
