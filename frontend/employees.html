@@ -48,7 +48,11 @@
               </a>
             </li>
             <li>
-              <a href="employees.html" class="nav-link active">
+              <a
+                href="employees.html"
+                class="nav-link active"
+                data-role="manager"
+              >
                 <i class="fas fa-users"></i>
                 <span>Employees</span>
               </a>
@@ -218,6 +222,12 @@
           <div class="form-group">
             <label for="employeeEmail">Email</label>
             <input type="email" id="employeeEmail" name="email" required />
+            <div class="account-creation-note">
+              <i class="fas fa-info-circle"></i>
+              <span
+                >This email will be used for the employee's account login</span
+              >
+            </div>
           </div>
           <div class="form-group">
             <label for="employeeRole">Role</label>
@@ -250,42 +260,22 @@
             />
           </div>
           <div class="form-group">
-            <label>Create Account</label>
-            <div class="account-creation">
-              <div class="form-check">
-                <input
-                  type="checkbox"
-                  id="createAccount"
-                  name="createAccount"
-                  class="form-check-input"
-                />
-                <label for="createAccount" class="form-check-label"
-                  >Create login account for this employee</label
-                >
-              </div>
-              <div class="account-fields" style="display: none">
-                <div class="form-group">
-                  <label for="accountEmail">Account Email</label>
-                  <input type="email" id="accountEmail" name="accountEmail" />
-                </div>
-                <div class="form-group">
-                  <label for="accountPassword">Password</label>
-                  <input
-                    type="password"
-                    id="accountPassword"
-                    name="accountPassword"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="confirmPassword">Confirm Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                  />
-                </div>
-              </div>
-            </div>
+            <label for="accountPassword">Account Password</label>
+            <input
+              type="password"
+              id="accountPassword"
+              name="accountPassword"
+              placeholder="Set password for employee account"
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm the password"
+            />
           </div>
           <div class="form-group">
             <label>Profile Picture</label>
@@ -313,5 +303,38 @@
     <!-- Scripts -->
     <script src="js/layout.js"></script>
     <script src="js/employees.js"></script>
+    <script>
+      // Role-based access control
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get user role from session storage (this should be set when user logs in)
+        const userRole = sessionStorage.getItem("userRole");
+        const employeesLink = document.querySelector(
+          'a[href="employees.html"]'
+        );
+        const addEmployeeBtn = document.getElementById("addEmployeeBtn");
+        const employeeForm = document.getElementById("employeeForm");
+        const employeeActions = document.querySelectorAll(".employee-actions");
+
+        if (userRole === "employee") {
+          // Hide employees page from employees
+          if (employeesLink) {
+            employeesLink.parentElement.style.display = "none";
+          }
+        } else if (userRole === "manager") {
+          // Managers can only view
+          if (addEmployeeBtn) {
+            addEmployeeBtn.style.display = "none";
+          }
+          if (employeeForm) {
+            employeeForm.style.display = "none";
+          }
+          if (employeeActions) {
+            employeeActions.forEach((action) => {
+              action.style.display = "none";
+            });
+          }
+        }
+      });
+    </script>
   </body>
 </html>

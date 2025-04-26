@@ -2,6 +2,36 @@ document.addEventListener("DOMContentLoaded", function () {
   // View Toggle Functionality
   const toggleButtons = document.querySelectorAll(".toggle-btn");
   const inventoryView = document.querySelector(".inventory-view");
+  const searchInput = document.querySelector(".search-input");
+
+  // Inventory-specific search function
+  const searchInventory = (query) => {
+    const searchTerm = query.toLowerCase();
+    const products = document.querySelectorAll(".product-card");
+
+    products.forEach((product) => {
+      const productName = product
+        .querySelector(".product-name")
+        .textContent.toLowerCase();
+      const productType = product
+        .querySelector(".product-type")
+        .textContent.toLowerCase();
+      const productQuantity = product
+        .querySelector(".product-quantity")
+        .textContent.toLowerCase();
+      const productExpiry = product
+        .querySelector(".product-expiry")
+        .textContent.toLowerCase();
+
+      const matchesSearch =
+        productName.includes(searchTerm) ||
+        productType.includes(searchTerm) ||
+        productQuantity.includes(searchTerm) ||
+        productExpiry.includes(searchTerm);
+
+      product.style.display = matchesSearch ? "block" : "none";
+    });
+  };
 
   toggleButtons.forEach((button) => {
     button.addEventListener("click", function () {
@@ -20,20 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Search Functionality
-  const searchInput = document.querySelector(".search-input");
-  searchInput.addEventListener("input", function () {
-    const searchTerm = this.value.toLowerCase();
-    const products = document.querySelectorAll(".product-card");
-
-    products.forEach((product) => {
-      const productName = product
-        .querySelector(".product-name")
-        .textContent.toLowerCase();
-      product.style.display = productName.includes(searchTerm)
-        ? "block"
-        : "none";
+  if (searchInput) {
+    searchInput.addEventListener("input", function (e) {
+      searchInventory(e.target.value);
     });
-  });
+  }
 
   // Initialize inventory with debugging
   console.log("Loading products...");

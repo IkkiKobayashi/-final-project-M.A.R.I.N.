@@ -741,46 +741,55 @@
 .form-check {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
 }
 
 .form-check:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: #f1f5f9;
 }
 
 .form-check-input {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: 0;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
   cursor: pointer;
-  accent-color: #3b82f6;
-  border: 2px solid #cbd5e1;
-  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.25rem;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
   transition: all 0.2s ease;
 }
 
 .form-check-input:checked {
-  border-color: #3b82f6;
   background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.form-check-input:checked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: white;
+  border-radius: 0.125rem;
 }
 
 .form-check-label {
-  font-size: 0.95rem;
-  color: #1e293b;
-  font-weight: 500;
+  font-size: 0.875rem;
+  color: #475569;
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .form-check:hover .form-check-label {
-  color: #3b82f6;
+  color: #1e293b;
 }
 
 .account-fields {
@@ -836,55 +845,54 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Password strength indicator */
-.password-strength {
-  margin-top: 0.75rem;
-  height: 4px;
-  background: #e2e8f0;
-  border-radius: 2px;
-  overflow: hidden;
-  position: relative;
-}
-
-.password-strength-bar {
-  height: 100%;
-  width: 0;
-  transition: all 0.3s ease;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.password-strength.weak .password-strength-bar {
-  background: #ef4444;
-  width: 33%;
-}
-
-.password-strength.medium .password-strength-bar {
-  background: #f59e0b;
-  width: 66%;
-}
-
-.password-strength.strong .password-strength-bar {
-  background: #10b981;
-  width: 100%;
-}
-
-.password-strength-text {
-  font-size: 0.8rem;
+.account-creation-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 0.5rem;
+  font-size: 0.875rem;
   color: #64748b;
-  transition: color 0.3s ease;
 }
 
-.password-strength.weak .password-strength-text {
-  color: #ef4444;
+.account-creation-note i {
+  color: #3b82f6;
 }
 
-.password-strength.medium .password-strength-text {
-  color: #f59e0b;
+/* Remove the old account creation styles */
+.account-creation,
+.form-check,
+.form-check-input,
+.form-check-label,
+.account-fields {
+  display: none;
 }
 
-.password-strength.strong .password-strength-text {
-  color: #10b981;
+/* Role-based access control */
+[data-role="manager"] {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.employee-actions {
+  display: none;
+}
+
+/* Show actions only for admin */
+body.admin .employee-actions {
+  display: flex;
+}
+
+/* Hide add button for managers */
+body.manager #addEmployeeBtn {
+  display: none;
+}
+
+/* Hide form for managers */
+body.manager .employee-form {
+  display: none;
+}
+
+/* Hide employees page for employees */
+body.employee [data-role="manager"] {
+  display: none;
 }

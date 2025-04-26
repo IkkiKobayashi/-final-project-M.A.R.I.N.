@@ -12,6 +12,7 @@ const cancelBtn = document.querySelector(".cancel-btn");
 const submitBtn = document.querySelector(".submit-btn");
 const modalTitle = document.querySelector("#modalTitle");
 const productId = document.querySelector("#productId");
+const searchInput = document.querySelector(".search-input");
 
 // View Toggle
 viewToggle.addEventListener("click", (e) => {
@@ -517,3 +518,35 @@ document.getElementById("productType").addEventListener("change", function () {
     typeIndicator.textContent = this.options[this.selectedIndex].text;
   }
 });
+
+// Product-specific search function
+const searchProducts = (query) => {
+  const products = Array.from(productsView.children);
+  const searchTerm = query.toLowerCase();
+
+  products.forEach((product) => {
+    const productName = product
+      .querySelector(".product-name")
+      .textContent.toLowerCase();
+    const productType = product
+      .querySelector(".product-type")
+      .textContent.toLowerCase();
+    const productPrice = product
+      .querySelector(".product-price")
+      .textContent.toLowerCase();
+
+    const matchesSearch =
+      productName.includes(searchTerm) ||
+      productType.includes(searchTerm) ||
+      productPrice.includes(searchTerm);
+
+    product.style.display = matchesSearch ? "block" : "none";
+  });
+};
+
+// Event Listeners
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    searchProducts(e.target.value);
+  });
+}

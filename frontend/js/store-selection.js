@@ -32,6 +32,21 @@ let searchQuery = "";
 let selectedImage = null;
 let editingStoreId = null;
 
+// Store-specific search function
+const searchStores = (query) => {
+  searchQuery = query.toLowerCase();
+  const filteredStores = stores.filter((store) => {
+    const matchesFilter =
+      currentFilter === "all stores" || store.status === currentFilter;
+    const matchesSearch =
+      store.name.toLowerCase().includes(searchQuery) ||
+      store.address.toLowerCase().includes(searchQuery) ||
+      store.manager.toLowerCase().includes(searchQuery);
+    return matchesFilter && matchesSearch;
+  });
+  return filteredStores;
+};
+
 // Utility Functions
 const formatTimeAgo = (date) => {
   const seconds = Math.floor((new Date() - date) / 1000);
@@ -121,15 +136,7 @@ const createStoreCard = (store) => {
 
 // Render Functions
 const renderStores = () => {
-  const filteredStores = stores.filter((store) => {
-    const matchesFilter =
-      currentFilter === "all stores" || store.status === currentFilter;
-    const matchesSearch =
-      store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      store.manager.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  const filteredStores = searchStores(searchQuery);
 
   storeGrid.innerHTML = "";
 

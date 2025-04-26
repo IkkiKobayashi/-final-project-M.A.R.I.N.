@@ -9,24 +9,58 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="login-container">
       <div class="login-box">
-        <div class="logo">
-          <h1>M.A.R.I.N</h1>
-          <p>Management & Analytics Resource Inventory Network</p>
+        <div class="logo-container">
+          <div class="logo-content">
+            <img
+              src="img/store logo/Marin LOGO.png"
+              alt="MARIN Logo"
+              class="logo-img"
+            />
+            <div class="logo-text">
+              <h1>M.A.R.I.N</h1>
+              <p>Management & Analytics Resource Inventory Network</p>
+            </div>
+          </div>
         </div>
         <form id="loginForm" class="login-form">
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required />
+            <label for="username">
+              <i class="fas fa-user"></i>
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Enter your username"
+              required
+            />
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
+            <label for="password">
+              <i class="fas fa-lock"></i>
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+            />
           </div>
-          <button type="submit" class="login-btn">Login</button>
+          <button type="submit" class="login-btn">
+            <i class="fas fa-sign-in-alt"></i>
+            Login
+          </button>
         </form>
       </div>
     </div>
