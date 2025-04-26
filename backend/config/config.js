@@ -10,8 +10,9 @@ module.exports = {
     process.env.MONGO_URI || "mongodb://localhost:27017/restaurant-management",
 
   // JWT Configuration
-  jwtSecret: process.env.JWT_SECRET || "your-super-secret-key",
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || "24h",
+  jwtSecret: process.env.JWT_SECRET || "your-secret-key",
+  jwtExpiresIn: "24h",
+  saltRounds: 10,
 
   // Email Configuration
   email: {

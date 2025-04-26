@@ -211,7 +211,7 @@
 }
 
 .employee-actions {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-top: 1px solid #f1f5f9;
   display: flex;
   gap: 0.75rem;
@@ -252,6 +252,29 @@
 .delete-btn:hover {
   background: #fecaca;
   color: #b91c1c;
+}
+
+/* Grid view specific styles */
+.grid-view .employee-actions {
+  margin-top: auto;
+}
+
+.grid-view .edit-btn span,
+.grid-view .delete-btn span {
+  display: inline;
+}
+
+/* List view specific styles */
+.list-view .employee-actions {
+  margin-left: auto;
+  padding: 0;
+  background: transparent;
+  align-items: center;
+}
+
+.list-view .edit-btn,
+.list-view .delete-btn {
+  padding: 0.375rem 0.75rem;
 }
 
 /* List View Specific Styles */
@@ -349,12 +372,13 @@
 }
 
 .list-view .employee-actions {
+  margin-left: auto;
   padding: 0;
   border: none;
   background: transparent;
-  margin-left: auto;
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .list-view .edit-btn,
@@ -516,14 +540,16 @@
 
 /* Image Upload Styles */
 .image-upload {
-  border: 2px dashed #e2e8f0;
-  border-radius: 8px;
-  padding: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
   background: #f8fafc;
-  position: relative;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .image-upload:hover {
@@ -531,39 +557,49 @@
   background: #ebf8ff;
 }
 
-.image-upload::after {
-  content: "Click to upload image";
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.85rem;
-  color: #718096;
-}
-
 .upload-preview {
   width: 120px;
   height: 120px;
-  margin: 0 auto 1rem;
+  border: 2px dashed #cbd5e1;
   border-radius: 50%;
-  overflow: hidden;
-  background: #e2e8f0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 3px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  background: #f8fafc;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-preview:hover {
+  border-color: #4299e1;
+  background: #ebf8ff;
 }
 
 .upload-preview i {
   font-size: 2.5rem;
   color: #a0aec0;
+  margin-bottom: 0.5rem;
+  z-index: 1;
+}
+
+.upload-text {
+  font-size: 0.9rem;
+  color: #718096;
+  text-align: center;
+  z-index: 1;
 }
 
 .upload-preview img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
+  z-index: 2;
 }
 
 #profileImage {
@@ -687,6 +723,20 @@
   .list-view .delete-btn {
     flex: 1;
     justify-content: center;
+  }
+
+  .grid-view .edit-btn span,
+  .grid-view .delete-btn span {
+    display: none;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    padding: 0.5rem;
+  }
+
+  .employee-actions {
+    padding: 0.75rem;
   }
 }
 
@@ -858,26 +908,17 @@
   color: #3b82f6;
 }
 
-/* Remove the old account creation styles */
-.account-creation,
-.form-check,
-.form-check-input,
-.form-check-label,
-.account-fields {
-  display: none;
-}
-
 /* Role-based access control */
 [data-role="manager"] {
   pointer-events: none;
   opacity: 0.7;
 }
 
-.employee-actions {
+/* Show/hide actions based on role */
+body:not(.admin) .employee-actions {
   display: none;
 }
 
-/* Show actions only for admin */
 body.admin .employee-actions {
   display: flex;
 }

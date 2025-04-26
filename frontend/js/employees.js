@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const closeModalBtn = document.querySelector(".close-modal-btn");
   const cancelBtn = document.querySelector(".cancel-btn");
   const imagePreview = document.getElementById("imagePreview");
-  const profileImageInput = document.getElementById("profileImage");
+  const profileImage = document.getElementById("profileImage");
   const searchInput = document.querySelector(".search-input");
   const viewToggleBtns = document.querySelectorAll(".toggle-btn");
   const imageUpload = document.querySelector(".image-upload");
   const saveBtn = document.querySelector(".save-btn");
 
   // Remove required attribute from profile image input to make it optional
-  profileImageInput.removeAttribute("required");
+  profileImage.removeAttribute("required");
 
   // State
   let employees = JSON.parse(localStorage.getItem("employees")) || [];
@@ -24,25 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentImageData = null;
 
   // Event Listeners
-  addEmployeeBtn.addEventListener("click", () => openModal());
+  addEmployeeBtn.addEventListener("click", openModal);
   closeModalBtn.addEventListener("click", closeModal);
   cancelBtn.addEventListener("click", closeModal);
-
-  // Account creation toggle
-  const createAccountCheckbox = document.getElementById("createAccount");
-  const accountFields = document.querySelector(".account-fields");
-  createAccountCheckbox.addEventListener("change", function () {
-    accountFields.style.display = this.checked ? "block" : "none";
-    if (this.checked) {
-      document.getElementById("accountEmail").required = true;
-      document.getElementById("accountPassword").required = true;
-      document.getElementById("confirmPassword").required = true;
-    } else {
-      document.getElementById("accountEmail").required = false;
-      document.getElementById("accountPassword").required = false;
-      document.getElementById("confirmPassword").required = false;
-    }
-  });
 
   // Form submission handler
   employeeForm.addEventListener("submit", function (e) {
@@ -50,17 +34,58 @@ document.addEventListener("DOMContentLoaded", function () {
     saveEmployee();
   });
 
-  // Save button click handler - direct approach
-  saveBtn.addEventListener("click", function () {
+  // Save button click handler
+  saveBtn.addEventListener("click", function (e) {
+    e.preventDefault();
     saveEmployee();
   });
 
-  // Image upload handler
-  imageUpload.addEventListener("click", function () {
-    profileImageInput.click();
-  });
+  // Image Upload Handling
+  if (imagePreview && profileImage) {
+    profileImage.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (!file.type.match("image.*")) {
+          showNotification("Please select an image file", "error");
+          return;
+        }
 
-  profileImageInput.addEventListener("change", handleImageUpload);
+        if (file.size > 5 * 1024 * 1024) {
+          showNotification("Image size should be less than 5MB", "error");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          currentImageData = e.target.result;
+          updateImagePreview(currentImageData);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function updateImagePreview(imageData) {
+    const imagePreview = document.getElementById("imagePreview");
+    const icon = imagePreview.querySelector("i");
+    const text = imagePreview.querySelector(".upload-text");
+
+    let img = imagePreview.querySelector("img");
+    if (!img) {
+      img = document.createElement("img");
+      imagePreview.appendChild(img);
+    }
+
+    img.src = imageData;
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "50%";
+
+    // Hide icon and text
+    if (icon) icon.style.display = "none";
+    if (text) text.style.display = "none";
+  }
 
   // Search handler
   searchInput.addEventListener("input", handleSearch);
@@ -70,98 +95,82 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.addEventListener("click", () => handleViewToggle(btn));
   });
 
+  // Image Upload Handling
+  imageUpload.addEventListener("click", function () {
+    profileImage.click();
+  });
+
+  profileImage.addEventListener("change", handleImageUpload);
+
   // Functions
   function saveEmployee() {
-    console.log("saveEmployee function called");
-
-    // Get form values
-    const name = document.getElementById("employeeName").value.trim();
-    const email = document.getElementById("employeeEmail").value.trim();
+    const name = document.getElementById("employeeName").value;
+    const email = document.getElementById("employeeEmail").value;
     const role = document.getElementById("employeeRole").value;
-    const phone = document.getElementById("employeePhone").value.trim();
-    const department = document
-      .getElementById("employeeDepartment")
-      .value.trim();
+    const phone = document.getElementById("employeePhone").value;
+    const department = document.getElementById("employeeDepartment").value;
     const joinedDate = document.getElementById("employeeJoinedDate").value;
-    const createAccount = document.getElementById("createAccount").checked;
-    const accountEmail = document.getElementById("accountEmail").value.trim();
     const accountPassword = document.getElementById("accountPassword").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
 
     // Validate required fields
-    if (!name || !email || !role || !phone || !department || !joinedDate) {
+    if (
+      !name ||
+      !email ||
+      !role ||
+      !phone ||
+      !department ||
+      !joinedDate ||
+      !accountPassword ||
+      !confirmPassword
+    ) {
       showNotification("Please fill in all required fields", "error");
       return;
     }
 
-    // Validate account creation fields if account creation is checked
-    if (createAccount) {
-      if (!accountEmail || !accountPassword || !confirmPassword) {
-        showNotification("Please fill in all account creation fields", "error");
-        return;
-      }
-      if (accountPassword !== confirmPassword) {
-        showNotification("Passwords do not match", "error");
-        return;
-      }
-      if (accountPassword.length < 8) {
-        showNotification(
-          "Password must be at least 8 characters long",
-          "error"
-        );
-        return;
-      }
+    // Validate passwords
+    if (accountPassword !== confirmPassword) {
+      showNotification("Passwords do not match", "error");
+      return;
+    }
+    if (accountPassword.length < 8) {
+      showNotification("Password must be at least 8 characters long", "error");
+      return;
     }
 
-    // Create employee object
     const employee = {
       id: editingEmployeeId || Date.now().toString(),
-      name: name,
-      email: email,
-      role: role,
-      phone: phone,
-      department: department,
-      joinedDate: joinedDate,
-      profileImage: currentImageData || "assets/profile-placeholder.jpg",
-    };
-
-    // Add account information if account creation is checked
-    if (createAccount) {
-      employee.account = {
-        email: accountEmail,
+      name,
+      email,
+      role,
+      phone,
+      department,
+      joinedDate,
+      profileImage: currentImageData || "img/user img/store admin.jpg",
+      account: {
+        email: email, // Using the same email for login
         password: accountPassword,
         role: role,
-      };
-    }
+      },
+    };
 
-    // Update or add employee
     if (editingEmployeeId) {
       const index = employees.findIndex((emp) => emp.id === editingEmployeeId);
       if (index !== -1) {
+        // Preserve the existing image if no new image was uploaded
+        if (!currentImageData) {
+          employee.profileImage = employees[index].profileImage;
+        }
         employees[index] = employee;
       }
     } else {
       employees.push(employee);
     }
 
-    // Save to localStorage
-    try {
-      localStorage.setItem("employees", JSON.stringify(employees));
-      console.log("Saved to localStorage:", employees);
-
-      // Update UI
-      renderEmployees();
-      closeModal();
-
-      // Show success message
-      showNotification("Employee saved successfully!");
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-      showNotification(
-        "Error saving employee data. Please try again.",
-        "error"
-      );
-    }
+    localStorage.setItem("employees", JSON.stringify(employees));
+    showNotification("Employee saved successfully!");
+    closeModal();
+    renderEmployees();
   }
 
   function openModal(employee = null) {
@@ -174,10 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
       editingEmployeeId = null;
       document.querySelector(".modal-title").textContent = "Add New Employee";
       employeeForm.reset();
-      imagePreview.innerHTML = '<i class="fas fa-user"></i>';
-      currentImageData = null;
-      document.getElementById("createAccount").checked = false;
-      document.querySelector(".account-fields").style.display = "none";
+      resetImagePreview();
     }
   }
 
@@ -185,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
     employeeModal.classList.remove("active");
     employeeForm.reset();
     editingEmployeeId = null;
-    currentImageData = null;
+    resetImagePreview();
   }
 
   function handleImageUpload(e) {
@@ -245,7 +251,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (employee.profileImage) {
       currentImageData = employee.profileImage;
-      imagePreview.innerHTML = `<img src="${employee.profileImage}" alt="Profile Preview">`;
+      const imagePreview = document.getElementById("imagePreview");
+      const img =
+        imagePreview.querySelector("img") || document.createElement("img");
+      img.src = employee.profileImage;
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "50%";
+      imagePreview.appendChild(img);
+
+      const icon = imagePreview.querySelector("i");
+      const text = imagePreview.querySelector(".upload-text");
+      if (icon) icon.style.display = "none";
+      if (text) text.style.display = "none";
     }
   }
 
@@ -270,14 +289,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function deleteEmployee(id) {
     if (confirm("Are you sure you want to delete this employee?")) {
       employees = employees.filter((emp) => emp.id !== id);
-      try {
-        localStorage.setItem("employees", JSON.stringify(employees));
-        renderEmployees();
-        showNotification("Employee deleted successfully");
-      } catch (error) {
-        console.error("Error deleting employee:", error);
-        showNotification("Error deleting employee. Please try again.", "error");
-      }
+      localStorage.setItem("employees", JSON.stringify(employees));
+      renderEmployees();
+      showNotification("Employee deleted successfully");
     }
   }
 
@@ -321,32 +335,19 @@ document.addEventListener("DOMContentLoaded", function () {
           ).toLocaleDateString()}</p>
         </div>
         <div class="employee-actions">
-          <button class="edit-btn" data-id="${employee.id}">
+          <button class="edit-btn" onclick="editEmployee('${employee.id}')">
             <i class="fas fa-edit"></i>
+            <span>Edit</span>
           </button>
-          <button class="delete-btn" data-id="${employee.id}">
+          <button class="delete-btn" onclick="deleteEmployee('${employee.id}')">
             <i class="fas fa-trash"></i>
+            <span>Delete</span>
           </button>
         </div>
       </div>
     `
       )
       .join("");
-
-    // Add event listeners to the newly created buttons
-    document.querySelectorAll(".edit-btn").forEach((btn) => {
-      btn.addEventListener("click", function () {
-        const id = this.getAttribute("data-id");
-        editEmployee(id);
-      });
-    });
-
-    document.querySelectorAll(".delete-btn").forEach((btn) => {
-      btn.addEventListener("click", function () {
-        const id = this.getAttribute("data-id");
-        deleteEmployee(id);
-      });
-    });
   }
 
   // Make functions globally available
@@ -356,3 +357,64 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initial render
   renderEmployees();
 });
+
+// Function to reset image preview
+function resetImagePreview() {
+  const imagePreview = document.getElementById("imagePreview");
+  const uploadText = imagePreview.querySelector(".upload-text");
+  const uploadIcon = imagePreview.querySelector("i");
+  const img = imagePreview.querySelector("img");
+
+  if (img) {
+    img.remove();
+  }
+  if (uploadIcon) {
+    uploadIcon.style.display = "block";
+  }
+  if (uploadText) {
+    uploadText.style.display = "block";
+  }
+  currentImageData = null;
+}
+
+// Make handleImageUpload globally available
+window.handleImageUpload = function (input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Check if file is an image
+  if (!file.type.startsWith("image/")) {
+    showNotification("Please select an image file", "error");
+    return;
+  }
+
+  // Check file size (limit to 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showNotification("Image size should be less than 5MB", "error");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const imagePreview = document.getElementById("imagePreview");
+    const icon = imagePreview.querySelector("i");
+    const text = imagePreview.querySelector(".upload-text");
+
+    // Create or update image element
+    let img = imagePreview.querySelector("img");
+    if (!img) {
+      img = document.createElement("img");
+      imagePreview.appendChild(img);
+    }
+    img.src = e.target.result;
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "50%";
+
+    // Hide icon and text
+    if (icon) icon.style.display = "none";
+    if (text) text.style.display = "none";
+  };
+  reader.readAsDataURL(file);
+};

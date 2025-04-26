@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M.A.R.I.N - Sign Up</title>
+    <link rel="stylesheet" href="css/signup.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="signup-container">
+      <div class="signup-box">
+        <div class="logo-container">
+          <div class="logo-content">
+            <img
+              src="img/store logo/Marin LOGO.png"
+              alt="MARIN Logo"
+              class="logo-img"
+            />
+            <div class="logo-text">
+              <h1>M.A.R.I.N</h1>
+              <p>Management & Analytics Resource Inventory Network</p>
+            </div>
+          </div>
+        </div>
+        <form id="signupForm" class="signup-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName">
+                <i class="fas fa-user"></i>
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">
+                <i class="fas fa-envelope"></i>
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username">
+                <i class="fas fa-user-circle"></i>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i>
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Choose a password"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">
+              <i class="fas fa-lock"></i>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm your password"
+              required
+            />
+          </div>
+          <button type="submit" class="signup-btn">
+            <i class="fas fa-user-plus"></i>
+            Create Account
+          </button>
+          <div class="login-link">
+            Already have an account? <a href="login.html">Login here</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="js/signup.js"></script>
+  </body>
+</html>

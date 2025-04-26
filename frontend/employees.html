@@ -266,6 +266,7 @@
               id="accountPassword"
               name="accountPassword"
               placeholder="Set password for employee account"
+              required
             />
           </div>
           <div class="form-group">
@@ -275,20 +276,25 @@
               id="confirmPassword"
               name="confirmPassword"
               placeholder="Confirm the password"
+              required
             />
           </div>
           <div class="form-group">
             <label>Profile Picture</label>
-            <div class="image-upload">
+            <div
+              class="image-upload"
+              onclick="document.getElementById('profileImage').click()"
+            >
               <div class="upload-preview" id="imagePreview">
                 <i class="fas fa-user"></i>
+                <span class="upload-text">Add a photo</span>
               </div>
               <input
                 type="file"
                 id="profileImage"
                 name="profileImage"
                 accept="image/*"
-                required
+                onchange="handleImageUpload(this)"
               />
             </div>
           </div>
@@ -307,13 +313,16 @@
       // Role-based access control
       document.addEventListener("DOMContentLoaded", function () {
         // Get user role from session storage (this should be set when user logs in)
-        const userRole = sessionStorage.getItem("userRole");
+        const userRole = sessionStorage.getItem("userRole") || "admin"; // Default to admin for testing
         const employeesLink = document.querySelector(
           'a[href="employees.html"]'
         );
         const addEmployeeBtn = document.getElementById("addEmployeeBtn");
         const employeeForm = document.getElementById("employeeForm");
         const employeeActions = document.querySelectorAll(".employee-actions");
+
+        // Add role class to body
+        document.body.classList.add(userRole);
 
         if (userRole === "employee") {
           // Hide employees page from employees
