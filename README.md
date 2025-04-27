@@ -42,9 +42,6 @@ This system is designed to simplify inventory management by providing real-time 
 **Multi-Store Management**
   - Allows management of multiple stores, each with its own inventory, employees, and activity logs.
 
-**Data Backup & Restore**
-  - Enables secure backup and restoration of system data to prevent loss and support recovery.
-
 ---
 
 ## 👥 Members
