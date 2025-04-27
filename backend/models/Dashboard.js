@@ -1,5 +1,30 @@
 const mongoose = require("mongoose");
 
+const widgetSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["inventory", "sales", "products", "activity", "alerts", "employees"],
+    required: true,
+  },
+  position: {
+    x: Number,
+    y: Number,
+  },
+  size: {
+    width: { type: Number, default: 1 },
+    height: { type: Number, default: 1 },
+  },
+  settings: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+    default: {},
+  },
+  isEnabled: {
+    type: Boolean,
+    default: true,
+  },
+});
+
 const dashboardSchema = new mongoose.Schema(
   {
     user: {
@@ -10,50 +35,22 @@ const dashboardSchema = new mongoose.Schema(
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",
+      required: true,
     },
     layout: {
       type: String,
-      enum: ["grid", "list", "custom"],
+      enum: ["grid", "list", "compact"],
       default: "grid",
     },
-    widgets: [
-      {
-        type: {
-          type: String,
-          enum: [
-            "inventory",
-            "sales",
-            "products",
-            "activity",
-            "alerts",
-            "custom",
-          ],
-          required: true,
-        },
-        position: {
-          x: Number,
-          y: Number,
-          width: Number,
-          height: Number,
-        },
-        config: {
-          type: Map,
-          of: mongoose.Schema.Types.Mixed,
-        },
-        isVisible: {
-          type: Boolean,
-          default: true,
-        },
-      },
-    ],
+    widgets: [widgetSchema],
     theme: {
       type: String,
       enum: ["light", "dark", "system"],
       default: "light",
     },
     refreshInterval: {
-      type: Number, // in minutes
-      default: 5,
+      type: Number, // in seconds
+      default: 300, // 5 minutes
     },
   },
   {

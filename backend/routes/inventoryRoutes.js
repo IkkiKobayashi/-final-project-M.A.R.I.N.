@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Inventory = require("../models/Inventory");
+const Product = require("../models/Product");
+const { auth, checkRole } = require("../middleware/auth");
+const ActivityLog = require("../models/ActivityLog");
+
+// All routes require authentication
+router.use(auth);
 
 // Create inventory record
 router.post("/", async (req, res) => {
@@ -73,9 +79,9 @@ router.delete("/:id", async (req, res) => {
 // Get inventory by store
 router.get("/store/:storeId", async (req, res) => {
   try {
-    const inventory = await Inventory.find({
-      store: req.params.storeId,
-    }).populate("product");
+    const inventory = await Inventory.find({ store: req.params.storeId })
+      .populate("product")
+      .sort({ status: 1, expiryDate: 1 });
     res.json(inventory);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -85,21 +91,133 @@ router.get("/store/:storeId", async (req, res) => {
 // Get inventory by product
 router.get("/product/:productId", async (req, res) => {
   try {
-    const inventory = await Inventory.find({
+    const inventory = await Inventory.findOne({
       product: req.params.productId,
-    }).populate("store");
+      store: req.query.storeId,
+    }).populate("product");
+    if (!inventory) {
+      return res.status(404).json({ message: "Inventory not found" });
+    }
     res.json(inventory);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
+// Add stock (admin and manager only)
+router.post("/add-stock", checkRole(["admin", "manager"]), async (req, res) => {
+  try {
+    const { productId, storeId, quantity, batchNumber, expiryDate, location } =
+      req.body;
+
+    let inventory = await Inventory.findOne({
+      product: productId,
+      store: storeId,
+      batchNumber: batchNumber,
+    });
+
+    if (inventory) {
+      inventory.quantity += quantity;
+    } else {
+      inventory = new Inventory({
+        product: productId,
+        store: storeId,
+        quantity,
+        batchNumber,
+        expiryDate,
+        location,
+        lastUpdatedBy: req.user.userId,
+      });
+    }
+
+    // Update status based on quantity
+    inventory.status = await updateInventoryStatus(inventory);
+    await inventory.save();
+
+    // Log activity
+    const activity = new ActivityLog({
+      user: req.user.userId,
+      store: storeId,
+      action: "add",
+      entityType: "inventory",
+      entityId: inventory._id,
+      details: `Added ${quantity} units to inventory`,
+    });
+    await activity.save();
+
+    res.status(201).json(inventory);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Remove stock (admin and manager only)
+router.post(
+  "/remove-stock",
+  checkRole(["admin", "manager"]),
+  async (req, res) => {
+    try {
+      const { productId, storeId, quantity, batchNumber } = req.body;
+
+      const inventory = await Inventory.findOne({
+        product: productId,
+        store: storeId,
+        batchNumber: batchNumber,
+      });
+
+      if (!inventory) {
+        return res.status(404).json({ message: "Inventory not found" });
+      }
+
+      if (inventory.quantity < quantity) {
+        return res.status(400).json({ message: "Insufficient stock" });
+      }
+
+      inventory.quantity -= quantity;
+      inventory.status = await updateInventoryStatus(inventory);
+      inventory.lastUpdatedBy = req.user.userId;
+      await inventory.save();
+
+      // Log activity
+      const activity = new ActivityLog({
+        user: req.user.userId,
+        store: storeId,
+        action: "remove",
+        entityType: "inventory",
+        entityId: inventory._id,
+        details: `Removed ${quantity} units from inventory`,
+      });
+      await activity.save();
+
+      res.json(inventory);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
 // Get low stock items
 router.get("/low-stock/:storeId", async (req, res) => {
   try {
     const inventory = await Inventory.find({
       store: req.params.storeId,
-      quantity: { $lte: "$minStockLevel" },
+      status: "low_stock",
+    }).populate("product");
+    res.json(inventory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get expiring items
+router.get("/expiring/:storeId", async (req, res) => {
+  try {
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const inventory = await Inventory.find({
+      store: req.params.storeId,
+      expiryDate: { $lte: thirtyDaysFromNow, $gt: new Date() },
     }).populate("product");
     res.json(inventory);
   } catch (error) {
@@ -124,5 +242,18 @@ router.patch("/:id/quantity", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+// Helper function to update inventory status
+async function updateInventoryStatus(inventory) {
+  const product = await Product.findById(inventory.product);
+
+  if (inventory.quantity === 0) {
+    return "out_of_stock";
+  } else if (inventory.quantity <= product.threshold) {
+    return "low_stock";
+  } else {
+    return "in_stock";
+  }
+}
 
 module.exports = router;

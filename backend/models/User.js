@@ -18,36 +18,30 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      minlength: 8,
     },
     role: {
       type: String,
       enum: ["admin", "manager", "employee"],
       default: "employee",
     },
-    profileImage: {
-      type: String,
-    },
-    position: {
-      type: String,
-    },
-    department: {
-      type: String,
-    },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",
     },
-    lastLogin: {
-      type: Date,
+    profileImage: {
+      type: String,
+      default: "img/user img/store admin.jpg",
     },
+    department: String,
+    phone: String,
     isActive: {
       type: Boolean,
       default: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+    lastLogin: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   {
     timestamps: true,
@@ -67,9 +61,9 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Method to compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+// Method to check password
+userSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);

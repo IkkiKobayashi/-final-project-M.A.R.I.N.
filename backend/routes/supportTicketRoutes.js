@@ -1,95 +1,46 @@
 const express = require("express");
 const router = express.Router();
 const SupportTicket = require("../models/SupportTicket");
+const { auth, checkRole } = require("../middleware/auth");
+const ActivityLog = require("../models/ActivityLog");
 
-// Create support ticket
+// All routes require authentication
+router.use(auth);
+
+// Create ticket
 router.post("/", async (req, res) => {
   try {
-    const ticket = new SupportTicket(req.body);
+    const ticket = new SupportTicket({
+      ...req.body,
+      createdBy: req.user.userId,
+      status: "open",
+    });
     await ticket.save();
+
+    // Log activity
+    const activity = new ActivityLog({
+      user: req.user.userId,
+      store: ticket.store,
+      action: "add",
+      entityType: "support_ticket",
+      entityId: ticket._id,
+      details: `Created support ticket: ${ticket.subject}`,
+    });
+    await activity.save();
+
     res.status(201).json(ticket);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// Get all support tickets
-router.get("/", async (req, res) => {
+// Get all tickets (admin only)
+router.get("/", checkRole(["admin"]), async (req, res) => {
   try {
     const tickets = await SupportTicket.find()
-      .populate("user")
-      .populate("store")
-      .populate("assignedTo");
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get ticket by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const ticket = await SupportTicket.findById(req.params.id)
-      .populate("user")
-      .populate("store")
-      .populate("assignedTo");
-    if (!ticket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Update ticket
-router.put("/:id", async (req, res) => {
-  try {
-    const ticket = await SupportTicket.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!ticket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-    res.json(ticket);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-// Delete ticket
-router.delete("/:id", async (req, res) => {
-  try {
-    const ticket = await SupportTicket.findByIdAndDelete(req.params.id);
-    if (!ticket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-    res.json({ message: "Ticket deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get tickets by status
-router.get("/status/:status", async (req, res) => {
-  try {
-    const tickets = await SupportTicket.find({ status: req.params.status })
-      .populate("user")
-      .populate("store");
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get tickets by user
-router.get("/user/:userId", async (req, res) => {
-  try {
-    const tickets = await SupportTicket.find({ user: req.params.userId })
-      .populate("store")
-      .populate("assignedTo");
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("store", "name");
     res.json(tickets);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -100,11 +51,108 @@ router.get("/user/:userId", async (req, res) => {
 router.get("/store/:storeId", async (req, res) => {
   try {
     const tickets = await SupportTicket.find({ store: req.params.storeId })
-      .populate("user")
-      .populate("assignedTo");
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
     res.json(tickets);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Get user's tickets
+router.get("/my-tickets", async (req, res) => {
+  try {
+    const tickets = await SupportTicket.find({ createdBy: req.user.userId })
+      .populate("assignedTo", "name email")
+      .populate("store", "name");
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get assigned tickets
+router.get("/assigned", checkRole(["admin", "manager"]), async (req, res) => {
+  try {
+    const tickets = await SupportTicket.find({ assignedTo: req.user.userId })
+      .populate("createdBy", "name email")
+      .populate("store", "name");
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get single ticket
+router.get("/:id", async (req, res) => {
+  try {
+    const ticket = await SupportTicket.findById(req.params.id)
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("store", "name");
+
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    // Check if user has access to this ticket
+    if (
+      req.user.role !== "admin" &&
+      ticket.createdBy._id.toString() !== req.user.userId &&
+      ticket.assignedTo?._id.toString() !== req.user.userId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this ticket" });
+    }
+
+    res.json(ticket);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update ticket
+router.put("/:id", async (req, res) => {
+  try {
+    const ticket = await SupportTicket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    // Check authorization
+    if (
+      req.user.role !== "admin" &&
+      ticket.createdBy.toString() !== req.user.userId &&
+      ticket.assignedTo?.toString() !== req.user.userId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update this ticket" });
+    }
+
+    // Only admin/manager can change assignment
+    if (req.user.role !== "admin" && req.user.role !== "manager") {
+      delete req.body.assignedTo;
+    }
+
+    Object.assign(ticket, req.body);
+    await ticket.save();
+
+    // Log activity
+    const activity = new ActivityLog({
+      user: req.user.userId,
+      store: ticket.store,
+      action: "edit",
+      entityType: "support_ticket",
+      entityId: ticket._id,
+      details: `Updated support ticket: ${ticket.subject}`,
+    });
+    await activity.save();
+
+    res.json(ticket);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 });
 
@@ -115,26 +163,67 @@ router.post("/:id/comments", async (req, res) => {
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
     }
-    ticket.comments.push(req.body);
+
+    const comment = {
+      content: req.body.content,
+      user: req.user.userId,
+      createdAt: new Date(),
+    };
+
+    ticket.comments.push(comment);
     await ticket.save();
-    res.json(ticket);
+
+    // Log activity
+    const activity = new ActivityLog({
+      user: req.user.userId,
+      store: ticket.store,
+      action: "add",
+      entityType: "ticket_comment",
+      entityId: ticket._id,
+      details: `Added comment to ticket: ${ticket.subject}`,
+    });
+    await activity.save();
+
+    res.status(201).json(comment);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// Update ticket status
-router.patch("/:id/status", async (req, res) => {
+// Close ticket
+router.patch("/:id/close", async (req, res) => {
   try {
-    const { status } = req.body;
-    const ticket = await SupportTicket.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true, runValidators: true }
-    );
+    const ticket = await SupportTicket.findById(req.params.id);
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
     }
+
+    // Check authorization
+    if (
+      req.user.role !== "admin" &&
+      ticket.assignedTo?.toString() !== req.user.userId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to close this ticket" });
+    }
+
+    ticket.status = "closed";
+    ticket.closedAt = new Date();
+    ticket.closedBy = req.user.userId;
+    await ticket.save();
+
+    // Log activity
+    const activity = new ActivityLog({
+      user: req.user.userId,
+      store: ticket.store,
+      action: "edit",
+      entityType: "support_ticket",
+      entityId: ticket._id,
+      details: `Closed support ticket: ${ticket.subject}`,
+    });
+    await activity.save();
+
     res.json(ticket);
   } catch (error) {
     res.status(400).json({ message: error.message });

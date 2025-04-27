@@ -1,63 +1,107 @@
 const mongoose = require("mongoose");
 
+const notificationSettingsSchema = new mongoose.Schema({
+  email: {
+    lowStock: { type: Boolean, default: true },
+    expiringItems: { type: Boolean, default: true },
+    activityAlerts: { type: Boolean, default: true },
+  },
+  push: {
+    lowStock: { type: Boolean, default: true },
+    expiringItems: { type: Boolean, default: true },
+    activityAlerts: { type: Boolean, default: true },
+  },
+  threshold: {
+    lowStock: { type: Number, default: 10 },
+    expiryWarningDays: { type: Number, default: 30 },
+  },
+});
+
 const settingsSchema = new mongoose.Schema(
   {
-    company: {
-      name: String,
-      logo: String,
-      address: {
-        street: String,
-        city: String,
-        state: String,
-        country: String,
-        postalCode: String,
-      },
-      contact: {
-        phone: String,
-        email: String,
-        website: String,
+    scope: {
+      type: String,
+      enum: ["global", "store", "user"],
+      required: true,
+    },
+    store: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+      required: function () {
+        return this.scope === "store";
       },
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: function () {
+        return this.scope === "user";
+      },
+    },
+    theme: {
+      type: String,
+      enum: ["light", "dark", "system"],
+      default: "system",
+    },
+    language: {
+      type: String,
+      default: "en",
+    },
+    dateFormat: {
+      type: String,
+      default: "MM/DD/YYYY",
+    },
+    timeFormat: {
+      type: String,
+      default: "12h",
+    },
+    currency: {
+      type: String,
+      default: "USD",
+    },
+    notifications: notificationSettingsSchema,
     inventory: {
       lowStockThreshold: {
         type: Number,
         default: 10,
       },
-      autoReorder: {
+      expiryWarningDays: {
+        type: Number,
+        default: 30,
+      },
+      autoReorderEnabled: {
         type: Boolean,
         default: false,
       },
-      defaultReorderQuantity: {
+      autoReorderThreshold: {
         type: Number,
-        default: 50,
-      },
-    },
-    notifications: {
-      email: {
-        lowStock: Boolean,
-        newOrder: Boolean,
-        systemAlerts: Boolean,
-      },
-      sms: {
-        lowStock: Boolean,
-        newOrder: Boolean,
-        systemAlerts: Boolean,
+        default: 5,
       },
     },
     security: {
-      passwordPolicy: {
-        minLength: Number,
-        requireSpecialChar: Boolean,
-        requireNumber: Boolean,
-        requireUppercase: Boolean,
+      mfaEnabled: {
+        type: Boolean,
+        default: false,
       },
-      sessionTimeout: Number, // in minutes
-      maxLoginAttempts: Number,
+      sessionTimeout: {
+        type: Number,
+        default: 30, // minutes
+      },
+      passwordPolicy: {
+        minLength: { type: Number, default: 8 },
+        requireNumbers: { type: Boolean, default: true },
+        requireSpecialChars: { type: Boolean, default: true },
+        requireUppercase: { type: Boolean, default: true },
+        expiryDays: { type: Number, default: 90 },
+      },
     },
-    theme: {
-      primaryColor: String,
-      secondaryColor: String,
-      darkMode: Boolean,
+    customization: {
+      logo: String,
+      colors: {
+        primary: { type: String, default: "#3B82F6" },
+        secondary: { type: String, default: "#6B7280" },
+        accent: { type: String, default: "#10B981" },
+      },
     },
   },
   {
@@ -65,13 +109,29 @@ const settingsSchema = new mongoose.Schema(
   }
 );
 
-// Ensure only one settings document exists
-settingsSchema.statics.getSettings = async function () {
-  let settings = await this.findOne();
-  if (!settings) {
-    settings = await this.create({});
+// Ensure unique combinations based on scope
+settingsSchema.index(
+  { scope: 1, store: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { scope: "store" },
   }
-  return settings;
-};
+);
+
+settingsSchema.index(
+  { scope: 1, user: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { scope: "user" },
+  }
+);
+
+settingsSchema.index(
+  { scope: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { scope: "global" },
+  }
+);
 
 module.exports = mongoose.model("Settings", settingsSchema);

@@ -1,42 +1,95 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const auth = async (req, res, next) => {
+// Authentication middleware
+exports.auth = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "No token, authorization denied" });
+      return res.status(401).json({
+        message: "No authentication token, access denied",
+        code: "AUTH_NO_TOKEN",
+      });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId).select("-password");
 
-    if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      if (!user) {
+        return res.status(401).json({
+          message: "User not found",
+          code: "AUTH_USER_NOT_FOUND",
+        });
+      }
+
+      if (!user.isActive) {
+        return res.status(401).json({
+          message: "User account is inactive",
+          code: "AUTH_USER_INACTIVE",
+        });
+      }
+
+      req.user = {
+        userId: user._id,
+        role: user.role,
+        store: user.store,
+        lastActive: new Date(),
+      };
+
+      next();
+    } catch (jwtError) {
+      return res.status(401).json({
+        message:
+          jwtError.name === "TokenExpiredError"
+            ? "Token has expired"
+            : "Token is invalid",
+        code:
+          jwtError.name === "TokenExpiredError"
+            ? "AUTH_TOKEN_EXPIRED"
+            : "AUTH_INVALID_TOKEN",
+      });
     }
-
-    req.user = user;
-    next();
   } catch (error) {
-    res.status(401).json({ message: "Token is not valid" });
+    console.error("Auth middleware error:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      code: "AUTH_INTERNAL_ERROR",
+    });
   }
 };
 
-const checkRole = (roles) => {
+// Role-based access control middleware
+exports.checkRole = (roles) => {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(403).json({
+        message: "Access denied: insufficient permissions",
+      });
     }
-
     next();
   };
 };
 
-module.exports = { auth, checkRole };
+// Store access middleware
+exports.checkStoreAccess = async (req, res, next) => {
+  try {
+    const storeId = req.params.storeId || req.body.storeId;
+
+    // Admins have access to all stores
+    if (req.user.role === "admin") {
+      return next();
+    }
+
+    // Check if user belongs to the store
+    if (req.user.store?.toString() !== storeId) {
+      return res.status(403).json({
+        message: "Access denied: you don't have access to this store",
+      });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

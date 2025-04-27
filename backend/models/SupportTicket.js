@@ -1,8 +1,24 @@
 const mongoose = require("mongoose");
 
+const commentSchema = new mongoose.Schema({
+  content: {
+    type: String,
+    required: true,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const supportTicketSchema = new mongoose.Schema(
   {
-    title: {
+    subject: {
       type: String,
       required: true,
       trim: true,
@@ -11,18 +27,14 @@ const supportTicketSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",
+      required: true,
     },
     category: {
       type: String,
-      enum: ["technical", "inventory", "account", "billing", "other"],
+      enum: ["technical", "access", "inventory", "billing", "other"],
       required: true,
     },
     priority: {
@@ -32,30 +44,19 @@ const supportTicketSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "in_progress", "resolved", "closed"],
+      enum: ["open", "in_progress", "on_hold", "resolved", "closed"],
       default: "open",
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    comments: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        text: {
-          type: String,
-          required: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    comments: [commentSchema],
     attachments: [
       {
         filename: String,
@@ -70,15 +71,73 @@ const supportTicketSchema = new mongoose.Schema(
         },
       },
     ],
+    resolution: {
+      note: String,
+      resolvedAt: Date,
+      resolvedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+    closedAt: Date,
+    closedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    dueDate: Date,
+    tags: [String],
+    // For tracking time spent on the ticket
+    timeTracking: {
+      totalTime: { type: Number, default: 0 }, // in minutes
+      logs: [
+        {
+          startTime: Date,
+          endTime: Date,
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+          notes: String,
+        },
+      ],
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Index for efficient querying
-supportTicketSchema.index({ status: 1, createdAt: -1 });
-supportTicketSchema.index({ user: 1, createdAt: -1 });
+// Indexes for efficient querying
+supportTicketSchema.index({ store: 1, status: 1 });
 supportTicketSchema.index({ assignedTo: 1, status: 1 });
+supportTicketSchema.index({ createdBy: 1, status: 1 });
+supportTicketSchema.index({ priority: 1, status: 1, createdAt: -1 });
+
+// Virtual for ticket age
+supportTicketSchema.virtual("age").get(function () {
+  return Math.floor(
+    (Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+  );
+});
+
+// Method to add time tracking entry
+supportTicketSchema.methods.addTimeTrackingLog = async function (
+  startTime,
+  endTime,
+  userId,
+  notes
+) {
+  const timeSpent = Math.floor(
+    (new Date(endTime) - new Date(startTime)) / (1000 * 60)
+  ); // Convert to minutes
+  this.timeTracking.logs.push({
+    startTime,
+    endTime,
+    user: userId,
+    notes,
+  });
+  this.timeTracking.totalTime += timeSpent;
+  await this.save();
+};
 
 module.exports = mongoose.model("SupportTicket", supportTicketSchema);

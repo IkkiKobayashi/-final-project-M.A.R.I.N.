@@ -15,30 +15,30 @@ const inventorySchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
+      min: 0,
       default: 0,
     },
-    minStockLevel: {
-      type: Number,
+    batchNumber: {
+      type: String,
       required: true,
-      default: 10,
     },
-    maxStockLevel: {
-      type: Number,
-      required: true,
-      default: 100,
+    expiryDate: {
+      type: Date,
     },
     location: {
       aisle: String,
       shelf: String,
       bin: String,
     },
-    lastRestocked: {
-      type: Date,
-    },
     status: {
       type: String,
-      enum: ["in_stock", "low_stock", "out_of_stock"],
+      enum: ["in_stock", "low_stock", "out_of_stock", "expired", "near_expiry"],
       default: "in_stock",
+    },
+    lastUpdatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   {
@@ -46,7 +46,14 @@ const inventorySchema = new mongoose.Schema(
   }
 );
 
-// Compound index to ensure unique product-store combination
-inventorySchema.index({ product: 1, store: 1 }, { unique: true });
+// Ensure unique product-store-batch combination
+inventorySchema.index(
+  { product: 1, store: 1, batchNumber: 1 },
+  { unique: true }
+);
+
+// Create compound index for efficient querying
+inventorySchema.index({ store: 1, status: 1 });
+inventorySchema.index({ expiryDate: 1 });
 
 module.exports = mongoose.model("Inventory", inventorySchema);

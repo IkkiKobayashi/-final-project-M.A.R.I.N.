@@ -1,57 +1,85 @@
-require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
+const config = require("./config/config");
 const connectDB = require("./config/db");
-const mongoose = require("mongoose");
-const { auth } = require("./middleware/auth");
+const configureMiddleware = require("./config/middleware");
+const path = require("path");
 
 // Import routes
+const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const storeRoutes = require("./routes/storeRoutes");
 const productRoutes = require("./routes/productRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
-const storeRoutes = require("./routes/storeRoutes");
-const supportTicketRoutes = require("./routes/supportTicketRoutes");
+const activityLogRoutes = require("./routes/activityLogRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const supportTicketRoutes = require("./routes/supportTicketRoutes");
 
+// Initialize express app
 const app = express();
-connectDB();
-
-// Middleware
-app.use(
-  cors({
-    origin: "http://localhost:5500", // Update this with your frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-app.use(express.json());
 
 // Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+connectDB();
 
-// Routes
+// Configure middleware
+configureMiddleware(app);
+
+// Static file serving
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// API Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/stores", storeRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/inventory", inventoryRoutes);
-app.use("/api/stores", storeRoutes);
-app.use("/api/support", supportTicketRoutes);
+app.use("/api/activity", activityLogRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/employees", require("./routes/employeeRoutes"));
+app.use("/api/settings", settingsRoutes);
+app.use("/api/support", supportTicketRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: "Something went wrong!",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date(),
+    uptime: process.uptime(),
   });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+// Global error handling
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  // Graceful shutdown
+  process.exit(1);
 });
+
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled Rejection:", error);
+});
+
+// Graceful shutdown handlers
+const shutdown = async () => {
+  console.log("Shutting down server...");
+  server.close(() => {
+    console.log("Server closed");
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+
+// Start server with error handling
+const PORT = config.server.port;
+const server = app
+  .listen(PORT, () => {
+    console.log(
+      `Server is running in ${config.server.env} mode on port ${PORT}`
+    );
+    console.log(`API URL: ${config.server.apiUrl}`);
+  })
+  .on("error", (error) => {
+    console.error("Server startup error:", error);
+    process.exit(1);
+  });

@@ -7,34 +7,42 @@ const activityLogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    action: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      enum: ["inventory", "product", "user", "store", "system"],
-      required: true,
-    },
-    details: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
-    },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",
+      required: true,
     },
-    ipAddress: String,
-    userAgent: String,
+    action: {
+      type: String,
+      enum: ["add", "edit", "delete", "view", "login", "logout", "other"],
+      required: true,
+    },
+    entityType: {
+      type: String,
+      enum: ["product", "inventory", "employee", "store", "user", "system"],
+      required: true,
+    },
+    entityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    details: {
+      type: String,
+      required: true,
+    },
+    metadata: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Index for efficient querying
-activityLogSchema.index({ category: 1, createdAt: -1 });
-activityLogSchema.index({ user: 1, createdAt: -1 });
+// Create indexes for efficient filtering and searching
 activityLogSchema.index({ store: 1, createdAt: -1 });
+activityLogSchema.index({ user: 1, createdAt: -1 });
+activityLogSchema.index({ action: 1, entityType: 1 });
 
 module.exports = mongoose.model("ActivityLog", activityLogSchema);
