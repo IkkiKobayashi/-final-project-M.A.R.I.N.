@@ -7,44 +7,34 @@ const storeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    address: {
+    location: {
       type: String,
       required: true,
     },
-    manager: {
+    owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["active", "inactive"],
-      default: "active",
-    },
-    image: {
-      type: String,
-      default: "https://via.placeholder.com/400x200",
-    },
-    employees: [
+    products: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Product",
       },
     ],
-    settings: {
-      lowStockThreshold: {
-        type: Number,
-        default: 10,
+    inventory: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        quantity: Number,
+        lastUpdated: Date,
       },
-      expiryWarningDays: {
-        type: Number,
-        default: 30,
-      },
-      notificationPreferences: {
-        lowStock: { type: Boolean, default: true },
-        expiryWarning: { type: Boolean, default: true },
-        activityAlerts: { type: Boolean, default: true },
-      },
+    ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   {

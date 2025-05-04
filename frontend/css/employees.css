@@ -107,6 +107,41 @@
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
+/* Search Wrapper */
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-input {
+  border: none;
+  padding: 0.5rem 1rem;
+  flex: 1;
+  font-size: 0.95rem;
+  color: #2d3748;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  color: #718096;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.search-button:hover {
+  color: #4299e1;
+}
+
 /* Employees View */
 .employees-view {
   display: grid;

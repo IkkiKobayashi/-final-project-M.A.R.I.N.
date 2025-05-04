@@ -11,12 +11,27 @@ module.exports = {
 
   // Database configuration
   database: {
-    uri: process.env.MONGODB_URI || "mongodb://localhost:27017/marin",
+    uri:
+      process.env.MONGODB_URI ||
+      "mongodb+srv://allendelvalle04:oZhONFiKPW100Lij@cluster0.nyv8wir.mongodb.net/marin_db",
+    name: process.env.DB_NAME || "marin_db",
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      retryWrites: true,
+      w: "majority",
+      maxPoolSize: 50,
+      minPoolSize: 10,
+      connectTimeoutMS: 10000,
+      retryReads: true,
+      autoIndex: process.env.NODE_ENV === "development",
+      serverApi: {
+        version: "1",
+        strict: true,
+        deprecationErrors: true,
+      },
     },
   },
 

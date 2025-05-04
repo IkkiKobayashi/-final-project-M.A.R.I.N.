@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { auth } = require("../middleware/auth");
+const emailService = require("../services/emailService"); // Assuming emailService is implemented
+const authController = require("../controllers/authController");
 
 // Register new user
 router.post("/register", async (req, res) => {
@@ -47,45 +49,24 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login user
-router.post("/login", async (req, res) => {
+router.post("/signup", authController.signup);
+router.post("/login", authController.login);
+
+// Verify email
+router.get("/verify/:token", async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    // Check if user exists
-    const user = await User.findOne({ email });
+    const decoded = jwt.verify(req.params.token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(404).json({ message: "User not found" });
     }
-
-    // Check password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    // Update last login
-    user.lastLogin = new Date();
+    user.isActive = true;
+    user.verificationToken = undefined;
     await user.save();
 
-    // Create token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    res.json({ message: "Email verified successfully. You can now login." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: "Invalid or expired verification token" });
   }
 });
 

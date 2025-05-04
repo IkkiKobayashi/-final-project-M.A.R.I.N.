@@ -7,14 +7,9 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    sku: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     description: {
       type: String,
-      trim: true,
+      required: true,
     },
     category: {
       type: String,
@@ -23,42 +18,29 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      min: 0,
     },
-    unit: {
+    sku: {
       type: String,
       required: true,
+      unique: true,
     },
-    image: {
+    imageUrl: {
       type: String,
-      default: "https://via.placeholder.com/200x200",
+      required: true,
     },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["active", "discontinued", "out_of_stock"],
-      default: "active",
-    },
-    threshold: {
-      type: Number,
-      default: 10,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
     timestamps: true,
   }
 );
-
-// Create index for searching
-productSchema.index({ name: "text", description: "text", sku: "text" });
 
 module.exports = mongoose.model("Product", productSchema);

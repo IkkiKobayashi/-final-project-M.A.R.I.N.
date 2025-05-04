@@ -4,11 +4,12 @@ const User = require("../models/User");
 // Authentication middleware
 exports.auth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const token =
+      req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
       return res.status(401).json({
-        message: "No authentication token, access denied",
-        code: "AUTH_NO_TOKEN",
+        success: false,
+        message: "No token, authorization denied",
       });
     }
 
@@ -40,14 +41,8 @@ exports.auth = async (req, res, next) => {
       next();
     } catch (jwtError) {
       return res.status(401).json({
-        message:
-          jwtError.name === "TokenExpiredError"
-            ? "Token has expired"
-            : "Token is invalid",
-        code:
-          jwtError.name === "TokenExpiredError"
-            ? "AUTH_TOKEN_EXPIRED"
-            : "AUTH_INVALID_TOKEN",
+        success: false,
+        message: "Token is not valid",
       });
     }
   } catch (error) {

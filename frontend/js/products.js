@@ -550,3 +550,95 @@ if (searchInput) {
     searchProducts(e.target.value);
   });
 }
+
+// New functionality for product addition with image upload
+document.addEventListener("DOMContentLoaded", function () {
+  const productForm = document.getElementById("productForm");
+  const storeId = JSON.parse(localStorage.getItem("selectedStore")).id;
+
+  productForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    const productData = {
+      name: document.getElementById("productName").value,
+      description: document.getElementById("productDescription").value,
+      category: document.getElementById("productCategory").value,
+      price: parseFloat(document.getElementById("productPrice").value),
+      sku: document.getElementById("productSKU").value,
+      storeId: storeId,
+    };
+
+    // Add product data to FormData
+    Object.keys(productData).forEach((key) => {
+      formData.append(key, productData[key]);
+    });
+
+    // Add image file to FormData
+    const imageFile = document.getElementById("productImage").files[0];
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/products/add", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Product added successfully!");
+        productForm.reset();
+        loadProducts(); // Refresh product list
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert(error.message || "Failed to add product");
+    }
+  });
+
+  // Function to load and display products
+  async function loadProducts() {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/products/${storeId}`,
+        {
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+
+      const productsContainer = document.querySelector(".products-grid");
+      productsContainer.innerHTML = data.products
+        .map(
+          (product) => `
+                <div class="product-card">
+                    <img src="${product.imageUrl}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                    <p class="sku">SKU: ${product.sku}</p>
+                    <div class="product-actions">
+                        <button onclick="editProduct('${
+                          product._id
+                        }')">Edit</button>
+                        <button onclick="deleteProduct('${
+                          product._id
+                        }')">Delete</button>
+                    </div>
+                </div>
+            `
+        )
+        .join("");
+    } catch (error) {
+      console.error("Error loading products:", error);
+    }
+  }
+
+  // Initial load of products
+  loadProducts();
+});

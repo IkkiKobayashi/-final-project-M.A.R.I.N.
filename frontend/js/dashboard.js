@@ -1,131 +1,65 @@
-// Wait for the DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", function () {
-  // Initialize dashboard data
-  initializeDashboard();
-});
-
-// Function to initialize dashboard data
-function initializeDashboard() {
-  // In a real application, this would fetch data from an API
-  // For now, we'll use sample data
-  const sampleData = {
-    totalProducts: 0,
-    currentInventory: 0,
-    itemsNearExpiry: 0,
-    outOfStock: 0,
-    alerts: [], // Alerts will be populated based on inventory data
-    recentActivity: [], // Activity will be populated from activity log
-  };
-
-  // Update summary cards
-  updateSummaryCards(sampleData);
-
-  // Update inventory alerts (will be populated when inventory data is available)
-  updateInventoryAlerts(sampleData.alerts);
-
-  // Update recent activity (will be populated from activity log)
-  updateRecentActivity(sampleData.recentActivity);
-}
-
-// Function to update summary cards
-function updateSummaryCards(data) {
-  const cards = {
-    "Total Products": data.totalProducts,
-    "Current Inventory": data.currentInventory,
-    "Items Near Expiry": data.itemsNearExpiry,
-    "Out of Stock": data.outOfStock,
-  };
-
-  document.querySelectorAll(".card").forEach((card) => {
-    const title = card.querySelector("h3").textContent;
-    const countElement = card.querySelector(".count");
-    if (cards[title] !== undefined) {
-      countElement.textContent = cards[title];
-    }
-  });
-}
-
-// Function to update inventory alerts
-function updateInventoryAlerts(alerts) {
-  const alertsContainer = document.querySelector(".alerts-container");
-  alertsContainer.innerHTML = "";
-
-  if (alerts.length === 0) {
-    // Show a message when there are no alerts
-    alertsContainer.innerHTML = `
-      <div class="no-alerts">
-        <i class="fas fa-check-circle"></i>
-        <p>No inventory alerts at this time.</p>
-      </div>
-    `;
+document.addEventListener("DOMContentLoaded", async function () {
+  const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+  if (!storeInfo) {
+    window.location.href = "store-selection.html";
     return;
   }
 
-  alerts.forEach((alert) => {
-    const alertElement = document.createElement("div");
-    alertElement.className = `alert ${alert.type}`;
+  // Update store info
+  document.querySelector(".store-name").textContent = storeInfo.name;
+  document.querySelector(".store-address").textContent = storeInfo.address;
 
-    const icon =
-      alert.type === "low-stock" ? "fa-exclamation-circle" : "fa-clock";
-    alertElement.innerHTML = `
-      <i class="fas ${icon}"></i>
-      <div class="alert-content">
-        <h4>${alert.product}</h4>
-        <p>${alert.message}</p>
-        ${
-          alert.type === "low-stock"
-            ? `<span>Current Stock: ${alert.currentStock}</span>`
-            : `<span>Days Left: ${alert.daysLeft}</span>`
+  // Fetch and update dashboard metrics
+  async function updateDashboardMetrics() {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/dashboard/metrics/${storeInfo.id}`,
+        {
+          credentials: "include",
         }
-      </div>
-    `;
+      );
+      const data = await response.json();
 
-    alertsContainer.appendChild(alertElement);
-  });
-}
+      if (data.success) {
+        // Update summary cards
+        document.querySelector(".card:nth-child(1) .count").textContent =
+          data.metrics.totalProducts;
+        document.querySelector(".card:nth-child(2) .count").textContent =
+          data.metrics.currentInventory;
+        document.querySelector(".card:nth-child(3) .count").textContent =
+          data.metrics.nearExpiry;
+        document.querySelector(".card:nth-child(4) .count").textContent =
+          data.metrics.outOfStock;
 
-// Function to update recent activity
-function updateRecentActivity(activities) {
-  const activityFeed = document.querySelector(".activity-feed");
-  activityFeed.innerHTML = "";
-
-  if (activities.length === 0) {
-    // Show a message when there are no activities
-    activityFeed.innerHTML = `
-      <div class="no-activity">
-        <i class="fas fa-history"></i>
-        <p>No recent activity to display.</p>
-      </div>
-    `;
-    return;
+        // Update alerts if any
+        updateInventoryAlerts(data.metrics.alerts);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard metrics:", error);
+    }
   }
 
-  activities.forEach((activity) => {
-    const activityElement = document.createElement("div");
-    activityElement.className = "activity-item";
+  function updateInventoryAlerts(alerts) {
+    const alertsContainer = document.querySelector(".alerts-container");
+    alertsContainer.innerHTML = alerts
+      .map(
+        (alert) => `
+            <div class="alert ${alert.type}">
+                <i class="fas ${
+                  alert.type === "warning"
+                    ? "fa-exclamation-triangle"
+                    : "fa-info-circle"
+                }"></i>
+                <span>${alert.message}</span>
+            </div>
+        `
+      )
+      .join("");
+  }
 
-    activityElement.innerHTML = `
-      <div class="activity-icon">
-        <i class="fas ${getActivityIcon(activity.action)}"></i>
-      </div>
-      <div class="activity-content">
-        <p class="activity-text">
-          <strong>${activity.user}</strong> ${activity.action} ${activity.item}
-        </p>
-        <span class="activity-time">${activity.timestamp}</span>
-      </div>
-    `;
+  // Initial update
+  updateDashboardMetrics();
 
-    activityFeed.appendChild(activityElement);
-  });
-}
-
-// Helper function to get activity icon
-function getActivityIcon(action) {
-  const icons = {
-    Added: "fa-plus-circle",
-    Updated: "fa-edit",
-    Deleted: "fa-trash-alt",
-  };
-  return icons[action] || "fa-info-circle";
-}
+  // Update metrics every 5 minutes
+  setInterval(updateDashboardMetrics, 300000);
+});
