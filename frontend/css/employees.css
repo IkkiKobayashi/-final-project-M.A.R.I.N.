@@ -108,6 +108,8 @@
 }
 
 /* Search Wrapper */
+/* Remove or comment out the custom search-wrapper, search-input, search-button styles below to use the global style from layout.css */
+/*
 .search-wrapper {
   display: flex;
   align-items: center;
@@ -141,6 +143,7 @@
 .search-button:hover {
   color: #4299e1;
 }
+*/
 
 /* Employees View */
 .employees-view {

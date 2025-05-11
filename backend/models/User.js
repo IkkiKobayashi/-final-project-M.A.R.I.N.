@@ -27,11 +27,25 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    role: {
+      type: String,
+      enum: ["admin", "manager", "employee"],
+      default: "employee",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true });
+userSchema.index({ role: 1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

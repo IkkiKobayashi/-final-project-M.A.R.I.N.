@@ -261,24 +261,57 @@
 
 .quick-btn {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 1rem;
-  background: #1a73e8;
+  justify-content: center;
+  min-width: 120px;
+  min-height: 70px;
+  padding: 1rem 0.5rem;
+  background: linear-gradient(135deg, #1a73e8 60%, #2563eb 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
   font-weight: 500;
-}
-
-.quick-btn:hover {
-  background: #1557b0;
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.10);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
 }
 
 .quick-btn i {
-  margin-right: 0.75rem;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+  background: rgba(255,255,255,0.13);
+  padding: 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.08);
+  transition: background 0.2s;
+}
+
+.quick-btn span {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-top: 0.1rem;
+  text-align: center;
+}
+
+.quick-btn:hover, .quick-btn:focus {
+  background: linear-gradient(135deg, #2563eb 60%, #1a73e8 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.13);
+  outline: none;
+}
+
+.quick-btn:hover i, .quick-btn:focus i {
+  background: rgba(255,255,255,0.22);
+}
+
+.quick-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.08);
 }
 
 /* Responsive Design */

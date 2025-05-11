@@ -305,6 +305,15 @@
     <script src="js/layout.js"></script>
     <script src="js/employees.js"></script>
     <script>
+      // Store info dynamic update
+      document.addEventListener("DOMContentLoaded", function () {
+        const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+        if (storeInfo) {
+          document.querySelector(".store-name").textContent = "Store: " + storeInfo.name;
+          document.querySelector(".store-address").textContent = "Address: " + storeInfo.address;
+        }
+      });
+
       // Role-based access control
       document.addEventListener("DOMContentLoaded", function () {
         // Get user role from session storage (this should be set when user logs in)

@@ -1,45 +1,66 @@
 const Store = require("../models/Store");
 const ActivityLog = require("../models/ActivityLog");
+const { ErrorHandler } = require("../utils/errorHandler");
 
-exports.getStores = async (req, res) => {
+exports.getStores = async (req, res, next) => {
   try {
     const stores = await Store.find().populate("owner");
-    res.json(stores);
+    res.json({
+      success: true,
+      data: stores,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(ErrorHandler.handleDatabaseError(error));
   }
 };
 
-exports.getStoreById = async (req, res) => {
+exports.getStoreById = async (req, res, next) => {
   try {
     const store = await Store.findById(req.params.id).populate("owner");
     if (!store) {
-      return res.status(404).json({ message: "Store not found" });
+      return next(ErrorHandler.notFoundError("Store not found"));
     }
-    res.json(store);
+    res.json({
+      success: true,
+      data: store,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(ErrorHandler.handleDatabaseError(error));
   }
 };
 
-exports.createStore = async (req, res) => {
+exports.createStore = async (req, res, next) => {
   try {
     const store = new Store({
       ...req.body,
       owner: req.user.userId,
     });
     await store.save();
-    res.status(201).json(store);
+
+    // Log activity
+    await new ActivityLog({
+      user: req.user.userId,
+      store: store._id,
+      action: "create",
+      entityType: "store",
+      entityId: store._id,
+      details: `Created new store: ${store.name}`,
+    }).save();
+
+    res.status(201).json({
+      success: true,
+      data: store,
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(ErrorHandler.handleDatabaseError(error));
   }
 };
 
-exports.updateStore = async (req, res) => {
+exports.updateStore = async (req, res, next) => {
   try {
     const store = await Store.findById(req.params.id);
     if (!store) {
-      return res.status(404).json({ message: "Store not found" });
+      return next(ErrorHandler.notFoundError("Store not found"));
     }
 
     Object.assign(store, req.body);
@@ -55,21 +76,38 @@ exports.updateStore = async (req, res) => {
       details: `Updated store: ${store.name}`,
     }).save();
 
-    res.json(store);
+    res.json({
+      success: true,
+      data: store,
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(ErrorHandler.handleDatabaseError(error));
   }
 };
 
-exports.deleteStore = async (req, res) => {
+exports.deleteStore = async (req, res, next) => {
   try {
     const store = await Store.findByIdAndDelete(req.params.id);
     if (!store) {
-      return res.status(404).json({ message: "Store not found" });
+      return next(ErrorHandler.notFoundError("Store not found"));
     }
-    res.json({ message: "Store deleted successfully" });
+
+    // Log activity
+    await new ActivityLog({
+      user: req.user.userId,
+      store: store._id,
+      action: "delete",
+      entityType: "store",
+      entityId: store._id,
+      details: `Deleted store: ${store.name}`,
+    }).save();
+
+    res.json({
+      success: true,
+      message: "Store deleted successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(ErrorHandler.handleDatabaseError(error));
   }
 };
 

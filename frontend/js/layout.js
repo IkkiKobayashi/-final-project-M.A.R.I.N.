@@ -81,29 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarHeader = document.querySelector(".sidebar-header");
   sidebarHeader.addEventListener("click", toggleSidebar);
 
-  // Search functionality
-  const searchInput = document.querySelector(".search-input");
-  const searchCategory = document.querySelector(".search-category");
-  const searchButton = document.querySelector(".search-button");
-
-  const performSearch = () => {
-    const query = searchInput.value.trim();
-    const category = searchCategory.value;
-
-    if (query) {
-      // In a real application, this would make an API call
-      console.log(`Searching for "${query}" in category: ${category}`);
-      // Redirect to search results page or update content
-    }
-  };
-
-  searchButton.addEventListener("click", performSearch);
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      performSearch();
-    }
-  });
-
   // Activity Log functionality
   const notificationBtn = document.querySelector(".notification-btn");
   const notificationBadge = document.querySelector(".notification-badge");

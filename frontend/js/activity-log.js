@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   // Get store information from localStorage
   const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
   if (storeInfo) {
-    document.querySelector(".store-name").textContent += storeInfo.name;
-    document.querySelector(".store-address").textContent += storeInfo.address;
+    document.querySelector(".store-name").textContent = "Store: " + storeInfo.name;
+    document.querySelector(".store-address").textContent = "Address: " + storeInfo.address;
   }
 
   // Initialize filters
@@ -11,112 +11,100 @@ document.addEventListener("DOMContentLoaded", function () {
   const dateFilter = document.getElementById("date-filter");
   const actionFilter = document.getElementById("action-filter");
 
-  // Fetch and display activity logs
-  fetchActivityLogs();
+  let allLogs = [];
+  let users = [];
 
-  // Add event listeners for filters
-  userFilter.addEventListener("change", filterActivityLogs);
-  dateFilter.addEventListener("change", filterActivityLogs);
-  actionFilter.addEventListener("change", filterActivityLogs);
-
-  // Function to fetch activity logs
+  // Fetch and display activity logs from backend
   async function fetchActivityLogs() {
     try {
-      // Get data from localStorage
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const products = JSON.parse(localStorage.getItem("products")) || [];
-      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
-      const activityLogs =
-        JSON.parse(localStorage.getItem("activityLogs")) || [];
+      if (!storeInfo || !storeInfo._id) return;
+      const res = await fetch(`/api/activity-log/store/${storeInfo._id}`);
+      if (!res.ok) throw new Error("Failed to fetch activity logs");
+      allLogs = await res.json();
 
-      // Populate user filter options from employees
-      populateUserFilter(employees);
+      // Extract unique users for filter
+      users = [];
+      allLogs.forEach(log => {
+        if (log.user && !users.some(u => u._id === log.user._id)) {
+          users.push(log.user);
+        }
+      });
+      populateUserFilter(users);
 
-      // Display logs
-      displayActivityLogs(activityLogs);
+      displayActivityLogs(allLogs);
     } catch (error) {
-      console.error("Error fetching activity logs:", error);
       showError("Failed to load activity logs");
     }
   }
 
-  // Function to populate user filter
-  function populateUserFilter(employees) {
-    const userFilter = document.getElementById("user-filter");
+  // Populate user filter dropdown
+  function populateUserFilter(users) {
     userFilter.innerHTML = '<option value="">All Users</option>';
-
-    employees.forEach((employee) => {
-      const option = document.createElement("option");
-      option.value = employee.id;
-      option.textContent = employee.name;
-      userFilter.appendChild(option);
+    users.forEach((user) => {
+      if (user) {
+        const option = document.createElement("option");
+        option.value = user._id;
+        option.textContent = user.name + (user.role ? ` (${user.role})` : "");
+        userFilter.appendChild(option);
+      }
     });
   }
 
-  // Function to display activity logs
+  // Display activity logs in the table
   function displayActivityLogs(logs) {
     const tbody = document.getElementById("activity-log-body");
     tbody.innerHTML = "";
 
     // Sort logs by timestamp (newest first)
-    logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    logs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     logs.forEach((log) => {
       const row = document.createElement("tr");
+      const timestamp = new Date(log.createdAt).toLocaleString();
 
-      // Format timestamp
-      const timestamp = new Date(log.timestamp).toLocaleString();
-
-      // Create action badge
+      // Action badge
       const actionBadge = document.createElement("span");
       actionBadge.className = `action-badge ${log.action}`;
-      actionBadge.textContent =
-        log.action.charAt(0).toUpperCase() + log.action.slice(1);
+      actionBadge.textContent = log.action.charAt(0).toUpperCase() + log.action.slice(1);
 
       row.innerHTML = `
-          <td>${timestamp}</td>
-          <td>${log.userName}</td>
-          <td>${actionBadge.outerHTML}</td>
-          <td>${log.entityType}</td>
-          <td>${log.details}</td>
+        <td>${timestamp}</td>
+        <td>${log.user ? log.user.name : "Unknown"}</td>
+        <td>${actionBadge.outerHTML}</td>
+        <td>${log.entityType}</td>
+        <td>${log.details}</td>
       `;
-
       tbody.appendChild(row);
     });
   }
 
-  // Function to filter activity logs
+  // Filter logs based on selected filters
   function filterActivityLogs() {
+    let filteredLogs = allLogs;
+
     const selectedUserId = userFilter.value;
     const selectedDate = dateFilter.value;
     const selectedAction = actionFilter.value;
 
-    const activityLogs = JSON.parse(localStorage.getItem("activityLogs")) || [];
-    let filteredLogs = activityLogs;
-
     if (selectedUserId) {
       filteredLogs = filteredLogs.filter(
-        (log) => log.userId === selectedUserId
+        (log) => log.user && log.user._id === selectedUserId
       );
     }
-
     if (selectedDate) {
       filteredLogs = filteredLogs.filter((log) => {
-        const logDate = new Date(log.timestamp).toISOString().split("T")[0];
+        const logDate = new Date(log.createdAt).toISOString().split("T")[0];
         return logDate === selectedDate;
       });
     }
-
     if (selectedAction) {
-      filteredLogs = filteredLogs.filter(
-        (log) => log.action === selectedAction
-      );
+      filteredLogs = filteredLogs.filter((log) => log.action === selectedAction);
     }
 
     displayActivityLogs(filteredLogs);
   }
 
-  // Function to show error message
+  // Show error message
   function showError(message) {
     const errorDiv = document.createElement("div");
     errorDiv.className = "error-message";
@@ -129,21 +117,32 @@ document.addEventListener("DOMContentLoaded", function () {
       errorDiv.remove();
     }, 3000);
   }
+
+  // Event listeners for filters
+  userFilter.addEventListener("change", filterActivityLogs);
+  dateFilter.addEventListener("change", filterActivityLogs);
+  actionFilter.addEventListener("change", filterActivityLogs);
+
+  // Add search bar filter for activity log page
+  const searchInput = document.querySelector(".search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      // Filter logs by search term (search in user, entityType, details)
+      let filteredLogs = allLogs.filter((log) => {
+        const user = log.user ? log.user.name.toLowerCase() : "";
+        const entityType = log.entityType ? log.entityType.toLowerCase() : "";
+        const details = log.details ? log.details.toLowerCase() : "";
+        return (
+          user.includes(searchTerm) ||
+          entityType.includes(searchTerm) ||
+          details.includes(searchTerm)
+        );
+      });
+      displayActivityLogs(filteredLogs);
+    });
+  }
+
+  // Initial fetch
+  fetchActivityLogs();
 });
-
-// Function to log activity (to be called from other modules)
-function logActivity(userId, userName, action, entityType, details) {
-  const activityLogs = JSON.parse(localStorage.getItem("activityLogs")) || [];
-
-  const newLog = {
-    timestamp: new Date().toISOString(),
-    userId,
-    userName,
-    action,
-    entityType,
-    details,
-  };
-
-  activityLogs.push(newLog);
-  localStorage.setItem("activityLogs", JSON.stringify(activityLogs));
-}

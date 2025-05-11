@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const config = require("./config/config");
 const connectDB = require("./config/db");
 const configureMiddleware = require("./config/middleware");
+const { ErrorHandler } = require("./utils/errorHandler");
 const path = require("path");
 const helmet = require("helmet");
 const compression = require("compression");
@@ -28,21 +29,11 @@ const Product = require("./models/Product"); // Assuming Product model is define
 // Initialize express app
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-app.use(
-  cors({
-    origin: ["http://localhost:5500", "http://127.0.0.1:5500"], // Allow both localhost and 127.0.0.1
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// Configure middleware
+configureMiddleware(app);
 
 // Connect to MongoDB Atlas
-mongoose
-  .connect(process.env.MONGODB_URI)
+connectDB()
   .then(() => {
     console.log("MongoDB Atlas connected successfully");
     startServer();
@@ -53,11 +44,6 @@ mongoose
   });
 
 function startServer() {
-  // Configure security middleware
-  app.use(helmet());
-  app.use(compression());
-  app.use(morgan("combined"));
-
   // Static file serving
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -83,20 +69,58 @@ function startServer() {
     });
   });
 
-  // 404 handler
+  // 404 handler (must be after all routes)
   app.use((req, res, next) => {
-    res.status(404).json({
-      success: false,
-      message: "Route not found",
-    });
+    next(
+      ErrorHandler.notFoundError(
+        `Cannot find ${req.originalUrl} on this server!`
+      )
+    );
   });
 
   // Global error handler
   app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status || 500).json({
+    if (err instanceof ErrorHandler.AppError) {
+      return res.status(err.statusCode).json({
+        success: false,
+        message: err.message,
+        errorCode: err.errorCode,
+        ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+      });
+    }
+
+    // Handle mongoose errors
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation Error",
+        errors: Object.values(err.errors).map((e) => e.message),
+      });
+    }
+
+    // Handle JWT errors
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token expired",
+      });
+    }
+
+    // Default error
+    console.error("Unhandled Error:", err);
+    res.status(500).json({
       success: false,
-      message: err.message || "Something went wrong!",
+      message:
+        process.env.NODE_ENV === "development"
+          ? err.message
+          : "Internal server error",
       ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
     });
   });

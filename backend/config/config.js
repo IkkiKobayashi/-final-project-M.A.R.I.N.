@@ -11,13 +11,9 @@ module.exports = {
 
   // Database configuration
   database: {
-    uri:
-      process.env.MONGODB_URI ||
-      "mongodb+srv://allendelvalle04:oZhONFiKPW100Lij@cluster0.nyv8wir.mongodb.net/marin_db",
+    uri: process.env.MONGODB_URI,
     name: process.env.DB_NAME || "marin_db",
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       retryWrites: true,

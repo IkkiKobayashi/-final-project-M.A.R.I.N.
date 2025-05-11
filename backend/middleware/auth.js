@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { ErrorHandler } = require("../utils/errorHandler");
 
 // Authentication middleware
 exports.auth = async (req, res, next) => {
@@ -7,10 +8,9 @@ exports.auth = async (req, res, next) => {
     const token =
       req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "No token, authorization denied",
-      });
+      return next(
+        ErrorHandler.authentication("No token, authorization denied")
+      );
     }
 
     try {
@@ -18,17 +18,11 @@ exports.auth = async (req, res, next) => {
       const user = await User.findById(decoded.userId).select("-password");
 
       if (!user) {
-        return res.status(401).json({
-          message: "User not found",
-          code: "AUTH_USER_NOT_FOUND",
-        });
+        return next(ErrorHandler.authentication("User not found"));
       }
 
       if (!user.isActive) {
-        return res.status(401).json({
-          message: "User account is inactive",
-          code: "AUTH_USER_INACTIVE",
-        });
+        return next(ErrorHandler.authentication("User account is inactive"));
       }
 
       req.user = {
@@ -40,17 +34,15 @@ exports.auth = async (req, res, next) => {
 
       next();
     } catch (jwtError) {
-      return res.status(401).json({
-        success: false,
-        message: "Token is not valid",
-      });
+      if (jwtError.name === "TokenExpiredError") {
+        return next(
+          ErrorHandler.authentication("Token expired. Please log in again.")
+        );
+      }
+      return next(ErrorHandler.authentication("Invalid token"));
     }
   } catch (error) {
-    console.error("Auth middleware error:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      code: "AUTH_INTERNAL_ERROR",
-    });
+    next(ErrorHandler.internal("Authentication error"));
   }
 };
 
@@ -58,9 +50,9 @@ exports.auth = async (req, res, next) => {
 exports.checkRole = (roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        message: "Access denied: insufficient permissions",
-      });
+      return next(
+        ErrorHandler.authorization("Access denied: insufficient permissions")
+      );
     }
     next();
   };
@@ -78,13 +70,15 @@ exports.checkStoreAccess = async (req, res, next) => {
 
     // Check if user belongs to the store
     if (req.user.store?.toString() !== storeId) {
-      return res.status(403).json({
-        message: "Access denied: you don't have access to this store",
-      });
+      return next(
+        ErrorHandler.authorization(
+          "Access denied: you don't have access to this store"
+        )
+      );
     }
 
     next();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(ErrorHandler.internal("Store access check failed"));
   }
 };

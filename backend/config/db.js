@@ -13,10 +13,19 @@ const connectDB = async () => {
       return mongoose.connection;
     }
 
+    // Validate MongoDB URI
+    if (!config.database.uri) {
+      throw new Error(
+        "MongoDB URI is not configured. Please check your .env file."
+      );
+    }
+
     // Connect with retry mechanism
     const conn = await mongoose.connect(config.database.uri, {
       ...config.database.options,
       dbName: config.database.name,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
 
     // Enable mongoose debug mode in development
@@ -45,6 +54,11 @@ const connectDB = async () => {
       }
     });
 
+    mongoose.connection.on("connected", () => {
+      LoggingUtil.info("MongoDB connected successfully");
+      retryCount = 0; // Reset retry count on successful connection
+    });
+
     // Handle application termination
     process.on("SIGINT", async () => {
       await mongoose.connection.close();
@@ -52,7 +66,6 @@ const connectDB = async () => {
       process.exit(0);
     });
 
-    retryCount = 0; // Reset retry count on successful connection
     return conn;
   } catch (error) {
     LoggingUtil.error("MongoDB connection error:", error);

@@ -216,6 +216,24 @@
   color: white;
 }
 
+.status-tag.recently-stocked,
+.status-recently-stocked {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.status-tag.near-expiry,
+.status-near-expiry {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-tag.expired,
+.status-expired {
+  background-color: #dc3545;
+  color: #fff;
+}
+
 .item-info {
   padding: 1rem;
 }

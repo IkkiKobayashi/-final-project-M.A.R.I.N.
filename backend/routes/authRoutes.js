@@ -49,8 +49,13 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Public routes
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
+router.post("/refresh-token", authController.refreshToken);
+
+// Protected routes
+router.post("/logout", auth, authController.logout);
 
 // Verify email
 router.get("/verify/:token", async (req, res) => {

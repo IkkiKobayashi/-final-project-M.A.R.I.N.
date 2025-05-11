@@ -92,23 +92,20 @@ productImage.addEventListener("change", (e) => {
 });
 
 // Form Submission
-submitBtn.addEventListener("click", (e) => {
+productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get form data
   const formData = new FormData(productForm);
   const imageFile = productImage.files[0];
   let imageData = "";
 
   if (imageFile) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageData = e.target.result;
-      saveProductWithImage(formData, imageData);
-    };
-    reader.readAsDataURL(imageFile);
+    imageData = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(imageFile);
+    });
   } else {
-    // If editing and no new image selected, keep the existing image
     if (productId.value) {
       const existingProduct = JSON.parse(localStorage.getItem("products")).find(
         (p) => p.id === productId.value
@@ -119,101 +116,109 @@ submitBtn.addEventListener("click", (e) => {
     } else {
       imageData = "img/default-product.png";
     }
-    saveProductWithImage(formData, imageData);
   }
+
+  await saveProductWithImage(formData, imageData);
+});
+
+// Remove the submitBtn click handler for saving product
+submitBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  productForm.requestSubmit();
 });
 
 // Save Product with Image
-function saveProductWithImage(formData, imageData) {
-  const product = {
-    id: productId.value || Date.now().toString(),
-    name: formData.get("productName"),
-    price: formData.get("productPrice"),
-    quantity: formData.get("productQuantity"),
-    expiry: formData.get("productExpiry"),
-    type: formData.get("productType"),
-    image: imageData,
-  };
+async function saveProductWithImage(formData, imageData) {
+  try {
+    const product = {
+      id: productId.value || Date.now().toString(),
+      name: formData.get("productName"),
+      price: formData.get("productPrice"),
+      quantity: formData.get("productQuantity"),
+      expiry: formData.get("productExpiry"),
+      type: formData.get("productType"),
+      image: imageData,
+    };
 
-  // Get current user from localStorage
-  const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
-    id: "system",
-    name: "System",
-  };
+    // Get current user from localStorage
+    const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
+      id: "system",
+      name: "System",
+    };
 
-  // Update or add product to view
-  if (productId.value) {
-    // Update existing product card
-    const existingCard = document.querySelector(
-      `.product-card[data-id="${product.id}"]`
-    );
-    if (existingCard) {
-      existingCard.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" class="product-image">
-        <div class="product-info">
-          <h3 class="product-name">${product.name}</h3>
-          <div class="product-type">${
-            product.type.charAt(0).toUpperCase() + product.type.slice(1)
-          }</div>
-          <div class="product-details">
-            <span class="product-price">₱${product.price}</span>
-            <span class="product-quantity">${product.quantity} in stock</span>
+    // Update or add product to view
+    if (productId.value) {
+      // Update existing product card
+      const existingCard = document.querySelector(
+        `.product-card[data-id="${product.id}"]`
+      );
+      if (existingCard) {
+        existingCard.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" class="product-image">
+          <div class="product-info">
+            <h3 class="product-name">${product.name}</h3>
+            <div class="product-type">${
+              product.type.charAt(0).toUpperCase() + product.type.slice(1)
+            }</div>
+            <div class="product-details">
+              <span class="product-price">₱${product.price}</span>
+              <span class="product-quantity">${product.quantity} in stock</span>
+            </div>
+            <div class="product-expiry">Expires: ${product.expiry}</div>
           </div>
-          <div class="product-expiry">Expires: ${product.expiry}</div>
-        </div>
-        <div class="product-actions">
-          <button class="action-btn edit-btn">
-            <i class="fas fa-edit"></i>
-            Edit
-          </button>
-          <button class="action-btn delete-btn">
-            <i class="fas fa-trash"></i>
-            Delete
-          </button>
-        </div>
-      `;
+          <div class="product-actions">
+            <button class="action-btn edit-btn">
+              <i class="fas fa-edit"></i>
+              Edit
+            </button>
+            <button class="action-btn delete-btn">
+              <i class="fas fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        `;
 
-      // Log edit activity
+        // Log edit activity
+        logActivity(
+          currentUser.id,
+          currentUser.name,
+          "edit",
+          "Product",
+          `Updated product: ${product.name}`
+        );
+
+        // Reattach event listeners
+        const editBtn = existingCard.querySelector(".edit-btn");
+        const deleteBtn = existingCard.querySelector(".delete-btn");
+
+        editBtn.addEventListener("click", () => {
+          editProduct(product);
+        });
+
+        deleteBtn.addEventListener("click", async () => {
+          if (await deleteProduct(product.id, product.name)) {
+            existingCard.remove();
+          }
+        });
+      }
+    } else {
+      // Add new product to view
+      addProductToView(product);
+      // Log add activity
       logActivity(
         currentUser.id,
         currentUser.name,
-        "edit",
+        "add",
         "Product",
-        `Updated product: ${product.name}`
+        `Added new product: ${product.name}`
       );
-
-      // Reattach event listeners
-      const editBtn = existingCard.querySelector(".edit-btn");
-      const deleteBtn = existingCard.querySelector(".delete-btn");
-
-      editBtn.addEventListener("click", () => {
-        editProduct(product);
-      });
-
-      deleteBtn.addEventListener("click", async () => {
-        if (await deleteProduct(product.id, product.name)) {
-          existingCard.remove();
-        }
-      });
     }
-  } else {
-    // Add new product to view
-    addProductToView(product);
-    // Log add activity
-    logActivity(
-      currentUser.id,
-      currentUser.name,
-      "add",
-      "Product",
-      `Added new product: ${product.name}`
-    );
+
+    // Save to localStorage
+    saveProduct(product);
+  } finally {
+    closeModal();
   }
-
-  // Save to localStorage
-  saveProduct(product);
-
-  // Close modal and reset form
-  closeModal();
 }
 
 // Save Product to localStorage
@@ -242,13 +247,15 @@ async function deleteProduct(productId, productName) {
   };
 
   return new Promise((resolve) => {
-    const confirmationModal = document.createElement("div");
-    confirmationModal.className = "modal delete-confirmation-modal";
-    confirmationModal.innerHTML = `
+    const modal = document.createElement("div");
+    modal.className = "modal delete-confirmation-modal active";
+    modal.style.display = "flex";
+
+    modal.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <h2>Confirm Deletion</h2>
-          <button class="close-modal-btn">
+          <button type="button" class="close-modal-btn">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -257,54 +264,55 @@ async function deleteProduct(productId, productName) {
           <p class="warning-text">This action cannot be undone.</p>
         </div>
         <div class="modal-actions">
-          <button class="cancel-btn">Cancel</button>
-          <button class="confirm-delete-btn">Delete</button>
+          <button type="button" class="cancel-btn">Cancel</button>
+          <button type="button" class="confirm-delete-btn">Delete</button>
         </div>
       </div>
     `;
 
-    document.body.appendChild(confirmationModal);
-    confirmationModal.classList.add("active");
+    document.body.appendChild(modal);
 
-    const closeModal = () => {
-      confirmationModal.classList.remove("active");
-      setTimeout(() => {
-        confirmationModal.remove();
-      }, 300);
-    };
+    const confirmDeleteBtn = modal.querySelector(".confirm-delete-btn");
+    const cancelBtn = modal.querySelector(".cancel-btn");
+    const closeModalBtn = modal.querySelector(".close-modal-btn");
 
-    const confirmDelete = () => {
+    const handleDelete = () => {
+      // Remove from localStorage
       let products = JSON.parse(localStorage.getItem("products")) || [];
-      products = products.filter((p) => p.id !== productId);
-      localStorage.setItem("products", JSON.stringify(products));
+      const index = products.findIndex((p) => String(p.id) === String(productId));
 
-      // Log delete activity
-      logActivity(
-        currentUser.id,
-        currentUser.name,
-        "delete",
-        "Product",
-        `Deleted product: ${productName}`
-      );
+      if (index > -1) {
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
 
-      closeModal();
-      resolve(true);
+        // Log activity
+        logActivity(
+          currentUser.id,
+          currentUser.name,
+          "delete",
+          "Product",
+          `Deleted product: ${productName}`
+        );
+
+        modal.remove();
+        loadProducts(); // Reload products to refresh the view
+        resolve(true);
+      } else {
+        console.warn("Product not found in localStorage:", productId);
+        modal.remove();
+        resolve(false);
+      }
     };
 
-    const cancelDelete = () => {
-      closeModal();
+    const handleCancel = () => {
+      modal.remove();
       resolve(false);
     };
 
-    confirmationModal
-      .querySelector(".close-modal-btn")
-      .addEventListener("click", cancelDelete);
-    confirmationModal
-      .querySelector(".cancel-btn")
-      .addEventListener("click", cancelDelete);
-    confirmationModal
-      .querySelector(".confirm-delete-btn")
-      .addEventListener("click", confirmDelete);
+    // Event Listeners
+    confirmDeleteBtn.addEventListener("click", handleDelete);
+    cancelBtn.addEventListener("click", handleCancel);
+    closeModalBtn.addEventListener("click", handleCancel);
   });
 }
 
@@ -489,6 +497,7 @@ function editProduct(product) {
 // Load Products on Page Load
 function loadProducts() {
   const products = JSON.parse(localStorage.getItem("products")) || [];
+  productsView.innerHTML = "";
   products.forEach((product) => addProductToView(product));
 }
 
@@ -499,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
   gridBtn.classList.add("active");
   productsView.classList.add("grid-view");
 
-  // Load existing products
+  // Load existing products from localStorage
   loadProducts();
 });
 
@@ -550,95 +559,3 @@ if (searchInput) {
     searchProducts(e.target.value);
   });
 }
-
-// New functionality for product addition with image upload
-document.addEventListener("DOMContentLoaded", function () {
-  const productForm = document.getElementById("productForm");
-  const storeId = JSON.parse(localStorage.getItem("selectedStore")).id;
-
-  productForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const formData = new FormData();
-    const productData = {
-      name: document.getElementById("productName").value,
-      description: document.getElementById("productDescription").value,
-      category: document.getElementById("productCategory").value,
-      price: parseFloat(document.getElementById("productPrice").value),
-      sku: document.getElementById("productSKU").value,
-      storeId: storeId,
-    };
-
-    // Add product data to FormData
-    Object.keys(productData).forEach((key) => {
-      formData.append(key, productData[key]);
-    });
-
-    // Add image file to FormData
-    const imageFile = document.getElementById("productImage").files[0];
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
-
-    try {
-      const response = await fetch("http://localhost:5000/api/products/add", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert("Product added successfully!");
-        productForm.reset();
-        loadProducts(); // Refresh product list
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert(error.message || "Failed to add product");
-    }
-  });
-
-  // Function to load and display products
-  async function loadProducts() {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/products/${storeId}`,
-        {
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-
-      const productsContainer = document.querySelector(".products-grid");
-      productsContainer.innerHTML = data.products
-        .map(
-          (product) => `
-                <div class="product-card">
-                    <img src="${product.imageUrl}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <p class="price">$${product.price.toFixed(2)}</p>
-                    <p class="sku">SKU: ${product.sku}</p>
-                    <div class="product-actions">
-                        <button onclick="editProduct('${
-                          product._id
-                        }')">Edit</button>
-                        <button onclick="deleteProduct('${
-                          product._id
-                        }')">Delete</button>
-                    </div>
-                </div>
-            `
-        )
-        .join("");
-    } catch (error) {
-      console.error("Error loading products:", error);
-    }
-  }
-
-  // Initial load of products
-  loadProducts();
-});

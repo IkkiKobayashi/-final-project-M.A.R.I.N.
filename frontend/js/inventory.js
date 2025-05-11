@@ -141,29 +141,38 @@ function createProductCard(product) {
 
 function getStatusTag(product) {
   const expiryDate = new Date(product.expiry);
+  const now = new Date();
   const daysUntilExpiry = Math.ceil(
-    (expiryDate - new Date()) / (1000 * 60 * 60 * 24)
+    (expiryDate - now) / (1000 * 60 * 60 * 24)
   );
   const lastStocked = product.lastStocked
     ? new Date(product.lastStocked)
     : null;
   const daysSinceLastStocked = lastStocked
-    ? Math.ceil((new Date() - lastStocked) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((now - lastStocked) / (1000 * 60 * 60 * 24))
     : null;
 
-  // Calculate stock percentage
-  const stockPercentage = (product.quantity / (product.quantity + 1)) * 100; // Using quantity + 1 as original quantity if not set
-
-  if (product.quantity === 0) {
-    return '<span class="status-tag status-out-of-stock">Out of Stock</span>';
-  } else if (stockPercentage < 25) {
-    return '<span class="status-tag status-low-stock">Low Stock</span>';
-  } else if (daysUntilExpiry <= 7) {
+  // Expired
+  if (product.expiry && expiryDate < now) {
+    return '<span class="status-tag status-expired">Expired</span>';
+  }
+  // Near Expiry (within 7 days)
+  if (product.expiry && daysUntilExpiry <= 7 && daysUntilExpiry >= 0) {
     return '<span class="status-tag status-near-expiry">Near Expiry</span>';
-  } else if (daysSinceLastStocked && daysSinceLastStocked <= 2) {
+  }
+  // Recently Stocked (within 2 days)
+  if (daysSinceLastStocked !== null && daysSinceLastStocked <= 2) {
     return '<span class="status-tag status-recently-stocked">Recently Stocked</span>';
   }
-
+  // Out of Stock
+  if (product.quantity === 0) {
+    return '<span class="status-tag status-out-of-stock">Out of Stock</span>';
+  }
+  // Low Stock
+  const stockPercentage = (product.quantity / (product.quantity + 1)) * 100;
+  if (stockPercentage < 25) {
+    return '<span class="status-tag status-low-stock">Low Stock</span>';
+  }
   return "";
 }
 
