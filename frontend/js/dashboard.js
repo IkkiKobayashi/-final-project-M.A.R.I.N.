@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function updateDashboardMetrics() {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/dashboard/metrics/${storeInfo.id}`,
+        `http://localhost:5000/dashboard/metrics/${storeInfo.id}`,
         {
           credentials: "include",
         }
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     alertsContainer.innerHTML = `<div>Loading alerts...</div>`;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/dashboard/alerts/${storeInfo.id}`,
+        `http://localhost:5000/dashboard/alerts/${storeInfo.id}`,
         { credentials: "include" }
       );
       const alerts = await response.json();
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     activityFeed.innerHTML = `<div>Loading recent activity...</div>`;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/activity-log/recent/${storeInfo.id}`,
+        `http://localhost:5000/activity-log/recent/${storeInfo.id}`,
         { credentials: "include" }
       );
       const activities = await response.json();
@@ -130,7 +130,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             else if (activity.action === "delete") actionClass = "delete";
 
             // Format time
-            const time = new Date(activity.createdAt || activity.timestamp).toLocaleString();
+            const time = new Date(
+              activity.createdAt || activity.timestamp
+            ).toLocaleString();
 
             return `
               <div class="activity-item">

@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       validateForm();
 
-      // Disable form while submitting
       const submitButton = signupForm.querySelector('button[type="submit"]');
       submitButton.disabled = true;
       submitButton.textContent = "Creating account...";
@@ -51,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
         body: JSON.stringify({
           fullName,
@@ -59,16 +57,20 @@ document.addEventListener("DOMContentLoaded", () => {
           username,
           password,
         }),
-        credentials: "include",
-        mode: "cors",
       });
 
+      // Log the raw response for debugging
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        throw new Error("Server response was not JSON");
+      try {
+        const textResponse = await response.text();
+        console.log("Raw response:", textResponse);
+        data = JSON.parse(textResponse);
+      } catch (parseError) {
+        console.error("Error parsing response:", parseError);
+        throw new Error("Invalid server response");
       }
 
       if (!response.ok) {
@@ -77,16 +79,30 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
-      alert("Account created successfully! Please login.");
-      window.location.href = "login.html";
+      if (data.success && data.token) {
+        // Show success message modal
+        const modal = document.createElement("div");
+        modal.className = "success-modal";
+        modal.innerHTML = `
+          <div class="modal-content">
+            <h2><i class="fas fa-check-circle"></i> Success!</h2>
+            <p>Your account has been created successfully.</p>
+            <button onclick="window.location.href='login.html'" class="success-btn">
+              Go to Login
+            </button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      } else {
+        throw new Error(data.message || "Failed to create account");
+      }
     } catch (error) {
       console.error("Error:", error);
       alert(error.message || "Error creating account. Please try again.");
     } finally {
-      // Re-enable form
       const submitButton = signupForm.querySelector('button[type="submit"]');
       submitButton.disabled = false;
-      submitButton.textContent = "Sign Up";
+      submitButton.textContent = "Create Account";
     }
   });
 });

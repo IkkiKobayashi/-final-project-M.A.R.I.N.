@@ -19,7 +19,10 @@ module.exports = (app) => {
   // CORS configuration
   app.use(
     cors({
-      origin: ["http://localhost:5500", "http://127.0.0.1:5500"],
+      origin:
+        process.env.NODE_ENV === "development"
+          ? "*"
+          : ["http://localhost:5500", "http://127.0.0.1:5500"], // Allow all origins in development
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
@@ -40,44 +43,4 @@ module.exports = (app) => {
 
   // Rate limiting
   app.use("/api/", limiter);
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-
-    // Handling specific types of errors
-    if (err.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Validation Error",
-        details: Object.values(err.errors).map((e) => e.message),
-      });
-    }
-
-    if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        message: "Invalid token",
-        error: err.message,
-      });
-    }
-
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({
-        message: "Token expired",
-        error: err.message,
-      });
-    }
-
-    // Default error
-    res.status(500).json({
-      message: "Internal Server Error",
-      error: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
-  });
-
-  // 404 handler
-  app.use((req, res) => {
-    res.status(404).json({
-      message: "Route not found",
-    });
-  });
 };

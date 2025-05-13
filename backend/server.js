@@ -29,7 +29,25 @@ const Product = require("./models/Product"); // Assuming Product model is define
 // Initialize express app
 const app = express();
 
-// Configure middleware
+// Basic middleware
+app.use(express.json());
+app.use(
+  cors({
+    origin: ["http://localhost:5500", "http://127.0.0.1:5500"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  })
+);
+
+// Add request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Configure other middleware
+app.use(cookieParser());
 configureMiddleware(app);
 
 // Connect to MongoDB Atlas
@@ -71,58 +89,17 @@ function startServer() {
 
   // 404 handler (must be after all routes)
   app.use((req, res, next) => {
-    next(
-      ErrorHandler.notFoundError(
-        `Cannot find ${req.originalUrl} on this server!`
-      )
-    );
+    console.log(`404 Not Found: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({
+      success: false,
+      message: `Cannot find ${req.originalUrl} on this server!`,
+    });
   });
 
   // Global error handler
   app.use((err, req, res, next) => {
-    if (err instanceof ErrorHandler.AppError) {
-      return res.status(err.statusCode).json({
-        success: false,
-        message: err.message,
-        errorCode: err.errorCode,
-        ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-      });
-    }
-
-    // Handle mongoose errors
-    if (err.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation Error",
-        errors: Object.values(err.errors).map((e) => e.message),
-      });
-    }
-
-    // Handle JWT errors
-    if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token",
-      });
-    }
-
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: false,
-        message: "Token expired",
-      });
-    }
-
-    // Default error
-    console.error("Unhandled Error:", err);
-    res.status(500).json({
-      success: false,
-      message:
-        process.env.NODE_ENV === "development"
-          ? err.message
-          : "Internal server error",
-      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-    });
+    console.error("Global error handler", err.stack);
+    res.status(500).json({ error: err.message });
   });
 
   // Start server

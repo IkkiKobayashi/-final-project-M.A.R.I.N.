@@ -2,8 +2,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Get store information from localStorage
   const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
   if (storeInfo) {
-    document.querySelector(".store-name").textContent = "Store: " + storeInfo.name;
-    document.querySelector(".store-address").textContent = "Address: " + storeInfo.address;
+    document.querySelector(".store-name").textContent =
+      "Store: " + storeInfo.name;
+    document.querySelector(".store-address").textContent =
+      "Address: " + storeInfo.address;
   }
 
   // Initialize filters
@@ -18,14 +20,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function fetchActivityLogs() {
     try {
       if (!storeInfo || !storeInfo._id) return;
-      const res = await fetch(`/api/activity-log/store/${storeInfo._id}`);
+      const res = await fetch(`/activity-log/store/${storeInfo._id}`);
       if (!res.ok) throw new Error("Failed to fetch activity logs");
       allLogs = await res.json();
 
       // Extract unique users for filter
       users = [];
-      allLogs.forEach(log => {
-        if (log.user && !users.some(u => u._id === log.user._id)) {
+      allLogs.forEach((log) => {
+        if (log.user && !users.some((u) => u._id === log.user._id)) {
           users.push(log.user);
         }
       });
@@ -65,7 +67,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Action badge
       const actionBadge = document.createElement("span");
       actionBadge.className = `action-badge ${log.action}`;
-      actionBadge.textContent = log.action.charAt(0).toUpperCase() + log.action.slice(1);
+      actionBadge.textContent =
+        log.action.charAt(0).toUpperCase() + log.action.slice(1);
 
       row.innerHTML = `
         <td>${timestamp}</td>
@@ -98,7 +101,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     }
     if (selectedAction) {
-      filteredLogs = filteredLogs.filter((log) => log.action === selectedAction);
+      filteredLogs = filteredLogs.filter(
+        (log) => log.action === selectedAction
+      );
     }
 
     displayActivityLogs(filteredLogs);
