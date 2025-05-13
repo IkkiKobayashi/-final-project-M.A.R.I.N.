@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.success && data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "dashboard.html";
+        window.location.href = "store-selection.html"; // Changed from dashboard.html
       } else {
         throw new Error("Invalid login response");
       }
