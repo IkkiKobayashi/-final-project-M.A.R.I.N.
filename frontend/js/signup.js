@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
-      if (data.success && data.token) {
+      if (data.success) {
         // Show success message modal
         const modal = document.createElement("div");
         modal.className = "success-modal";
@@ -93,6 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
         document.body.appendChild(modal);
+
+        // Clear the form
+        signupForm.reset();
       } else {
         throw new Error(data.message || "Failed to create account");
       }

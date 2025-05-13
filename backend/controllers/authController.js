@@ -5,18 +5,24 @@ const bcrypt = require("bcryptjs");
 // Login user
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    // Check if user exists
-    const user = await User.findOne({ email });
+    // Check if user exists by username instead of email
+    const user = await User.findOne({ username });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
     // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
     // Create token
@@ -27,16 +33,21 @@ exports.login = async (req, res) => {
     );
 
     res.json({
+      success: true,
       token,
       user: {
         id: user._id,
-        name: user.name,
+        fullName: user.fullName,
+        username: user.username,
         email: user.email,
         role: user.role,
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
