@@ -2,15 +2,24 @@ const Store = require("../models/Store");
 const ActivityLog = require("../models/ActivityLog");
 const { ErrorHandler } = require("../utils/errorHandler");
 
-exports.getStores = async (req, res, next) => {
+exports.getStores = async (req, res) => {
   try {
-    const stores = await Store.find().populate("owner");
-    res.json({
+    console.log("Fetching stores...");
+    const stores = await Store.find();
+    console.log("Found stores:", stores);
+
+    res.status(200).json({
       success: true,
       data: stores,
+      count: stores.length,
     });
   } catch (error) {
-    next(ErrorHandler.handleDatabaseError(error));
+    console.error("Error fetching stores:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching stores",
+      error: error.message,
+    });
   }
 };
 
@@ -29,30 +38,30 @@ exports.getStoreById = async (req, res, next) => {
   }
 };
 
-exports.createStore = async (req, res, next) => {
+exports.createStore = async (req, res) => {
   try {
-    const store = new Store({
-      ...req.body,
-      owner: req.user.userId,
-    });
-    await store.save();
+    console.log("Creating store with data:", req.body);
 
-    // Log activity
-    await new ActivityLog({
-      user: req.user.userId,
-      store: store._id,
-      action: "create",
-      entityType: "store",
-      entityId: store._id,
-      details: `Created new store: ${store.name}`,
-    }).save();
+    if (!req.body.name || !req.body.location) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and location are required",
+      });
+    }
+
+    const store = await Store.create(req.body);
+    console.log("Store created:", store);
 
     res.status(201).json({
       success: true,
       data: store,
     });
   } catch (error) {
-    next(ErrorHandler.handleDatabaseError(error));
+    console.error("Store creation error:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to create store",
+    });
   }
 };
 

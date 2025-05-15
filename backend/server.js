@@ -33,16 +33,21 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5500", "http://127.0.0.1:5500"],
+    origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
   })
 );
 
-// Add request logging
+// Add request logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  console.log(`${req.method} ${req.url}`, {
+    headers: req.headers,
+    body: req.body,
+    query: req.query,
+  });
   next();
 });
 
@@ -93,6 +98,25 @@ function startServer() {
     res.status(404).json({
       success: false,
       message: `Cannot find ${req.originalUrl} on this server!`,
+    });
+  });
+
+  // Error handling middleware
+  app.use((err, req, res, next) => {
+    console.error("Error:", err);
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(err.errors)
+          .map((e) => e.message)
+          .join(", "),
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   });
 

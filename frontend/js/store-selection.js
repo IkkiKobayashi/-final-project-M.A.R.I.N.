@@ -40,8 +40,8 @@ const searchStores = (query) => {
       currentFilter === "all stores" || store.status === currentFilter;
     const matchesSearch =
       store.name.toLowerCase().includes(searchQuery) ||
-      store.address.toLowerCase().includes(searchQuery) ||
-      store.manager.toLowerCase().includes(searchQuery);
+      store.location.toLowerCase().includes(searchQuery) ||
+      store.contact.manager.toLowerCase().includes(searchQuery);
     return matchesFilter && matchesSearch;
   });
   return filteredStores;
@@ -75,12 +75,12 @@ const createStoreCard = (store) => {
   card.innerHTML = `
         <div class="store-actions">
             <button class="action-btn edit-btn" title="Edit Store" data-id="${
-              store.id
+              store._id
             }">
                 <i class="fas fa-edit"></i>
             </button>
             <button class="action-btn delete-btn" title="Delete Store" data-id="${
-              store.id
+              store._id
             }">
                 <i class="fas fa-trash-alt"></i>
             </button>
@@ -95,16 +95,16 @@ const createStoreCard = (store) => {
             <div class="store-details">
                 <div class="store-info">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>${store.address}</span>
+                    <span>${store.location}</span>
                 </div>
                 <div class="store-info">
                     <i class="fas fa-user"></i>
-                    <span>${store.manager}</span>
+                    <span>${store.contact.manager}</span>
                 </div>
                 <div class="store-info">
                     <i class="fas fa-clock"></i>
                     <span>Last updated: ${formatTimeAgo(
-                      store.lastUpdated
+                      new Date(store.lastUpdated)
                     )}</span>
                 </div>
             </div>
@@ -114,7 +114,7 @@ const createStoreCard = (store) => {
   // Add Event Listeners
   card.addEventListener("click", (e) => {
     if (!e.target.closest(".action-btn")) {
-      navigateToStore(store.id);
+      navigateToStore(store._id);
     }
   });
 
@@ -123,12 +123,12 @@ const createStoreCard = (store) => {
 
   editBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    editStore(store.id);
+    editStore(store._id);
   });
 
   deleteBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    deleteStore(store.id);
+    deleteStore(store._id);
   });
 
   return card;
@@ -153,16 +153,23 @@ const renderStores = () => {
 };
 
 // Event Handlers
-const navigateToStore = (storeId) => {
-  const store = stores.find((s) => s.id === storeId);
-  if (store) {
-    const storeData = {
-      id: store.id,
-      name: store.name,
-      address: store.address,
-    };
-    localStorage.setItem("selectedStore", JSON.stringify(storeData));
-    window.location.href = "dashboard.html";
+const navigateToStore = async (storeId) => {
+  try {
+    const store = stores.find((s) => s._id === storeId);
+    if (store) {
+      localStorage.setItem(
+        "selectedStore",
+        JSON.stringify({
+          id: store._id,
+          name: store.name,
+          address: store.location,
+        })
+      );
+      window.location.href = "dashboard.html";
+    }
+  } catch (error) {
+    console.error("Error navigating to store:", error);
+    showNotification("Failed to select store", "error");
   }
 };
 
@@ -170,10 +177,41 @@ const editStore = (storeId) => {
   openEditModal(storeId);
 };
 
-const deleteStore = (storeId) => {
+const deleteStore = async (storeId) => {
   if (confirm("Are you sure you want to delete this store?")) {
-    stores = stores.filter((store) => store.id !== storeId);
-    renderStores();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(
+        `http://localhost:5000/api/stores/${storeId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete store");
+      }
+
+      await fetchStores();
+      showNotification("Store deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting store:", error);
+      if (error.message === "No authentication token found") {
+        window.location.href = "login.html";
+      } else {
+        showNotification(error.message || "Failed to delete store", "error");
+      }
+    }
   }
 };
 
@@ -191,14 +229,14 @@ const closeAddModal = () => {
 
 const openEditModal = (storeId) => {
   editingStoreId = storeId;
-  const store = stores.find((s) => s.id === storeId);
+  const store = stores.find((s) => s._id === storeId);
   if (!store) return;
 
   // Populate form fields
-  editStoreForm.elements.storeId.value = store.id;
+  editStoreForm.elements.storeId.value = store._id;
   editStoreForm.elements.storeName.value = store.name;
-  editStoreForm.elements.storeAddress.value = store.address;
-  editStoreForm.elements.storeManager.value = store.manager;
+  editStoreForm.elements.storeAddress.value = store.location;
+  editStoreForm.elements.storeManager.value = store.contact.manager;
   editStoreForm.elements.storeStatus.value = store.status;
 
   // Show current image
@@ -248,54 +286,104 @@ const handleImageUpload = (e, previewElement) => {
 };
 
 // Form Submission Handlers
-const handleAddStore = (e) => {
+const handleAddStore = async (e) => {
   e.preventDefault();
-
   const formData = new FormData(addStoreForm);
-  const newStore = {
-    id: Date.now(),
-    name: formData.get("storeName"),
-    address: formData.get("storeAddress"),
-    manager: formData.get("storeManager"),
-    status: formData.get("storeStatus"),
-    lastUpdated: new Date(),
-    image: selectedImage || "https://via.placeholder.com/400x200",
-  };
 
-  stores.unshift(newStore);
-  closeAddModal();
-  renderStores();
-  showNotification("Store added successfully!");
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
+
+    const storeData = {
+      name: formData.get("storeName"),
+      location: formData.get("storeAddress"),
+      status: formData.get("storeStatus"),
+      contact: {
+        manager: formData.get("storeManager"),
+      },
+      image: selectedImage || "https://via.placeholder.com/400x200",
+    };
+
+    const response = await fetch("http://localhost:5000/api/stores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(storeData),
+    });
+
+    const result = await response.json();
+    console.log("Server response:", result);
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    showNotification("Store added successfully!");
+    closeAddModal();
+    await fetchStores();
+  } catch (error) {
+    console.error("Error:", error);
+    showNotification(error.message || "Failed to create store", "error");
+  }
 };
 
-const handleEditStore = (e) => {
+const handleEditStore = async (e) => {
   e.preventDefault();
-
   const formData = new FormData(editStoreForm);
-  const updatedStore = {
-    id: parseInt(formData.get("storeId")),
-    name: formData.get("storeName"),
-    address: formData.get("storeAddress"),
-    manager: formData.get("storeManager"),
-    status: formData.get("storeStatus"),
-    lastUpdated: new Date(),
-    image: selectedImage || stores.find((s) => s.id === editingStoreId).image,
-  };
 
-  // Update store in array
-  stores = stores.map((store) =>
-    store.id === updatedStore.id ? updatedStore : store
-  );
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
 
-  closeEditModal();
-  renderStores();
-  showNotification("Store updated successfully!");
+    const response = await fetch(
+      `http://localhost:5000/api/stores/${editingStoreId}`,
+      {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.get("storeName"),
+          location: formData.get("storeAddress"),
+          status: formData.get("storeStatus"),
+          contact: {
+            manager: formData.get("storeManager"),
+          },
+          image: selectedImage,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to update store");
+    }
+
+    closeEditModal();
+    await fetchStores(); // Refresh the stores list
+    showNotification("Store updated successfully!");
+  } catch (error) {
+    console.error("Error updating store:", error);
+    if (error.message === "No authentication token found") {
+      window.location.href = "login.html";
+    } else {
+      showNotification(error.message || "Failed to update store", "error");
+    }
+  }
 };
 
 // Notification Function
-const showNotification = (message) => {
+const showNotification = (message, type = "success") => {
   const notification = document.createElement("div");
-  notification.className = "notification";
+  notification.className = `notification ${type}`;
   notification.innerHTML = `
         <i class="fas fa-check-circle"></i>
         <span>${message}</span>
@@ -366,5 +454,85 @@ submitEditStoreBtn.addEventListener("click", (e) => {
   });
 });
 
-// Initial Render
-renderStores();
+// Fetch stores from API
+async function fetchStores() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await fetch("http://localhost:5000/api/stores", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+    console.log("Fetch response:", result);
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    stores = result.data || [];
+    renderStores();
+  } catch (error) {
+    console.error("Fetch error:", error);
+    showNotification(error.message, "error");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+  fetchStores();
+});
+
+async function addStore(storeData) {
+  try {
+    const response = await fetch("/api/stores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(storeData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error adding store:", error);
+    throw error;
+  }
+}
+
+// Example usage:
+document
+  .getElementById("add-store-form")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const storeData = {
+      name: document.getElementById("store-name").value,
+      location: document.getElementById("store-location").value,
+      // Add other fields as necessary
+    };
+
+    try {
+      const result = await addStore(storeData);
+      console.log("Store added successfully:", result);
+      // Optionally, refresh the store list or show a success message
+    } catch (error) {
+      console.error("Failed to add store:", error);
+      // Show an error message to the user
+    }
+  });

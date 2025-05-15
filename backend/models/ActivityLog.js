@@ -14,12 +14,11 @@ const activityLogSchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["add", "edit", "delete", "view", "login", "logout", "other"],
+      enum: ["add", "edit", "delete", "create", "update"],
       required: true,
     },
     entityType: {
       type: String,
-      enum: ["product", "inventory", "employee", "store", "user", "system"],
       required: true,
     },
     entityId: {
@@ -30,19 +29,14 @@ const activityLogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    metadata: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
+    timestamp: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
     timestamps: true,
   }
 );
-
-// Create indexes for efficient filtering and searching
-activityLogSchema.index({ store: 1, createdAt: -1 });
-activityLogSchema.index({ user: 1, createdAt: -1 });
-activityLogSchema.index({ action: 1, entityType: 1 });
 
 module.exports = mongoose.model("ActivityLog", activityLogSchema);
