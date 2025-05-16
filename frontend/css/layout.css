@@ -722,3 +722,19 @@ body {
 .manage-store-btn:active {
   transform: translateY(0);
 }
+
+/* Placeholder Styles */
+.placeholder {
+  width: 40px; /* Adjusted size */
+  height: 40px; /* Adjusted size */
+  background-color: #ccc; /* Placeholder color */
+  border-radius: 50%; /* Make it circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px; /* Adjusted font size */
+  color: #fff; /* Text color */
+  text-align: center;
+  border: 2px solid white; /* Optional border */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}

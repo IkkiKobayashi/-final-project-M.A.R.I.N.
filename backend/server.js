@@ -48,6 +48,7 @@ app.use((req, res, next) => {
     body: req.body,
     query: req.query,
   });
+  console.log(`Request URL: ${req.url}`);
   next();
 });
 
@@ -69,6 +70,7 @@ connectDB()
 function startServer() {
   // Static file serving
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+  app.use(express.static(path.join(__dirname, "../frontend")));
 
   // API Routes
   app.use("/api/auth", authRoutes);
