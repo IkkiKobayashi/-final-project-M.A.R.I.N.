@@ -200,7 +200,7 @@ async function saveProductWithImage(formData, imageData) {
     const data = await response.json();
     console.log("Server response:", data);
 
-    // Update local storage with minimal data
+    // Update local storage with the complete product data including image
     try {
       let products = JSON.parse(localStorage.getItem("products")) || [];
       const newProduct = {
@@ -210,7 +210,7 @@ async function saveProductWithImage(formData, imageData) {
         quantity: productData.quantity,
         type: productData.type,
         expiry: productData.expiry,
-        image: getDefaultImage(),
+        image: productData.image, // Store the actual image data
       };
       products.push(newProduct);
       localStorage.setItem("products", JSON.stringify(products));
