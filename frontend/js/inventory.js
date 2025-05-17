@@ -190,6 +190,83 @@ function loadProducts() {
   displayProducts(products);
 }
 
+// --- SORT FUNCTIONALITY ---
+let currentSort = null;
+
+function sortInventory(sortBy) {
+  const inventoryView = document.querySelector(".inventory-view");
+  const items = Array.from(inventoryView.children);
+
+  items.sort((a, b) => {
+    switch (sortBy) {
+      case "name": {
+        const nameA = a
+          .querySelector(".product-name")
+          .textContent.toLowerCase();
+        const nameB = b
+          .querySelector(".product-name")
+          .textContent.toLowerCase();
+        return nameA.localeCompare(nameB);
+      }
+      case "quantity": {
+        const qtyA =
+          parseInt(a.querySelector(".product-quantity")?.textContent) || 0;
+        const qtyB =
+          parseInt(b.querySelector(".product-quantity")?.textContent) || 0;
+        return qtyB - qtyA;
+      }
+      case "type": {
+        const typeA =
+          a.querySelector(".product-type")?.textContent.toLowerCase() || "";
+        const typeB =
+          b.querySelector(".product-type")?.textContent.toLowerCase() || "";
+        return typeA.localeCompare(typeB);
+      }
+      case "expiry": {
+        const expA = new Date(
+          a.querySelector(".product-expiry")?.textContent.split(": ")[1] || 0
+        );
+        const expB = new Date(
+          b.querySelector(".product-expiry")?.textContent.split(": ")[1] || 0
+        );
+        return expA - expB;
+      }
+      default:
+        return 0;
+    }
+  });
+
+  inventoryView.innerHTML = "";
+  items.forEach((item) => inventoryView.appendChild(item));
+
+  // Highlight active sort option
+  document.querySelectorAll(".sort-option").forEach((option) => {
+    option.classList.remove("active");
+    if (option.dataset.sort === sortBy) {
+      option.classList.add("active");
+    }
+  });
+
+  currentSort = sortBy;
+}
+
+document.querySelectorAll(".sort-option").forEach((option) => {
+  option.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const sortBy = option.dataset.sort;
+    sortInventory(sortBy);
+  });
+});
+
+// Keep sorted after reload
+const originalDisplayProducts = displayProducts;
+displayProducts = function (products) {
+  originalDisplayProducts(products);
+  if (currentSort) {
+    sortInventory(currentSort);
+  }
+};
+
 function displayProducts(products) {
   const container = document.querySelector(".inventory-view");
   if (!container) return;

@@ -234,7 +234,6 @@ async function saveProductWithImage(formData, imageData) {
     showNotification(error.message || "Failed to save product", "error");
   }
 }
-
 // Add this function for error notifications
 function showNotification(message, type = "success") {
   const notification = document.createElement("div");

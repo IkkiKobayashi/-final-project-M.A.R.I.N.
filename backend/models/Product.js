@@ -40,7 +40,6 @@ const productSchema = new mongoose.Schema(
       required: [true, "SKU is required"],
       unique: true,
       trim: true,
-      // Remove the strict validation for now
     },
   },
   {
