@@ -18,7 +18,6 @@ const userRoutes = require("./routes/userRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const productRoutes = require("./routes/productRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
-const activityLogRoutes = require("./routes/activityLogRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const supportTicketRoutes = require("./routes/supportTicketRoutes");
@@ -86,7 +85,6 @@ function startServer() {
   app.use("/api/stores", storeRoutes);
   app.use("/api/products", productRoutes);
   app.use("/api/inventory", inventoryRoutes);
-  app.use("/api/activity", activityLogRoutes);
   app.use("/api/dashboard", dashboardRoutes);
   app.use("/api/settings", settingsRoutes);
   app.use("/api/support", supportTicketRoutes);

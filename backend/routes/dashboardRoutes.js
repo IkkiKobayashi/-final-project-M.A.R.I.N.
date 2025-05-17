@@ -5,7 +5,6 @@ const Dashboard = require("../models/Dashboard");
 const Inventory = require("../models/Inventory");
 const Product = require("../models/Product");
 const User = require("../models/User");
-const ActivityLog = require("../models/ActivityLog");
 const dashboardController = require("../controllers/dashboardController");
 
 // All routes require authentication

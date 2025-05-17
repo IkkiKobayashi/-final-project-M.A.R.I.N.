@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const SupportTicket = require("../models/SupportTicket");
 const { auth, checkRole } = require("../middleware/auth");
-const ActivityLog = require("../models/ActivityLog");
+
 
 // All routes require authentication
 router.use(auth);

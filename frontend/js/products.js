@@ -47,13 +47,21 @@ function openModal() {
 function closeModal() {
   modal.classList.remove("active");
   resetForm();
+  // Clear any existing error messages
+  const errorMessages = modal.querySelectorAll(".error-message");
+  errorMessages.forEach((msg) => msg.remove());
 }
 
 // Form Reset
 function resetForm() {
   productForm.reset();
-  imagePreview.src = "";
-  imagePreview.style.display = "none";
+  const previewContainer = document.querySelector(".upload-preview");
+  if (previewContainer) {
+    previewContainer.innerHTML = `
+      <i class="fas fa-cloud-upload-alt"></i>
+      <span>Click to upload image</span>
+    `;
+  }
 }
 
 // Event Listeners
@@ -95,39 +103,49 @@ productImage.addEventListener("change", (e) => {
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const formData = new FormData(productForm);
-  const imageFile = productImage.files[0];
-  let imageData = "";
+  try {
+    const formData = new FormData(productForm);
+    const imageFile = productImage.files[0];
+    let imageData = "";
 
-  if (imageFile) {
-    imageData = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(imageFile);
-    });
-  } else {
-    if (productId.value) {
-      const existingProduct = JSON.parse(localStorage.getItem("products")).find(
-        (p) => p.id === productId.value
-      );
-      imageData = existingProduct
-        ? existingProduct.image
-        : "img/default-product.png";
+    if (imageFile) {
+      imageData = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(imageFile);
+      });
     } else {
-      imageData = "img/default-product.png";
+      if (productId.value) {
+        const existingProduct = JSON.parse(
+          localStorage.getItem("products")
+        ).find((p) => p.id === productId.value);
+        imageData = existingProduct
+          ? existingProduct.image
+          : "img/default-product.png";
+      } else {
+        imageData = "img/default-product.png";
+      }
     }
-  }
 
-  await saveProductWithImage(formData, imageData);
+    await saveProductWithImage(formData, imageData);
+  } catch (error) {
+    console.error("Error in form submission:", error);
+    showNotification(error.message || "Failed to save product", "error");
+  }
 });
 
 // Remove the submitBtn click handler for saving product
 submitBtn.addEventListener("click", (e) => {
   e.preventDefault();
-  productForm.requestSubmit();
+  productForm.dispatchEvent(new Event("submit"));
 });
 
-// Save Product with Image
+// Add this helper function at the top of the file
+function getDefaultImage() {
+  return "https://via.placeholder.com/300x300?text=No+Image";
+}
+
+// Update the saveProductWithImage function
 async function saveProductWithImage(formData, imageData) {
   try {
     // Get the current store ID from localStorage
@@ -157,7 +175,7 @@ async function saveProductWithImage(formData, imageData) {
       quantity: parseInt(quantity),
       expiry: expiry,
       type: type,
-      image: imageData || "img/default-product.png",
+      image: imageData || getDefaultImage(),
       storeId: currentStore.id,
     };
 
@@ -173,28 +191,44 @@ async function saveProductWithImage(formData, imageData) {
     });
 
     console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.msg || "Failed to save product");
+    }
+
     const data = await response.json();
     console.log("Server response:", data);
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to save product");
+    // Update local storage with minimal data
+    try {
+      let products = JSON.parse(localStorage.getItem("products")) || [];
+      const newProduct = {
+        id: data._id,
+        name: productData.name,
+        price: productData.price,
+        quantity: productData.quantity,
+        type: productData.type,
+        expiry: productData.expiry,
+        image: getDefaultImage(),
+      };
+      products.push(newProduct);
+      localStorage.setItem("products", JSON.stringify(products));
+    } catch (storageError) {
+      console.warn("Could not update localStorage:", storageError);
     }
 
-    if (!data.success) {
-      throw new Error(data.message || "Failed to save product");
-    }
+    // Add to view with full data
+    addProductToView({
+      ...productData,
+      id: data._id,
+    });
 
-    // Update local storage
-    let products = JSON.parse(localStorage.getItem("products")) || [];
-    const newProduct = { ...productData, id: data.product._id };
-    products.push(newProduct);
-    localStorage.setItem("products", JSON.stringify(products));
-    console.log("Updated products in localStorage:", products);
-
-    // Add to view
-    addProductToView(data.product); // Use data.product from the server response
     showNotification("Product saved successfully!");
     closeModal();
+
+    // Refresh the products list
+    await fetchAndDisplayProducts();
   } catch (error) {
     console.error("Error saving product:", error);
     showNotification(error.message || "Failed to save product", "error");
@@ -212,6 +246,11 @@ function showNotification(message, type = "success") {
 
 // Delete Confirmation Modal
 async function deleteProduct(productId, productName) {
+  if (!productId) {
+    showNotification("Invalid product ID", "error");
+    return false;
+  }
+
   const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
     id: "system",
     name: "System",
@@ -247,16 +286,43 @@ async function deleteProduct(productId, productName) {
     const cancelBtn = modal.querySelector(".cancel-btn");
     const closeModalBtn = modal.querySelector(".close-modal-btn");
 
-    const handleDelete = () => {
-      // Remove from localStorage
-      let products = JSON.parse(localStorage.getItem("products")) || [];
-      const index = products.findIndex(
-        (p) => String(p.id) === String(productId)
-      );
+    const handleDelete = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          showNotification("Please log in to delete products", "error");
+          modal.remove();
+          resolve(false);
+          return;
+        }
 
-      if (index > -1) {
-        products.splice(index, 1);
-        localStorage.setItem("products", JSON.stringify(products));
+        // Call the backend API to delete the product
+        const response = await fetch(
+          `http://localhost:5000/api/products/${productId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete product");
+        }
+
+        // Remove from localStorage
+        let products = JSON.parse(localStorage.getItem("products")) || [];
+        const index = products.findIndex(
+          (p) => String(p.id) === String(productId)
+        );
+
+        if (index > -1) {
+          products.splice(index, 1);
+          localStorage.setItem("products", JSON.stringify(products));
+        }
 
         // Log activity
         logActivity(
@@ -267,11 +333,13 @@ async function deleteProduct(productId, productName) {
           `Deleted product: ${productName}`
         );
 
+        showNotification("Product deleted successfully");
         modal.remove();
-        loadProducts(); // Reload products to refresh the view
+        await fetchAndDisplayProducts(); // Refresh the products list
         resolve(true);
-      } else {
-        console.warn("Product not found in localStorage:", productId);
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        showNotification(error.message || "Failed to delete product", "error");
         modal.remove();
         resolve(false);
       }
@@ -381,14 +449,23 @@ addProductToView = function (product) {
   }
 };
 
-// Add Product to View
+// Update the addProductToView function
 function addProductToView(product) {
   const productCard = document.createElement("div");
   productCard.className = "product-card";
   productCard.dataset.id = product.id;
 
+  // Handle image loading error
+  const imageUrl = product.image || getDefaultImage();
+  const imageHtml = `
+    <img src="${imageUrl}" 
+         alt="${product.name}" 
+         class="product-image"
+         onerror="this.onerror=null; this.src='${getDefaultImage()}';">
+  `;
+
   productCard.innerHTML = `
-    <img src="${product.image}" alt="${product.name}" class="product-image">
+    ${imageHtml}
     <div class="product-info">
       <h3 class="product-name">${product.name}</h3>
       <div class="product-type">${
@@ -476,37 +553,100 @@ function loadProducts() {
 
 // Fetch products from backend and update localStorage and view
 async function fetchAndDisplayProducts() {
-  const currentStore = JSON.parse(localStorage.getItem("currentStore"));
-  if (!currentStore || !currentStore.id) {
-    showNotification("Please select a store first", "error");
-    window.location.href = "store-selection.html";
-    return;
-  }
   try {
+    const currentStore = JSON.parse(localStorage.getItem("currentStore"));
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      showNotification("Please log in to view products", "error");
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (!currentStore || !currentStore.id) {
+      showNotification("Please select a store first", "error");
+      window.location.href = "store-selection.html";
+      return;
+    }
+
+    console.log("Fetching products for store:", currentStore.id);
     const response = await fetch(
       `http://localhost:5000/api/products?storeId=${currentStore.id}`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       }
     );
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      // If backend returns array directly
-      localStorage.setItem("products", JSON.stringify(data));
-      loadProducts();
-    } else if (data.products) {
-      // If backend returns { products: [...] }
-      localStorage.setItem("products", JSON.stringify(data.products));
-      loadProducts();
-    } else {
-      localStorage.setItem("products", "[]");
-      loadProducts();
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error response:", errorData);
+      throw new Error(
+        errorData.msg || `Failed to fetch products: ${response.status}`
+      );
     }
-  } catch (err) {
-    console.error("Failed to fetch products from backend:", err);
-    loadProducts();
+
+    const products = await response.json();
+    console.log("Fetched products:", products);
+
+    // Clear existing products
+    productsView.innerHTML = "";
+
+    if (!Array.isArray(products)) {
+      console.error("Invalid products data:", products);
+      throw new Error("Invalid response format from server");
+    }
+
+    if (products.length === 0) {
+      productsView.innerHTML = `
+        <div class="no-products">
+          <i class="fas fa-box-open"></i>
+          <p>No products found for this store</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Add each product to the view
+    products.forEach((product) => {
+      if (!product._id || !product.name) {
+        console.warn("Invalid product data:", product);
+        return;
+      }
+      addProductToView(product);
+    });
+
+    // Update local storage with minimal data only
+    try {
+      const minimalProducts = products.map((product) => ({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        quantity: product.quantity,
+        type: product.type,
+        expiry: product.expiry,
+        // Removed image from localStorage to prevent quota issues
+      }));
+      localStorage.setItem("products", JSON.stringify(minimalProducts));
+    } catch (storageError) {
+      console.warn("Could not update localStorage:", storageError);
+      // Continue execution even if localStorage fails
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    showNotification(error.message || "Failed to load products", "error");
+
+    productsView.innerHTML = `
+      <div class="error-state">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>Failed to load products</p>
+        <button onclick="fetchAndDisplayProducts()" class="retry-btn">
+          <i class="fas fa-sync"></i> Retry
+        </button>
+      </div>
+    `;
   }
 }
 

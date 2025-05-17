@@ -3,7 +3,6 @@ const router = express.Router();
 const Inventory = require("../models/Inventory");
 const Product = require("../models/Product");
 const { auth, checkRole } = require("../middleware/auth");
-const ActivityLog = require("../models/ActivityLog");
 
 // All routes require authentication
 router.use(auth);

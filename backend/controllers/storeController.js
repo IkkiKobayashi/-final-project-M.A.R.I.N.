@@ -1,5 +1,4 @@
 const Store = require("../models/Store");
-const ActivityLog = require("../models/ActivityLog");
 const { ErrorHandler } = require("../utils/errorHandler");
 
 exports.getStores = async (req, res) => {

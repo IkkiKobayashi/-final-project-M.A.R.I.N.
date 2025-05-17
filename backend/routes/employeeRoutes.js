@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const { auth, checkRole } = require("../middleware/auth");
 const EmployeeController = require("../controllers/EmployeeController");
-const ActivityLog = require("../models/ActivityLog");
+
 
 // All routes require authentication
 router.use(auth);
