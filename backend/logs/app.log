@@ -118,3 +118,19 @@
 {"error":{"code":323,"message":"Error in specification { background: true, name: \"name_text_description_text\", key: { name: \"text\", description: \"text\" } } :: caused by :: text indexes cannot be created with apiStrict: true","stack":"MongoServerError: Error in specification { background: true, name: \"name_text_description_text\", key: { name: \"text\", description: \"text\" } } :: caused by :: text indexes cannot be created with apiStrict: true\n    at Connection.sendCommand (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\cmap\\connection.js:299:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\cmap\\connection.js:327:26)\n    at async Server.command (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\sdam\\server.js:168:29)\n    at async CreateIndexesOperation.executeCommand (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\operations\\command.js:76:16)\n    at async CreateIndexesOperation.execute (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\operations\\indexes.js:122:9)\n    at async tryOperation (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:207:20)\n    at async executeOperation (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:75:16)\n    at async Collection.createIndex (R:\\Code\\Websys\\final-project-MARIN\\backend\\node_modules\\mongodb\\lib\\collection.js:329:25)"},"level":"error","message":"MongoDB connection error:","timestamp":"2025-05-16T13:47:12.418Z"}
 {"level":"info","message":"Retrying connection... Attempt 1/3","timestamp":"2025-05-16T13:47:12.420Z"}
 {"level":"info","message":"MongoDB is already connected","timestamp":"2025-05-16T13:47:17.422Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T14:11:54.993Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T14:12:47.465Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T14:27:20.315Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T14:58:32.726Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T15:12:24.364Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T15:12:31.544Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T15:18:52.469Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T15:57:50.225Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T15:57:56.678Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T16:03:17.910Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T16:03:25.565Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T16:08:12.661Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-16T17:05:32.825Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-16T17:05:40.364Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-17T08:34:41.793Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-17T08:44:05.954Z"}

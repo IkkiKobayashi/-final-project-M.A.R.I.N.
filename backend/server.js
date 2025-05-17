@@ -29,26 +29,34 @@ const Product = require("./models/Product"); // Assuming Product model is define
 // Initialize express app
 const app = express();
 
-// Basic middleware
-app.use(express.json());
+// Basic middleware with increased limits
+app.use(
+  express.json({
+    limit: "50mb",
+    parameterLimit: 100000,
+    extended: true,
+  })
+);
+app.use(
+  express.urlencoded({
+    limit: "50mb",
+    parameterLimit: 100000,
+    extended: true,
+  })
+);
 app.use(
   cors({
     origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Authorization"],
   })
 );
 
 // Add request logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`, {
-    headers: req.headers,
     body: req.body,
     query: req.query,
   });
-  console.log(`Request URL: ${req.url}`);
   next();
 });
 
@@ -106,19 +114,9 @@ function startServer() {
   // Error handling middleware
   app.use((err, req, res, next) => {
     console.error("Error:", err);
-
-    if (err.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: Object.values(err.errors)
-          .map((e) => e.message)
-          .join(", "),
-      });
-    }
-
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: err.message,
     });
   });
 
@@ -164,4 +162,5 @@ process.on("uncaughtException", (error) => {
 // Unhandled rejection handler
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled Rejection:", error);
+  process.exit(1);
 });

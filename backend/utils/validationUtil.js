@@ -38,6 +38,10 @@ class ValidationUtil {
       errors.push("SKU must contain only letters and numbers");
     }
 
+    if (data.sku && !validator.matches(data.sku, /^[A-Z]{3}\d{4}$/)) {
+      errors.push("SKU must be in format XXX0000");
+    }
+
     if (!data.price || !validator.isFloat(data.price.toString(), { min: 0 })) {
       errors.push("Price must be a positive number");
     }

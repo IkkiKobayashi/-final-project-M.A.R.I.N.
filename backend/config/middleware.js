@@ -29,9 +29,21 @@ module.exports = (app) => {
     })
   );
 
-  // Request parsing
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Request parsing with increased limits
+  app.use(
+    express.json({
+      limit: "50mb",
+      parameterLimit: 100000,
+      extended: true,
+    })
+  );
+  app.use(
+    express.urlencoded({
+      limit: "50mb",
+      parameterLimit: 100000,
+      extended: true,
+    })
+  );
 
   // Logging in development
   if (process.env.NODE_ENV === "development") {

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+  const storeInfo = JSON.parse(localStorage.getItem("currentStore"));
   if (!storeInfo) {
     window.location.href = "store-selection.html";
     return;
@@ -100,84 +100,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Fetch and display recent activities from backend
-  async function updateRecentActivityFromAPI() {
-    const activityFeed = document.querySelector(".activity-feed");
-    activityFeed.innerHTML = `<div>Loading recent activity...</div>`;
-    try {
-      const response = await fetch(
-        `http://localhost:5000/activity-log/recent/${storeInfo.id}`,
-        { credentials: "include" }
-      );
-      const activities = await response.json();
-
-      if (Array.isArray(activities) && activities.length > 0) {
-        activityFeed.innerHTML = activities
-          .map((activity) => {
-            // Choose icon based on entityType or action
-            let icon = "fa-info-circle";
-            if (activity.entityType === "product") icon = "fa-box";
-            else if (activity.entityType === "inventory") icon = "fa-warehouse";
-            else if (activity.entityType === "employee") icon = "fa-user";
-            else if (activity.entityType === "store") icon = "fa-store";
-            else if (activity.entityType === "system") icon = "fa-cog";
-            else if (activity.entityType === "user") icon = "fa-user-circle";
-
-            // Action badge color
-            let actionClass = "";
-            if (activity.action === "add") actionClass = "add";
-            else if (activity.action === "edit") actionClass = "edit";
-            else if (activity.action === "delete") actionClass = "delete";
-
-            // Format time
-            const time = new Date(
-              activity.createdAt || activity.timestamp
-            ).toLocaleString();
-
-            return `
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="fas ${icon}"></i>
-                </div>
-                <div class="activity-content">
-                  <div class="activity-text">
-                    <span class="activity-user">${activity.user?.name || activity.user || "Unknown"}</span>
-                    <span class="activity-action action-badge ${actionClass}">${activity.action?.charAt(0).toUpperCase() + activity.action?.slice(1) || ""}</span>
-                    <span class="activity-entity">${activity.entityType ? "on " + activity.entityType : ""}</span>
-                    <span class="activity-details">${activity.details || ""}</span>
-                  </div>
-                  <div class="activity-time">${time}</div>
-                </div>
-              </div>
-            `;
-          })
-          .join("");
-      } else {
-        activityFeed.innerHTML = `
-          <div class="no-activity">
-            <i class="fas fa-check-circle"></i>
-            <p>No recent activity at this time.</p>
-          </div>
-        `;
-      }
-    } catch (error) {
-      activityFeed.innerHTML = `
-        <div class="no-activity">
-          <i class="fas fa-exclamation-circle"></i>
-          <p>Failed to load recent activity.</p>
-        </div>
-      `;
-      console.error("Error fetching recent activity:", error);
-    }
-  }
-
   // Initial update
   updateDashboardMetrics();
   updateInventoryAlertsFromAPI();
-  updateRecentActivityFromAPI();
 
   // Update metrics every 5 minutes
   setInterval(updateDashboardMetrics, 300000);
   setInterval(updateInventoryAlertsFromAPI, 300000);
-  setInterval(updateRecentActivityFromAPI, 300000);
 });

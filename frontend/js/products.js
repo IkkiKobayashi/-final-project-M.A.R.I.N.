@@ -130,113 +130,84 @@ submitBtn.addEventListener("click", (e) => {
 // Save Product with Image
 async function saveProductWithImage(formData, imageData) {
   try {
-    const product = {
-      id: productId.value || Date.now().toString(),
-      name: formData.get("productName"),
-      price: formData.get("productPrice"),
-      quantity: formData.get("productQuantity"),
-      expiry: formData.get("productExpiry"),
-      type: formData.get("productType"),
-      image: imageData,
-    };
+    // Get the current store ID from localStorage
+    const currentStore = JSON.parse(localStorage.getItem("currentStore"));
+    console.log("Current store from localStorage:", currentStore);
 
-    // Get current user from localStorage
-    const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {
-      id: "system",
-      name: "System",
-    };
-
-    // Update or add product to view
-    if (productId.value) {
-      // Update existing product card
-      const existingCard = document.querySelector(
-        `.product-card[data-id="${product.id}"]`
-      );
-      if (existingCard) {
-        existingCard.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" class="product-image">
-          <div class="product-info">
-            <h3 class="product-name">${product.name}</h3>
-            <div class="product-type">${
-              product.type.charAt(0).toUpperCase() + product.type.slice(1)
-            }</div>
-            <div class="product-details">
-              <span class="product-price">₱${product.price}</span>
-              <span class="product-quantity">${product.quantity} in stock</span>
-            </div>
-            <div class="product-expiry">Expires: ${product.expiry}</div>
-          </div>
-          <div class="product-actions">
-            <button class="action-btn edit-btn">
-              <i class="fas fa-edit"></i>
-              Edit
-            </button>
-            <button class="action-btn delete-btn">
-              <i class="fas fa-trash"></i>
-              Delete
-            </button>
-          </div>
-        `;
-
-        // Log edit activity
-        logActivity(
-          currentUser.id,
-          currentUser.name,
-          "edit",
-          "Product",
-          `Updated product: ${product.name}`
-        );
-
-        // Reattach event listeners
-        const editBtn = existingCard.querySelector(".edit-btn");
-        const deleteBtn = existingCard.querySelector(".delete-btn");
-
-        editBtn.addEventListener("click", () => {
-          editProduct(product);
-        });
-
-        deleteBtn.addEventListener("click", async () => {
-          if (await deleteProduct(product.id, product.name)) {
-            existingCard.remove();
-          }
-        });
-      }
-    } else {
-      // Add new product to view
-      addProductToView(product);
-      // Log add activity
-      logActivity(
-        currentUser.id,
-        currentUser.name,
-        "add",
-        "Product",
-        `Added new product: ${product.name}`
-      );
+    if (!currentStore || !currentStore.id) {
+      showNotification("Please select a store first", "error");
+      window.location.href = "store-selection.html";
+      return;
     }
 
-    // Save to localStorage
-    saveProduct(product);
-  } finally {
+    // Validate form data
+    const name = formData.get("productName");
+    const price = formData.get("productPrice");
+    const quantity = formData.get("productQuantity");
+    const type = formData.get("productType");
+    const expiry = formData.get("productExpiry");
+
+    if (!name || !price || !quantity || !type || !expiry) {
+      throw new Error("All fields are required");
+    }
+
+    const productData = {
+      name: name,
+      price: parseFloat(price),
+      quantity: parseInt(quantity),
+      expiry: expiry,
+      type: type,
+      image: imageData || "img/default-product.png",
+      storeId: currentStore.id,
+    };
+
+    console.log("Sending product data to server:", productData);
+
+    const response = await fetch("http://localhost:5000/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(productData),
+    });
+
+    console.log("Response status:", response.status);
+    const data = await response.json();
+    console.log("Server response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to save product");
+    }
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to save product");
+    }
+
+    // Update local storage
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+    const newProduct = { ...productData, id: data.product._id };
+    products.push(newProduct);
+    localStorage.setItem("products", JSON.stringify(products));
+    console.log("Updated products in localStorage:", products);
+
+    // Add to view
+    addProductToView(data.product); // Use data.product from the server response
+    showNotification("Product saved successfully!");
     closeModal();
+  } catch (error) {
+    console.error("Error saving product:", error);
+    showNotification(error.message || "Failed to save product", "error");
   }
 }
 
-// Save Product to localStorage
-function saveProduct(product) {
-  let products = JSON.parse(localStorage.getItem("products")) || [];
-
-  if (productId.value) {
-    // Update existing product
-    const index = products.findIndex((p) => p.id === product.id);
-    if (index !== -1) {
-      products[index] = product;
-    }
-  } else {
-    // Add new product
-    products.push(product);
-  }
-
-  localStorage.setItem("products", JSON.stringify(products));
+// Add this function for error notifications
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
 }
 
 // Delete Confirmation Modal
@@ -279,7 +250,9 @@ async function deleteProduct(productId, productName) {
     const handleDelete = () => {
       // Remove from localStorage
       let products = JSON.parse(localStorage.getItem("products")) || [];
-      const index = products.findIndex((p) => String(p.id) === String(productId));
+      const index = products.findIndex(
+        (p) => String(p.id) === String(productId)
+      );
 
       if (index > -1) {
         products.splice(index, 1);
@@ -501,6 +474,42 @@ function loadProducts() {
   products.forEach((product) => addProductToView(product));
 }
 
+// Fetch products from backend and update localStorage and view
+async function fetchAndDisplayProducts() {
+  const currentStore = JSON.parse(localStorage.getItem("currentStore"));
+  if (!currentStore || !currentStore.id) {
+    showNotification("Please select a store first", "error");
+    window.location.href = "store-selection.html";
+    return;
+  }
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/products?storeId=${currentStore.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      // If backend returns array directly
+      localStorage.setItem("products", JSON.stringify(data));
+      loadProducts();
+    } else if (data.products) {
+      // If backend returns { products: [...] }
+      localStorage.setItem("products", JSON.stringify(data.products));
+      loadProducts();
+    } else {
+      localStorage.setItem("products", "[]");
+      loadProducts();
+    }
+  } catch (err) {
+    console.error("Failed to fetch products from backend:", err);
+    loadProducts();
+  }
+}
+
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   // Set default view
@@ -508,8 +517,8 @@ document.addEventListener("DOMContentLoaded", () => {
   gridBtn.classList.add("active");
   productsView.classList.add("grid-view");
 
-  // Load existing products from localStorage
-  loadProducts();
+  // Fetch products from backend and display
+  fetchAndDisplayProducts();
 });
 
 // Add event listener for product type selection

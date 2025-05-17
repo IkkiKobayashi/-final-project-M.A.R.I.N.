@@ -42,7 +42,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: flex-start;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   border: 1px solid #eee;
 }
 
@@ -159,84 +161,6 @@
   font-size: 1rem;
 }
 
-/* Recent Activity */
-.recent-activity {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-  border: 1px solid #eee;
-}
-
-.recent-activity h2 {
-  margin: 0 0 1rem;
-  color: #202124;
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.activity-feed {
-  display: grid;
-  gap: 1rem;
-}
-
-.activity-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 1rem;
-  background: #fafafa;
-  border-radius: 8px;
-  border: 1px solid #eee;
-}
-
-.activity-icon {
-  margin-right: 1rem;
-}
-
-.activity-icon i {
-  color: #1a73e8;
-  font-size: 1.2rem;
-}
-
-.activity-content {
-  flex: 1;
-}
-
-.activity-text {
-  margin: 0;
-  color: #202124;
-}
-
-.activity-time {
-  font-size: 0.9rem;
-  color: #5f6368;
-}
-
-/* No Activity State */
-.no-activity {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  text-align: center;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #eee;
-}
-
-.no-activity i {
-  font-size: 2rem;
-  color: #5f6368;
-  margin-bottom: 1rem;
-}
-
-.no-activity p {
-  color: #5f6368;
-  margin: 0;
-  font-size: 1rem;
-}
-
 /* Quick Access */
 .quick-access {
   background: white;
@@ -272,9 +196,12 @@
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
+  transition:
+    transform 0.16s,
+    box-shadow 0.16s,
+    background 0.16s;
   font-weight: 500;
-  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.10);
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.1);
   position: relative;
   overflow: hidden;
   margin-bottom: 0.25rem;
@@ -283,7 +210,7 @@
 .quick-btn i {
   font-size: 1.3rem;
   margin-bottom: 0.3rem;
-  background: rgba(255,255,255,0.13);
+  background: rgba(255, 255, 255, 0.13);
   padding: 0.5rem;
   border-radius: 50%;
   box-shadow: 0 1px 4px rgba(26, 115, 232, 0.08);
@@ -298,15 +225,17 @@
   text-align: center;
 }
 
-.quick-btn:hover, .quick-btn:focus {
+.quick-btn:hover,
+.quick-btn:focus {
   background: linear-gradient(135deg, #2563eb 60%, #1a73e8 100%);
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 4px 12px rgba(26, 115, 232, 0.13);
   outline: none;
 }
 
-.quick-btn:hover i, .quick-btn:focus i {
-  background: rgba(255,255,255,0.22);
+.quick-btn:hover i,
+.quick-btn:focus i {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .quick-btn:active {

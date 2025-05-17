@@ -53,12 +53,6 @@
                 <span>Employees</span>
               </a>
             </li>
-            <li>
-              <a href="activity-log.html" class="nav-link">
-                <i class="fas fa-history"></i>
-                <span>Activity Log</span>
-              </a>
-            </li>
           </ul>
         </nav>
       </aside>
@@ -310,7 +304,7 @@
     <script src="js/products.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+        const storeInfo = JSON.parse(localStorage.getItem("currentStore"));
         if (storeInfo) {
           document.querySelector(".store-name").textContent = storeInfo.name;
           document.querySelector(".store-address").textContent =

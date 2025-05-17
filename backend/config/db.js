@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const config = require("./config");
 const LoggingUtil = require("../utils/loggingUtil");
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 let retryCount = 0;
 
 const connectDB = async () => {
@@ -23,12 +23,24 @@ const connectDB = async () => {
     console.log("Connecting to MongoDB with URI:", config.database.uri);
     console.log("Using DB name:", config.database.name);
 
-    // Connect with retry mechanism
+    // Connect with retry mechanism and improved options
     const conn = await mongoose.connect(config.database.uri, {
       ...config.database.options,
       dbName: config.database.name,
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000, // Increase timeout
+      socketTimeoutMS: 45000,
+      family: 4, // Use IPv4, skip trying IPv6
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      retryWrites: true,
+      w: "majority",
+      serverApi: {
+        version: "1",
+        strict: false, // Disable strict mode to allow text indexes
+        deprecationErrors: true,
+      },
     });
 
     // Enable mongoose debug mode in development
@@ -108,9 +120,12 @@ async function setupDatabase() {
       { expireAfterSeconds: 30 * 24 * 60 * 60 }
     );
 
-    // Create text indexes for search functionality
+    // Create text indexes for search functionality with background option
     const Product = mongoose.model("Product");
-    await Product.collection.createIndex({ name: "text", description: "text" });
+    await Product.collection.createIndex(
+      { name: "text", description: "text" },
+      { background: true }
+    );
 
     // Create compound indexes for common queries
     const Inventory = mongoose.model("Inventory");

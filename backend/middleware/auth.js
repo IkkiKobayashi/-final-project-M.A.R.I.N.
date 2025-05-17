@@ -5,24 +5,44 @@ const { ErrorHandler } = require("../utils/errorHandler");
 // Authentication middleware
 exports.auth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    
+    const token =
+      req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided'
-      });
+      return next(
+        ErrorHandler.authentication("No token, authorization denied")
+      );
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: decoded.id };
-    next();
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId).select("-password");
+
+      if (!user) {
+        return next(ErrorHandler.authentication("User not found"));
+      }
+
+      if (!user.isActive) {
+        return next(ErrorHandler.authentication("User account is inactive"));
+      }
+
+      req.user = {
+        userId: user._id,
+        role: user.role,
+        store: user.store,
+        lastActive: new Date(),
+      };
+
+      next();
+    } catch (jwtError) {
+      if (jwtError.name === "TokenExpiredError") {
+        return next(
+          ErrorHandler.authentication("Token expired. Please log in again.")
+        );
+      }
+      return next(ErrorHandler.authentication("Invalid token"));
+    }
   } catch (error) {
-    console.error('Auth error:', error);
-    res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    });
+    next(ErrorHandler.internal("Authentication error"));
   }
 };
 

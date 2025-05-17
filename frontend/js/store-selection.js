@@ -157,14 +157,13 @@ const navigateToStore = async (storeId) => {
   try {
     const store = stores.find((s) => s._id === storeId);
     if (store) {
-      localStorage.setItem(
-        "selectedStore",
-        JSON.stringify({
-          id: store._id,
-          name: store.name,
-          address: store.location,
-        })
-      );
+      const storeInfo = {
+        id: store._id,
+        name: store.name,
+        address: store.location,
+      };
+      localStorage.setItem("currentStore", JSON.stringify(storeInfo));
+      localStorage.setItem("selectedStore", JSON.stringify(storeInfo)); // Keep for backward compatibility
       window.location.href = "dashboard.html";
     }
   } catch (error) {
@@ -288,7 +287,6 @@ const handleImageUpload = (e, previewElement) => {
 // Form Submission Handlers
 const handleAddStore = async (e) => {
   e.preventDefault();
-  const formData = new FormData(addStoreForm);
 
   try {
     const token = localStorage.getItem("token");
@@ -296,15 +294,20 @@ const handleAddStore = async (e) => {
       throw new Error("Authentication token not found");
     }
 
+    const formData = new FormData(addStoreForm);
     const storeData = {
       name: formData.get("storeName"),
       location: formData.get("storeAddress"),
+      code: `STR${Date.now()}`,
       status: formData.get("storeStatus"),
       contact: {
         manager: formData.get("storeManager"),
       },
       image: selectedImage || "https://via.placeholder.com/400x200",
+      lastUpdated: new Date(),
     };
+
+    console.log("Sending store data:", storeData);
 
     const response = await fetch("http://localhost:5000/api/stores", {
       method: "POST",
@@ -312,21 +315,26 @@ const handleAddStore = async (e) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
       body: JSON.stringify(storeData),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to create store");
+    }
+
     const result = await response.json();
-    console.log("Server response:", result);
 
     if (!result.success) {
-      throw new Error(result.message);
+      throw new Error(result.message || "Failed to create store");
     }
 
     showNotification("Store added successfully!");
     closeAddModal();
-    await fetchStores();
+    await fetchStores(); // Refresh the store list
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Store creation error:", error);
     showNotification(error.message || "Failed to create store", "error");
   }
 };
@@ -459,7 +467,8 @@ async function fetchStores() {
   try {
     const token = localStorage.getItem("token");
     if (!token) {
-      throw new Error("No authentication token found");
+      window.location.href = "login.html";
+      return;
     }
 
     const response = await fetch("http://localhost:5000/api/stores", {
@@ -470,18 +479,22 @@ async function fetchStores() {
       },
     });
 
-    const result = await response.json();
-    console.log("Fetch response:", result);
-
-    if (!result.success) {
-      throw new Error(result.message);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    stores = result.data || [];
-    renderStores();
+    const data = await response.json();
+    console.log("Received data:", data);
+
+    if (data.success && Array.isArray(data.data)) {
+      stores = data.data;
+      renderStores();
+    } else {
+      throw new Error(data.message || "Invalid data received");
+    }
   } catch (error) {
-    console.error("Fetch error:", error);
-    showNotification(error.message, "error");
+    console.error("Error fetching stores:", error);
+    showNotification("Failed to load stores: " + error.message, "error");
   }
 }
 
@@ -493,46 +506,3 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   fetchStores();
 });
-
-async function addStore(storeData) {
-  try {
-    const response = await fetch("/api/stores", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(storeData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch");
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error adding store:", error);
-    throw error;
-  }
-}
-
-// Example usage:
-document
-  .getElementById("add-store-form")
-  .addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const storeData = {
-      name: document.getElementById("store-name").value,
-      location: document.getElementById("store-location").value,
-      // Add other fields as necessary
-    };
-
-    try {
-      const result = await addStore(storeData);
-      console.log("Store added successfully:", result);
-      // Optionally, refresh the store list or show a success message
-    } catch (error) {
-      console.error("Failed to add store:", error);
-      // Show an error message to the user
-    }
-  });

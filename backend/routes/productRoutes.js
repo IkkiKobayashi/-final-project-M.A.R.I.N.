@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
-const { auth, checkRole } = require("../middleware/auth");
+const Store = require("../models/Store");
 const ActivityLog = require("../models/ActivityLog");
+const { auth } = require("../middleware/auth");
+const generateSKU = require("../utils/skuGenerator");
 
-// All routes require authentication
+// Apply auth middleware to all routes
 router.use(auth);
 
 // Get all products
@@ -40,35 +42,58 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Create product (admin and manager only)
-router.post("/", checkRole(["admin", "manager"]), async (req, res) => {
+// Create product
+router.post("/", async (req, res) => {
   try {
+    console.log("Received product data:", req.body);
+
+    // Validate required fields
+    if (
+      !req.body.name ||
+      !req.body.price ||
+      !req.body.quantity ||
+      !req.body.type ||
+      !req.body.expiry
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    // Generate SKU first before creating product
+    const generatedSKU = await generateSKU(req.body.name);
+    if (!generatedSKU) {
+      throw new Error("Failed to generate SKU");
+    }
+
+    // Create product with generated SKU
     const product = new Product({
-      ...req.body,
-      createdBy: req.user.userId,
+      name: req.body.name,
+      price: parseFloat(req.body.price),
+      quantity: parseInt(req.body.quantity),
+      expiry: req.body.expiry,
+      type: req.body.type,
+      image: req.body.image || "img/default-product.png",
+      store: req.body.storeId,
+      sku: generatedSKU, // Add the generated SKU
     });
 
-    await product.save();
-
-    // Log activity
-    const activity = new ActivityLog({
-      user: req.user.userId,
-      store: product.store,
-      action: "add",
-      entityType: "product",
-      entityId: product._id,
-      details: `Added new product: ${product.name}`,
-    });
-    await activity.save();
-
-    res.status(201).json(product);
+    console.log("Attempting to save product:", product);
+    const savedProduct = await product.save();
+    res.status(201).json(savedProduct);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Error saving product:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+      details: error.stack,
+    });
   }
 });
 
 // Update product (admin and manager only)
-router.put("/:id", checkRole(["admin", "manager"]), async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -96,7 +121,7 @@ router.put("/:id", checkRole(["admin", "manager"]), async (req, res) => {
 });
 
 // Delete product (admin only)
-router.delete("/:id", checkRole(["admin"]), async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
