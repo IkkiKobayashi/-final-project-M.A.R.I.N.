@@ -148,6 +148,7 @@ async function fetchAndDisplayProducts() {
         quantity: product.quantity,
         type: product.type,
         expiry: product.expiry,
+        lastStocked: product.lastStocked,
         // Don't store image data in localStorage
       }));
       localStorage.setItem("products", JSON.stringify(minimalProducts));
@@ -307,16 +308,12 @@ function createProductCard(product) {
   let imageUrl = "img/placeholder-product.png"; // Default placeholder
   if (product.image) {
     if (product.image.startsWith("data:image")) {
-      // If it's a base64 image, use it directly
       imageUrl = product.image;
     } else if (product.image.startsWith("http")) {
-      // If it's an absolute URL, use it as is
       imageUrl = product.image;
     } else if (product.image.startsWith("/")) {
-      // If it's a root-relative path, remove the leading slash
       imageUrl = product.image.substring(1);
     } else {
-      // If it's a relative path, use it as is
       imageUrl = product.image;
     }
   }
@@ -330,6 +327,11 @@ function createProductCard(product) {
     ? product.type.charAt(0).toUpperCase() + product.type.slice(1).toLowerCase()
     : "";
 
+  // Detect if list view is active
+  const inventoryView = document.querySelector(".inventory-view");
+  const isListView =
+    inventoryView && inventoryView.classList.contains("list-view");
+
   card.innerHTML = `
     <div class="product-image-container">
       <img 
@@ -339,8 +341,8 @@ function createProductCard(product) {
         onerror="this.onerror=null; this.src='img/placeholder-product.png';"
       >
     </div>
-    ${statusTag}
     <div class="product-info">
+      ${isListView ? statusTag : ""}
       <h3 class="product-name">${product.name || "Unnamed Product"}</h3>
       <div class="product-type">${formattedType}</div>
       <div class="product-details">
@@ -349,6 +351,7 @@ function createProductCard(product) {
       </div>
       ${product.expiry ? `<div class="product-expiry">Expires: ${product.expiry}</div>` : ""}
     </div>
+    ${!isListView ? statusTag : ""}
     <div class="stock-actions">
       <button class="stock-btn add-stock-btn" data-action="add" data-product-id="${product._id || product.id}">
         <i class="fas fa-plus"></i> Add Stock
@@ -379,38 +382,55 @@ function createProductCard(product) {
 }
 
 function getStatusTag(product) {
-  const expiryDate = new Date(product.expiry);
-  const now = new Date();
-  const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-  const lastStocked = product.lastStocked
-    ? new Date(product.lastStocked)
-    : null;
-  const daysSinceLastStocked = lastStocked
-    ? Math.ceil((now - lastStocked) / (1000 * 60 * 60 * 24))
-    : null;
+  console.log("Getting status tag for product:", product);
+  console.log("Last stocked value:", product.lastStocked);
 
-  // Expired
-  if (product.expiry && expiryDate < now) {
-    return '<span class="status-tag status-expired">Expired</span>';
+  const now = new Date();
+  let statusTags = [];
+
+  // Check expiry status
+  if (product.expiry) {
+    const expiryDate = new Date(product.expiry);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate - now) / (1000 * 60 * 60 * 24)
+    );
+
+    if (expiryDate < now) {
+      statusTags.push('<span class="status-tag status-expired">Expired</span>');
+    } else if (daysUntilExpiry <= 7 && daysUntilExpiry >= 0) {
+      statusTags.push(
+        '<span class="status-tag status-near-expiry">Near Expiry</span>'
+      );
+    }
   }
-  // Near Expiry (within 7 days)
-  if (product.expiry && daysUntilExpiry <= 7 && daysUntilExpiry >= 0) {
-    return '<span class="status-tag status-near-expiry">Near Expiry</span>';
+
+  // Check newly stocked status
+  if (product.lastStocked) {
+    const lastStocked = new Date(product.lastStocked);
+    const daysSinceLastStocked = Math.ceil(
+      (now - lastStocked) / (1000 * 60 * 60 * 24)
+    );
+    console.log("Days since last stocked:", daysSinceLastStocked);
+    console.log("Last stocked date:", lastStocked);
+
+    if (daysSinceLastStocked <= 2) {
+      statusTags.push(
+        '<span class="status-tag status-newly-stocked">Newly Stocked</span>'
+      );
+    }
   }
-  // Recently Stocked (within 2 days)
-  if (daysSinceLastStocked !== null && daysSinceLastStocked <= 2) {
-    return '<span class="status-tag status-recently-stocked">Recently Stocked</span>';
+
+  // Check low stock status
+  if (product.quantity !== undefined) {
+    const lowStockThreshold = 25; // Consider stock low if less than 25%
+    if (product.quantity <= lowStockThreshold) {
+      statusTags.push(
+        '<span class="status-tag status-low-stock">Low Stock</span>'
+      );
+    }
   }
-  // Out of Stock
-  if (product.quantity === 0) {
-    return '<span class="status-tag status-out-of-stock">Out of Stock</span>';
-  }
-  // Low Stock
-  const stockPercentage = (product.quantity / (product.quantity + 1)) * 100;
-  if (stockPercentage < 25) {
-    return '<span class="status-tag status-low-stock">Low Stock</span>';
-  }
-  return "";
+
+  return `<div class="status-tags-container">${statusTags.join("")}</div>`;
 }
 
 // Stock Management Modal Functions
