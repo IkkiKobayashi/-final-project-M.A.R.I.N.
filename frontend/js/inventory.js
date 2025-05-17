@@ -139,7 +139,7 @@ async function fetchAndDisplayProducts() {
     // Display products
     displayProducts(products);
 
-    // Update local storage with minimal data
+    // Update local storage with minimal data (excluding images)
     try {
       const minimalProducts = products.map((product) => ({
         id: product._id,
@@ -148,11 +148,12 @@ async function fetchAndDisplayProducts() {
         quantity: product.quantity,
         type: product.type,
         expiry: product.expiry,
-        image: product.image,
+        // Don't store image data in localStorage
       }));
       localStorage.setItem("products", JSON.stringify(minimalProducts));
     } catch (storageError) {
       console.warn("Could not update localStorage:", storageError);
+      // Continue execution even if localStorage fails
     }
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -207,7 +208,7 @@ function createProductCard(product) {
 
   const card = document.createElement("div");
   card.className = "product-card";
-  card.dataset.id = product.id;
+  card.dataset.id = product._id || product.id;
 
   const statusTag = getStatusTag(product);
 
@@ -272,10 +273,10 @@ function createProductCard(product) {
       ${product.expiry ? `<div class="product-expiry">Expires: ${product.expiry}</div>` : ""}
     </div>
     <div class="stock-actions">
-      <button class="stock-btn add-stock-btn" data-action="add" data-product-id="${product.id}">
+      <button class="stock-btn add-stock-btn" data-action="add" data-product-id="${product._id || product.id}">
         <i class="fas fa-plus"></i> Add Stock
       </button>
-      <button class="stock-btn deduct-stock-btn" data-action="deduct" data-product-id="${product.id}">
+      <button class="stock-btn deduct-stock-btn" data-action="deduct" data-product-id="${product._id || product.id}">
         <i class="fas fa-minus"></i> Deduct Stock
       </button>
     </div>
@@ -287,13 +288,13 @@ function createProductCard(product) {
 
   if (addBtn) {
     addBtn.addEventListener("click", () => {
-      openStockModal(product.id, "add");
+      openStockModal(product._id || product.id, "add");
     });
   }
 
   if (deductBtn) {
     deductBtn.addEventListener("click", () => {
-      openStockModal(product.id, "deduct");
+      openStockModal(product._id || product.id, "deduct");
     });
   }
 
@@ -375,24 +376,58 @@ function updateStock(productId, action, quantity) {
     return;
   }
 
-  const products = JSON.parse(localStorage.getItem("products")) || [];
-  const productIndex = products.findIndex((p) => p.id === productId);
+  // Fetch the current product data from the backend first
+  fetch(`http://localhost:5000/api/products/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch product data");
+      }
+      return response.json();
+    })
+    .then((product) => {
+      const currentQuantity = parseInt(product.quantity) || 0;
+      const newQuantity = parseInt(quantity) || 0;
 
-  if (productIndex !== -1) {
-    const product = products[productIndex];
-    const currentQuantity = parseInt(product.quantity) || 0;
-    const newQuantity = parseInt(quantity) || 0;
+      // Update the quantity based on the action
+      if (action === "add") {
+        product.quantity = currentQuantity + newQuantity;
+        product.lastStocked = new Date().toISOString();
+      } else {
+        product.quantity = Math.max(0, currentQuantity - newQuantity);
+      }
 
-    if (action === "add") {
-      product.quantity = currentQuantity + newQuantity;
-      product.lastStocked = new Date().toISOString();
-    } else {
-      product.quantity = Math.max(0, currentQuantity - newQuantity);
-    }
-
-    localStorage.setItem("products", JSON.stringify(products));
-    displayProducts(products);
-  }
+      // Update the product on the backend
+      return fetch(`http://localhost:5000/api/products/${productId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      });
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to update product");
+      }
+      return response.json();
+    })
+    .then((updatedProduct) => {
+      // Refresh the products display
+      fetchAndDisplayProducts();
+      showNotification(
+        `Stock ${action === "add" ? "added" : "deducted"} successfully`
+      );
+    })
+    .catch((error) => {
+      console.error("Error updating stock:", error);
+      showNotification(error.message || "Failed to update stock", "error");
+    });
 }
 
 // Close modal when clicking outside
