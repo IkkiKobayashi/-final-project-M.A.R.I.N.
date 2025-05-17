@@ -244,7 +244,42 @@ function showNotification(message, type = "success") {
   setTimeout(() => notification.remove(), 3000);
 }
 
-// Delete Confirmation Modal
+// Add this function for activity logging
+async function logActivity(userId, userName, action, entityType, description) {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("No token found for activity logging");
+      return;
+    }
+
+    const activityData = {
+      userId,
+      userName,
+      action,
+      entityType,
+      description,
+      timestamp: new Date().toISOString(),
+    };
+
+    const response = await fetch("http://localhost:5000/api/activities", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(activityData),
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to log activity:", await response.text());
+    }
+  } catch (error) {
+    console.warn("Error logging activity:", error);
+  }
+}
+
+// Update the deleteProduct function to handle activity logging
 async function deleteProduct(productId, productName) {
   if (!productId) {
     showNotification("Invalid product ID", "error");
@@ -325,7 +360,7 @@ async function deleteProduct(productId, productName) {
         }
 
         // Log activity
-        logActivity(
+        await logActivity(
           currentUser.id,
           currentUser.name,
           "delete",
@@ -453,7 +488,7 @@ addProductToView = function (product) {
 function addProductToView(product) {
   const productCard = document.createElement("div");
   productCard.className = "product-card";
-  productCard.dataset.id = product.id;
+  productCard.dataset.id = product._id || product.id; // Use _id from MongoDB or fallback to id
 
   // Handle image loading error
   const imageUrl = product.image || getDefaultImage();
@@ -482,7 +517,7 @@ function addProductToView(product) {
         <i class="fas fa-edit"></i>
         Edit
       </button>
-      <button class="action-btn delete-btn">
+      <button class="action-btn delete-btn" data-id="${product._id || product.id}" data-name="${product.name}">
         <i class="fas fa-trash"></i>
         Delete
       </button>
@@ -498,7 +533,11 @@ function addProductToView(product) {
   });
 
   deleteBtn.addEventListener("click", async () => {
-    if (await deleteProduct(product.id, product.name)) {
+    const productId = deleteBtn.dataset.id;
+    const productName = deleteBtn.dataset.name;
+    console.log("Deleting product:", { id: productId, name: productName }); // Debug log
+
+    if (await deleteProduct(productId, productName)) {
       productCard.remove();
     }
   });
