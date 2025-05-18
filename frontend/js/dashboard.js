@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
   // Get store info from localStorage
   const storeInfo = JSON.parse(localStorage.getItem("currentStore"));
-  if (!storeInfo) {
+  if (!storeInfo || !storeInfo.id) {
     window.location.href = "store-selection.html";
     return;
   }
@@ -13,11 +13,16 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Fetch and update dashboard metrics
   async function updateDashboardMetrics() {
     try {
-      const response = await fetch(`/api/dashboard/stats/${storeInfo._id}`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`/api/dashboard/stats/${storeInfo.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          // Add any authentication headers if needed
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
       });
@@ -30,28 +35,37 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Update summary cards
       document.querySelector(".card:nth-child(1) .count").textContent =
-        data.totalProducts;
+        data.totalProducts || 0;
       document.querySelector(".card:nth-child(2) .count").textContent =
-        data.lowStock;
+        data.lowStock || 0;
       document.querySelector(".card:nth-child(3) .count").textContent =
-        data.nearExpiry;
+        data.nearExpiry || 0;
       document.querySelector(".card:nth-child(4) .count").textContent =
-        data.outOfStock;
+        data.outOfStock || 0;
     } catch (error) {
       console.error("Error fetching dashboard metrics:", error);
+      showNotification("Failed to load dashboard metrics", "error");
     }
   }
 
   // Fetch and display inventory alerts from backend
   async function updateInventoryAlertsFromAPI() {
     const alertsContainer = document.querySelector(".alerts-container");
+    if (!alertsContainer) return;
+
     alertsContainer.innerHTML = `<div class="loading">Loading alerts...</div>`;
 
     try {
-      const response = await fetch(`/api/dashboard/alerts/${storeInfo._id}`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`/api/dashboard/alerts/${storeInfo.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
       });
@@ -113,14 +127,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             return `
-            <div class="alert ${alert.type} ${alert.severity}">
-              <div class="alert-header">
-                <i class="fas ${icon}"></i>
-                <span class="alert-message">${alert.message}</span>
+              <div class="alert ${alert.type} ${alert.severity}">
+                <div class="alert-header">
+                  <i class="fas ${icon}"></i>
+                  <span class="alert-message">${alert.message}</span>
+                </div>
+                ${itemsList}
               </div>
-              ${itemsList}
-            </div>
-          `;
+            `;
           })
           .join("");
       } else {
@@ -132,13 +146,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
       }
     } catch (error) {
+      console.error("Error fetching inventory alerts:", error);
       alertsContainer.innerHTML = `
         <div class="no-alerts error">
           <i class="fas fa-exclamation-circle"></i>
           <p>Failed to load alerts. Please try again later.</p>
         </div>
       `;
-      console.error("Error fetching inventory alerts:", error);
     }
   }
 
@@ -150,6 +164,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   setInterval(updateDashboardMetrics, 300000);
   setInterval(updateInventoryAlertsFromAPI, 300000);
 });
+
+// Function to show notifications
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
 
 // Function to fetch dashboard statistics
 async function fetchDashboardStats() {
