@@ -52,7 +52,8 @@ class EmployeeController {
   // Create employee
   static async createEmployee(req, res) {
     try {
-      const { email, name, role, store, department, phone } = req.body;
+      const { name, email, role, department, phone, joinedDate, profileImage } =
+        req.body;
 
       // Check if email already exists
       const existingUser = await User.findOne({ email });
@@ -64,13 +65,15 @@ class EmployeeController {
       const tempPassword = Math.random().toString(36).slice(-8);
 
       const employee = new User({
-        email,
         name,
+        email,
         password: tempPassword,
         role: role || "employee",
-        store,
         department,
         phone,
+        joinedDate: joinedDate || new Date(),
+        profileImage: profileImage || "img/user img/store admin.jpg",
+        store: req.user.store, // Use the store from the authenticated user
       });
 
       await employee.save();
@@ -86,8 +89,6 @@ class EmployeeController {
       });
       await activity.save();
 
-      // TODO: Send welcome email with temporary password
-
       res.status(201).json({
         message: "Employee created successfully",
         employee: {
@@ -95,9 +96,14 @@ class EmployeeController {
           name: employee.name,
           email: employee.email,
           role: employee.role,
+          department: employee.department,
+          phone: employee.phone,
+          joinedDate: employee.joinedDate,
+          profileImage: employee.profileImage,
         },
       });
     } catch (error) {
+      console.error("Error creating employee:", error);
       res.status(400).json({ message: error.message });
     }
   }
