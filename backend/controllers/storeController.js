@@ -1,4 +1,5 @@
 const Store = require("../models/Store");
+const Product = require("../models/Product");
 const { ErrorHandler } = require("../utils/errorHandler");
 
 exports.getStores = async (req, res) => {
@@ -41,10 +42,23 @@ exports.createStore = async (req, res) => {
   try {
     console.log("Creating store with data:", req.body);
 
-    if (!req.body.name || !req.body.location) {
+    // Validate required fields
+    const requiredFields = ["name", "location", "code"];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Name and location are required",
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Check if store code already exists
+    const existingStore = await Store.findOne({ code: req.body.code });
+    if (existingStore) {
+      return res.status(400).json({
+        success: false,
+        message: "Store code already exists",
       });
     }
 
@@ -54,12 +68,14 @@ exports.createStore = async (req, res) => {
     res.status(201).json({
       success: true,
       data: store,
+      message: "Store created successfully",
     });
   } catch (error) {
     console.error("Store creation error:", error);
     res.status(400).json({
       success: false,
       message: error.message || "Failed to create store",
+      error: error.name === "ValidationError" ? error.errors : undefined,
     });
   }
 };
@@ -95,27 +111,32 @@ exports.updateStore = async (req, res, next) => {
 
 exports.deleteStore = async (req, res, next) => {
   try {
-    const store = await Store.findByIdAndDelete(req.params.id);
+    const store = await Store.findById(req.params.id);
     if (!store) {
-      return next(ErrorHandler.notFoundError("Store not found"));
+      return res.status(404).json({
+        success: false,
+        message: "Store not found",
+      });
     }
 
-    // Log activity
-    await new ActivityLog({
-      user: req.user.userId,
-      store: store._id,
-      action: "delete",
-      entityType: "store",
-      entityId: store._id,
-      details: `Deleted store: ${store.name}`,
-    }).save();
+    // Delete all products associated with this store
+    await Product.deleteMany({ store: req.params.id });
 
-    res.json({
+    // Now delete the store
+    await Store.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
       success: true,
-      message: "Store deleted successfully",
+      message: "Store and associated products deleted successfully",
+      data: store,
     });
   } catch (error) {
-    next(ErrorHandler.handleDatabaseError(error));
+    console.error("Store deletion error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete store",
+      error: error.message,
+    });
   }
 };
 

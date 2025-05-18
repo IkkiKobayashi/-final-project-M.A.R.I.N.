@@ -188,7 +188,6 @@ const deleteStore = async (storeId) => {
         `http://localhost:5000/api/stores/${storeId}`,
         {
           method: "DELETE",
-          credentials: "include",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -315,7 +314,6 @@ const handleAddStore = async (e) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      credentials: "include",
       body: JSON.stringify(storeData),
     });
 
@@ -353,7 +351,6 @@ const handleEditStore = async (e) => {
       `http://localhost:5000/api/stores/${editingStoreId}`,
       {
         method: "PUT",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
