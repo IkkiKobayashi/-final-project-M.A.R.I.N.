@@ -69,9 +69,9 @@ connectDB()
   });
 
 function startServer() {
-  // Static file serving
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+  // Static file serving for frontend
   app.use(express.static(path.join(__dirname, "public")));
+  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
   // API Routes
   app.use("/api/auth", authRoutes);
@@ -94,28 +94,9 @@ function startServer() {
     });
   });
 
-  // 404 handler (must be after all routes)
-  app.use((req, res, next) => {
-    console.log(`404 Not Found: ${req.method} ${req.originalUrl}`);
-    res.status(404).json({
-      success: false,
-      message: `Cannot find ${req.originalUrl} on this server!`,
-    });
-  });
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
-    console.error("Error:", err);
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  });
-
-  // Global error handler
-  app.use((err, req, res, next) => {
-    console.error("Global error handler", err.stack);
-    res.status(500).json({ error: err.message });
+  // Serve frontend for all other routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "login.html"));
   });
 
   // Start server
