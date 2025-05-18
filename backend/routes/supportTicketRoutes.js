@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const SupportTicket = require("../models/SupportTicket");
+const ActivityLog = require("../models/ActivityLog");
 const { auth, checkRole } = require("../middleware/auth");
-
 
 // All routes require authentication
 router.use(auth);
@@ -47,18 +47,6 @@ router.get("/", checkRole(["admin"]), async (req, res) => {
   }
 });
 
-// Get tickets by store
-router.get("/store/:storeId", async (req, res) => {
-  try {
-    const tickets = await SupportTicket.find({ store: req.params.storeId })
-      .populate("createdBy", "name email")
-      .populate("assignedTo", "name email");
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // Get user's tickets
 router.get("/my-tickets", async (req, res) => {
   try {
@@ -77,6 +65,18 @@ router.get("/assigned", checkRole(["admin", "manager"]), async (req, res) => {
     const tickets = await SupportTicket.find({ assignedTo: req.user.userId })
       .populate("createdBy", "name email")
       .populate("store", "name");
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get tickets by store
+router.get("/store/:storeId", async (req, res) => {
+  try {
+    const tickets = await SupportTicket.find({ store: req.params.storeId })
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
     res.json(tickets);
   } catch (error) {
     res.status(500).json({ message: error.message });

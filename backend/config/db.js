@@ -27,8 +27,6 @@ const connectDB = async () => {
     const conn = await mongoose.connect(config.database.uri, {
       ...config.database.options,
       dbName: config.database.name,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 30000, // Increase timeout
       socketTimeoutMS: 45000,
       family: 4, // Use IPv4, skip trying IPv6

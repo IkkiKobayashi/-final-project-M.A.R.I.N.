@@ -12,21 +12,11 @@ const helmet = require("helmet");
 const compression = require("compression");
 const morgan = require("morgan");
 
-// Import routes
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const storeRoutes = require("./routes/storeRoutes");
-const productRoutes = require("./routes/productRoutes");
-const inventoryRoutes = require("./routes/inventoryRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes");
-const settingsRoutes = require("./routes/settingsRoutes");
-const supportTicketRoutes = require("./routes/supportTicketRoutes");
-
-// Import models
-const Product = require("./models/Product"); // Assuming Product model is defined
-
 // Initialize express app
 const app = express();
+
+// Configure middleware
+configureMiddleware(app);
 
 // Basic middleware with increased limits
 app.use(
@@ -44,18 +34,18 @@ app.use(
   })
 );
 
-// Add request logging middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`, {
-    body: req.body,
-    query: req.query,
-  });
-  next();
-});
-
 // Configure other middleware
 app.use(cookieParser());
-configureMiddleware(app);
+
+// Import routes
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const storeRoutes = require("./routes/storeRoutes");
+const productRoutes = require("./routes/productRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const supportTicketRoutes = require("./routes/supportTicketRoutes");
 
 // Connect to MongoDB Atlas
 connectDB()
@@ -69,11 +59,7 @@ connectDB()
   });
 
 function startServer() {
-  // Static file serving for frontend
-  app.use(express.static(path.join(__dirname, "public")));
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-  // API Routes
+  // API Routes - More specific routes first
   app.use("/api/auth", authRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/stores", storeRoutes);
@@ -83,20 +69,20 @@ function startServer() {
   app.use("/api/settings", settingsRoutes);
   app.use("/api/support", supportTicketRoutes);
 
-  // Health check endpoint
-  app.get("/health", (req, res) => {
-    res.json({
-      status: "healthy",
-      timestamp: new Date(),
-      uptime: process.uptime(),
-      mongoConnection:
-        mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-    });
-  });
+  // Static file serving for frontend - Move this after API routes
+  app.use(express.static(path.join(__dirname, "../frontend")));
+  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-  // Serve frontend for all other routes
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "login.html"));
+  // Error handling middleware
+  app.use(ErrorHandler.handleError);
+
+  // Handle 404s
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      res.status(404).json({ message: "API endpoint not found" });
+    } else {
+      res.sendFile(path.join(__dirname, "../frontend", "login.html"));
+    }
   });
 
   // Start server

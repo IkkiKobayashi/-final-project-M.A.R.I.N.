@@ -14,7 +14,11 @@ const limiter = rateLimit({
 // Configure middleware
 module.exports = (app) => {
   // Security middleware
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
 
   // CORS configuration
   app.use(
@@ -22,26 +26,20 @@ module.exports = (app) => {
       origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-      exposedHeaders: ["Content-Range", "X-Content-Range"],
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
+      allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
 
-  // Request parsing with increased limits
+  // Request parsing
   app.use(
     express.json({
       limit: "50mb",
-      parameterLimit: 100000,
-      extended: true,
     })
   );
   app.use(
     express.urlencoded({
-      limit: "50mb",
-      parameterLimit: 100000,
       extended: true,
+      limit: "50mb",
     })
   );
 
@@ -55,4 +53,15 @@ module.exports = (app) => {
 
   // Rate limiting
   app.use("/api/", limiter);
+
+  // Error catching middleware
+  app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+      return res.status(400).json({ message: "Invalid JSON payload" });
+    }
+    if (err instanceof URIError) {
+      return res.status(400).json({ message: "Invalid URL" });
+    }
+    next(err);
+  });
 };

@@ -14,8 +14,6 @@ module.exports = {
     uri: process.env.MONGODB_URI || "mongodb+srv://your_connection_string",
     name: process.env.DB_NAME || "marin_db",
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       retryWrites: true,
