@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  // Get store info from localStorage
   const storeInfo = JSON.parse(localStorage.getItem("currentStore"));
   if (!storeInfo) {
     window.location.href = "store-selection.html";
@@ -12,25 +13,30 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Fetch and update dashboard metrics
   async function updateDashboardMetrics() {
     try {
-      const response = await fetch(
-        `http://localhost:5000/dashboard/metrics/${storeInfo.id}`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/dashboard/stats/${storeInfo._id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any authentication headers if needed
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard metrics");
+      }
+
       const data = await response.json();
 
-      if (data.success) {
-        // Update summary cards
-        document.querySelector(".card:nth-child(1) .count").textContent =
-          data.metrics.totalProducts;
-        document.querySelector(".card:nth-child(2) .count").textContent =
-          data.metrics.currentInventory;
-        document.querySelector(".card:nth-child(3) .count").textContent =
-          data.metrics.nearExpiry;
-        document.querySelector(".card:nth-child(4) .count").textContent =
-          data.metrics.outOfStock;
-      }
+      // Update summary cards
+      document.querySelector(".card:nth-child(1) .count").textContent =
+        data.totalProducts;
+      document.querySelector(".card:nth-child(2) .count").textContent =
+        data.lowStock;
+      document.querySelector(".card:nth-child(3) .count").textContent =
+        data.nearExpiry;
+      document.querySelector(".card:nth-child(4) .count").textContent =
+        data.outOfStock;
     } catch (error) {
       console.error("Error fetching dashboard metrics:", error);
     }
@@ -42,20 +48,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     alertsContainer.innerHTML = `<div class="loading">Loading alerts...</div>`;
 
     try {
-      const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
-      if (!storeInfo || !storeInfo._id) {
-        alertsContainer.innerHTML = `
-          <div class="no-alerts">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Please select a store to view alerts.</p>
-          </div>
-        `;
-        return;
-      }
-
       const response = await fetch(`/api/dashboard/alerts/${storeInfo._id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch alerts");
+      }
+
       const alerts = await response.json();
 
       if (Array.isArray(alerts) && alerts.length > 0) {

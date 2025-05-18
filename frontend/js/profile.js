@@ -2,7 +2,7 @@ import config from "./config.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Get user data from localStorage
-  const userData = JSON.parse(localStorage.getItem("user"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
   const token = localStorage.getItem("token");
 
   if (!userData || !token) {
@@ -12,10 +12,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // Fetch latest user data from backend
-    const response = await fetch(`${config.apiUrl}/api/users/${userData.id}`, {
+    const response = await fetch(`/api/users/${userData._id}`, {
+      method: "GET",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -25,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const updatedUserData = await response.json();
 
     // Update localStorage with latest data
-    localStorage.setItem("user", JSON.stringify(updatedUserData));
+    localStorage.setItem("userData", JSON.stringify(updatedUserData));
 
     // Update profile information
     updateProfileInfo(updatedUserData);
@@ -34,7 +37,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupProfilePictureUpload();
   } catch (error) {
     console.error("Error fetching user data:", error);
-    showNotification("Failed to load profile data", "error");
+    showNotification(
+      "Failed to load profile data. Please try again later.",
+      "error"
+    );
   }
 });
 
@@ -44,48 +50,54 @@ function updateProfileInfo(userData) {
   if (userData.profileImage) {
     const imageUrl = userData.profileImage.startsWith("http")
       ? userData.profileImage
-      : `${config.apiUrl}/${userData.profileImage}`;
-    profilePicture.style.backgroundImage = `url(${imageUrl})`;
-    profilePicture.classList.remove("placeholder");
+      : `/uploads/${userData.profileImage}`;
+    profilePicture.src = imageUrl;
+    profilePicture.onerror = function () {
+      this.src = "img/profile-placeholder.jpg";
+    };
   }
 
   // Update name
   const profileName = document.getElementById("profileName");
-  profileName.value = userData.name || "";
+  if (profileName) profileName.value = userData.name || "";
 
   // Update role
   const roleValue = document.querySelector(".role-value");
-  roleValue.textContent = userData.role || "Admin";
+  if (roleValue) roleValue.textContent = userData.role || "User";
 
   // Update contact details
   const profileEmail = document.getElementById("profileEmail");
-  profileEmail.value = userData.email || "";
+  if (profileEmail) profileEmail.value = userData.email || "";
 
   const profilePhone = document.getElementById("profilePhone");
-  profilePhone.value = userData.phone || "";
+  if (profilePhone) profilePhone.value = userData.phone || "";
 
   // Update address
   const profileAddress = document.getElementById("profileAddress");
-  profileAddress.value = userData.address || "";
+  if (profileAddress) profileAddress.value = userData.address || "";
 
   // Update header profile picture
   const headerProfileImg = document.querySelector(".profile-btn .profile-img");
-  if (userData.profileImage) {
+  if (headerProfileImg && userData.profileImage) {
     const imageUrl = userData.profileImage.startsWith("http")
       ? userData.profileImage
-      : `${config.apiUrl}/${userData.profileImage}`;
-    headerProfileImg.style.backgroundImage = `url(${imageUrl})`;
-    headerProfileImg.classList.remove("placeholder");
+      : `/uploads/${userData.profileImage}`;
+    headerProfileImg.src = imageUrl;
+    headerProfileImg.onerror = function () {
+      this.src = "img/profile-placeholder.jpg";
+    };
   }
 
   // Update header name
   const headerName = document.querySelector(".profile-btn span");
-  headerName.textContent = userData.name || "Admin";
+  if (headerName) headerName.textContent = userData.name || "User";
 }
 
 function setupProfilePictureUpload() {
   const profilePictureInput = document.getElementById("profilePictureInput");
   const profilePicture = document.getElementById("profilePicture");
+
+  if (!profilePictureInput || !profilePicture) return;
 
   profilePictureInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
@@ -107,35 +119,47 @@ function setupProfilePictureUpload() {
       const formData = new FormData();
       formData.append("profileImage", file);
 
-      const response = await fetch(`${config.apiUrl}/api/users/profile-image`, {
+      const response = await fetch("/api/users/profile-image", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: formData,
+        credentials: "include",
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile picture");
+      }
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update profile picture");
-      }
-
       // Update profile picture
-      profilePicture.style.backgroundImage = `url(${data.profileImage})`;
-      profilePicture.classList.remove("placeholder");
+      const imageUrl = data.profileImage.startsWith("http")
+        ? data.profileImage
+        : `/uploads/${data.profileImage}`;
+
+      profilePicture.src = imageUrl;
+      profilePicture.onerror = function () {
+        this.src = "img/profile-placeholder.jpg";
+      };
 
       // Update header profile picture
       const headerProfileImg = document.querySelector(
         ".profile-btn .profile-img"
       );
-      headerProfileImg.style.backgroundImage = `url(${data.profileImage})`;
-      headerProfileImg.classList.remove("placeholder");
+      if (headerProfileImg) {
+        headerProfileImg.src = imageUrl;
+        headerProfileImg.onerror = function () {
+          this.src = "img/profile-placeholder.jpg";
+        };
+      }
 
       // Update user data in localStorage
-      const userData = JSON.parse(localStorage.getItem("user"));
+      const userData = JSON.parse(localStorage.getItem("userData"));
       userData.profileImage = data.profileImage;
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("userData", JSON.stringify(userData));
 
       showNotification("Profile picture updated successfully", "success");
     } catch (error) {
@@ -152,9 +176,9 @@ function showNotification(message, type = "success") {
   const notification = document.createElement("div");
   notification.className = `notification ${type}`;
   notification.innerHTML = `
-        <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
-        <span>${message}</span>
-    `;
+    <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+    <span>${message}</span>
+  `;
   document.body.appendChild(notification);
 
   setTimeout(() => {
