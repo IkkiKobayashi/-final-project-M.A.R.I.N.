@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "live-server --port=5500 --open=login.html",
-    "build": "echo 'Building frontend...'",
+    "build": "mkdir -p dist && cp -r *.html css js assets dist/",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

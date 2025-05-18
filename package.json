@@ -4,7 +4,7 @@
   "description": "MARIN - Management & Automation for Resourceful Inventory Navigation",
   "scripts": {
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
-    "build": "cd frontend && npm run build && cd ../backend && npm run build",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build && cp -r frontend/dist/* backend/public/",
     "start": "cd backend && node server.js"
   },
   "author": "MARIN Team",

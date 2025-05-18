@@ -71,7 +71,7 @@ connectDB()
 function startServer() {
   // Static file serving
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-  app.use(express.static(path.join(__dirname, "../frontend")));
+  app.use(express.static(path.join(__dirname, "public")));
 
   // API Routes
   app.use("/api/auth", authRoutes);
