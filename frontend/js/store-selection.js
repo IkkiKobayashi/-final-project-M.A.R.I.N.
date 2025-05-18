@@ -1,3 +1,5 @@
+import config from "./config.js";
+
 // Store Data Management
 let stores = [];
 
@@ -185,16 +187,13 @@ const deleteStore = async (storeId) => {
       }
 
       console.log("Attempting to delete store:", storeId);
-      const response = await fetch(
-        `http://localhost:5000/api/stores/${storeId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${config.apiUrl}/api/stores/${storeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
       console.log("Delete response:", data);
@@ -315,7 +314,7 @@ const handleAddStore = async (e) => {
 
     console.log("Sending store data:", storeData);
 
-    const response = await fetch("http://localhost:5000/api/stores", {
+    const response = await fetch(`${config.apiUrl}/api/stores`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -355,7 +354,7 @@ const handleEditStore = async (e) => {
     }
 
     const response = await fetch(
-      `http://localhost:5000/api/stores/${editingStoreId}`,
+      `${config.apiUrl}/api/stores/${editingStoreId}`,
       {
         method: "PUT",
         headers: {
@@ -475,7 +474,7 @@ async function fetchStores() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/stores", {
+    const response = await fetch(`${config.apiUrl}/api/stores`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
