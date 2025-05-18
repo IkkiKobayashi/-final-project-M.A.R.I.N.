@@ -42,7 +42,10 @@ function updateProfileInfo(userData) {
   // Update profile picture
   const profilePicture = document.getElementById("profilePicture");
   if (userData.profileImage) {
-    profilePicture.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
+    const imageUrl = userData.profileImage.startsWith("http")
+      ? userData.profileImage
+      : `${config.apiUrl}/${userData.profileImage}`;
+    profilePicture.style.backgroundImage = `url(${imageUrl})`;
     profilePicture.classList.remove("placeholder");
   }
 
@@ -68,7 +71,10 @@ function updateProfileInfo(userData) {
   // Update header profile picture
   const headerProfileImg = document.querySelector(".profile-btn .profile-img");
   if (userData.profileImage) {
-    headerProfileImg.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
+    const imageUrl = userData.profileImage.startsWith("http")
+      ? userData.profileImage
+      : `${config.apiUrl}/${userData.profileImage}`;
+    headerProfileImg.style.backgroundImage = `url(${imageUrl})`;
     headerProfileImg.classList.remove("placeholder");
   }
 

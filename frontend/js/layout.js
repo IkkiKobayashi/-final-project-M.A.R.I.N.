@@ -22,35 +22,35 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update profile picture in the admin dropdown
     const adminProfilePictures = document.querySelectorAll(".profile-img");
     adminProfilePictures.forEach((img) => {
-      img.src = imageUrl;
-      img.onerror = function () {
-        // If image fails to load, use default placeholder
-        this.src = "assets/profile-placeholder.jpg";
-      };
+      if (imageUrl) {
+        img.style.backgroundImage = `url(${imageUrl})`;
+        img.classList.remove("placeholder");
+      } else {
+        img.style.backgroundImage = "";
+        img.classList.add("placeholder");
+      }
     });
 
     // Update profile picture in the profile page if we're on that page
     const profilePicture = document.getElementById("profilePicture");
     if (profilePicture) {
-      profilePicture.src = imageUrl;
-      profilePicture.onerror = function () {
-        // If image fails to load, use default placeholder
-        this.src = "assets/profile-placeholder.jpg";
-      };
+      if (imageUrl) {
+        profilePicture.style.backgroundImage = `url(${imageUrl})`;
+        profilePicture.classList.remove("placeholder");
+      } else {
+        profilePicture.style.backgroundImage = "";
+        profilePicture.classList.add("placeholder");
+      }
     }
-
-    // Save the profile picture URL to localStorage
-    localStorage.setItem("profilePicture", imageUrl);
   }
 
-  // Initialize profile picture from localStorage on page load
-  const savedProfilePicture = localStorage.getItem("profilePicture");
-  if (savedProfilePicture) {
-    updateProfilePicture(savedProfilePicture);
-  } else {
-    // If no saved profile picture, use the default placeholder
-    const defaultProfilePicture = "assets/profile-placeholder.jpg";
-    updateProfilePicture(defaultProfilePicture);
+  // Initialize profile picture from user data in localStorage
+  const userData = JSON.parse(localStorage.getItem("user"));
+  if (userData && userData.profileImage) {
+    const imageUrl = userData.profileImage.startsWith("http")
+      ? userData.profileImage
+      : `${config.apiUrl}/${userData.profileImage}`;
+    updateProfilePicture(imageUrl);
   }
 
   // Handle profile picture upload if we're on the profile page
@@ -121,25 +121,4 @@ document.addEventListener("DOMContentLoaded", () => {
   manageStoreBtn.addEventListener("click", () => {
     window.location.href = "store-selection.html";
   });
-
-  function updateHeaderProfile() {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData) {
-      // Update header profile picture
-      const headerProfileImg = document.querySelector(
-        ".profile-btn .profile-img"
-      );
-      if (userData.profileImage) {
-        headerProfileImg.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
-        headerProfileImg.classList.remove("placeholder");
-      }
-
-      // Update header name
-      const headerName = document.querySelector(".profile-btn span");
-      headerName.textContent = userData.name || "Admin";
-    }
-  }
-
-  // Call updateHeaderProfile when the page loads
-  document.addEventListener("DOMContentLoaded", updateHeaderProfile);
 });
