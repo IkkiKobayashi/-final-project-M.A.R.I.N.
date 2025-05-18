@@ -180,28 +180,68 @@ router.get("/alerts/:storeId", async (req, res) => {
           id: item._id,
           name: item.product.name,
           quantity: item.quantity,
+          threshold: item.product.threshold,
         })),
       });
     }
 
-    // Check for expiring items
-    const expiringItems = await Inventory.find({
+    // Check for near expiry items (within 30 days)
+    const nearExpiryItems = await Inventory.find({
       store: req.params.storeId,
       expiryDate: {
-        $lte: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+        $lte: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
         $gt: now,
       },
     }).populate("product");
 
-    if (expiringItems.length > 0) {
+    if (nearExpiryItems.length > 0) {
       alerts.push({
-        type: "expiring_soon",
+        type: "near_expiry",
         severity: "warning",
-        message: `${expiringItems.length} items are expiring within 7 days`,
-        items: expiringItems.map((item) => ({
+        message: `${nearExpiryItems.length} items are expiring within 30 days`,
+        items: nearExpiryItems.map((item) => ({
           id: item._id,
           name: item.product.name,
           expiryDate: item.expiryDate,
+          quantity: item.quantity,
+        })),
+      });
+    }
+
+    // Check for expired items
+    const expiredItems = await Inventory.find({
+      store: req.params.storeId,
+      expiryDate: { $lt: now },
+    }).populate("product");
+
+    if (expiredItems.length > 0) {
+      alerts.push({
+        type: "expired",
+        severity: "danger",
+        message: `${expiredItems.length} items have expired`,
+        items: expiredItems.map((item) => ({
+          id: item._id,
+          name: item.product.name,
+          expiryDate: item.expiryDate,
+          quantity: item.quantity,
+        })),
+      });
+    }
+
+    // Check for out of stock items
+    const outOfStockItems = await Inventory.find({
+      store: req.params.storeId,
+      status: "out_of_stock",
+    }).populate("product");
+
+    if (outOfStockItems.length > 0) {
+      alerts.push({
+        type: "out_of_stock",
+        severity: "danger",
+        message: `${outOfStockItems.length} items are out of stock`,
+        items: outOfStockItems.map((item) => ({
+          id: item._id,
+          name: item.product.name,
         })),
       });
     }
@@ -286,5 +326,43 @@ router.patch("/:id/refresh", async (req, res) => {
 
 // Get dashboard metrics
 router.get("/metrics/:storeId", dashboardController.getDashboardMetrics);
+
+// Get dashboard statistics
+router.get("/stats/:storeId", auth, async (req, res) => {
+  try {
+    const storeId = req.params.storeId;
+
+    // Get total products count
+    const totalProducts = await Product.countDocuments({ store: storeId });
+
+    // Get inventory statistics
+    const [lowStock, nearExpiry, outOfStock] = await Promise.all([
+      // Count low stock items
+      Inventory.countDocuments({
+        store: storeId,
+        status: "low_stock",
+      }),
+      // Count near expiry items
+      Inventory.countDocuments({
+        store: storeId,
+        status: "near_expiry",
+      }),
+      // Count out of stock items
+      Inventory.countDocuments({
+        store: storeId,
+        status: "out_of_stock",
+      }),
+    ]);
+
+    res.json({
+      totalProducts,
+      lowStock,
+      nearExpiry,
+      outOfStock,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

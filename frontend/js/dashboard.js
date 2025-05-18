@@ -39,12 +39,23 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Fetch and display inventory alerts from backend
   async function updateInventoryAlertsFromAPI() {
     const alertsContainer = document.querySelector(".alerts-container");
-    alertsContainer.innerHTML = `<div>Loading alerts...</div>`;
+    alertsContainer.innerHTML = `<div class="loading">Loading alerts...</div>`;
+
     try {
-      const response = await fetch(
-        `http://localhost:5000/dashboard/alerts/${storeInfo.id}`,
-        { credentials: "include" }
-      );
+      const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+      if (!storeInfo || !storeInfo._id) {
+        alertsContainer.innerHTML = `
+          <div class="no-alerts">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Please select a store to view alerts.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const response = await fetch(`/api/dashboard/alerts/${storeInfo._id}`, {
+        credentials: "include",
+      });
       const alerts = await response.json();
 
       if (Array.isArray(alerts) && alerts.length > 0) {
@@ -53,32 +64,59 @@ document.addEventListener("DOMContentLoaded", async function () {
             let itemsList = "";
             if (alert.items && alert.items.length > 0) {
               itemsList =
-                "<ul>" +
+                "<ul class='alert-items'>" +
                 alert.items
                   .map((item) => {
-                    if (alert.type === "low_stock") {
-                      return `<li>${item.name} - ${item.quantity} left</li>`;
-                    } else if (alert.type === "expiring_soon") {
-                      return `<li>${item.name} - Expires: ${new Date(
-                        item.expiryDate
-                      ).toLocaleDateString()}</li>`;
+                    let itemDetails = "";
+                    switch (alert.type) {
+                      case "low_stock":
+                        itemDetails = `${item.name} - ${item.quantity} left (Threshold: ${item.threshold})`;
+                        break;
+                      case "near_expiry":
+                        itemDetails = `${item.name} - Expires: ${new Date(item.expiryDate).toLocaleDateString()} (${item.quantity} units)`;
+                        break;
+                      case "expired":
+                        itemDetails = `${item.name} - Expired on ${new Date(item.expiryDate).toLocaleDateString()} (${item.quantity} units)`;
+                        break;
+                      case "out_of_stock":
+                        itemDetails = `${item.name}`;
+                        break;
+                      default:
+                        itemDetails = item.name;
                     }
-                    return `<li>${item.name}</li>`;
+                    return `<li>${itemDetails}</li>`;
                   })
                   .join("") +
                 "</ul>";
             }
+
+            let icon = "";
+            switch (alert.type) {
+              case "low_stock":
+                icon = "fa-exclamation-triangle";
+                break;
+              case "near_expiry":
+                icon = "fa-clock";
+                break;
+              case "expired":
+                icon = "fa-times-circle";
+                break;
+              case "out_of_stock":
+                icon = "fa-ban";
+                break;
+              default:
+                icon = "fa-info-circle";
+            }
+
             return `
-              <div class="alert ${alert.type}">
-                <i class="fas ${
-                  alert.type === "low_stock"
-                    ? "fa-exclamation-triangle"
-                    : "fa-clock"
-                }"></i>
-                <span>${alert.message}</span>
-                ${itemsList}
+            <div class="alert ${alert.type} ${alert.severity}">
+              <div class="alert-header">
+                <i class="fas ${icon}"></i>
+                <span class="alert-message">${alert.message}</span>
               </div>
-            `;
+              ${itemsList}
+            </div>
+          `;
           })
           .join("");
       } else {
@@ -91,9 +129,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     } catch (error) {
       alertsContainer.innerHTML = `
-        <div class="no-alerts">
+        <div class="no-alerts error">
           <i class="fas fa-exclamation-circle"></i>
-          <p>Failed to load alerts.</p>
+          <p>Failed to load alerts. Please try again later.</p>
         </div>
       `;
       console.error("Error fetching inventory alerts:", error);
@@ -107,4 +145,59 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Update metrics every 5 minutes
   setInterval(updateDashboardMetrics, 300000);
   setInterval(updateInventoryAlertsFromAPI, 300000);
+});
+
+// Function to fetch dashboard statistics
+async function fetchDashboardStats() {
+  try {
+    const storeInfo = JSON.parse(localStorage.getItem("selectedStore"));
+    if (!storeInfo || !storeInfo._id) {
+      console.error("No store selected");
+      return;
+    }
+
+    const response = await fetch(`/api/dashboard/stats/${storeInfo._id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any authentication headers if needed
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch dashboard statistics");
+    }
+
+    const data = await response.json();
+    updateDashboardCards(data);
+  } catch (error) {
+    console.error("Error fetching dashboard statistics:", error);
+  }
+}
+
+// Function to update dashboard cards with statistics
+function updateDashboardCards(stats) {
+  // Update Total Products
+  document.querySelector(".card:nth-child(1) .count").textContent =
+    stats.totalProducts;
+
+  // Update Low on Stock
+  document.querySelector(".card:nth-child(2) .count").textContent =
+    stats.lowStock;
+
+  // Update Items Near Expiry
+  document.querySelector(".card:nth-child(3) .count").textContent =
+    stats.nearExpiry;
+
+  // Update Out of Stock
+  document.querySelector(".card:nth-child(4) .count").textContent =
+    stats.outOfStock;
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  fetchDashboardStats();
+
+  // Refresh dashboard stats every 5 minutes
+  setInterval(fetchDashboardStats, 5 * 60 * 1000);
 });

@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdownMenu = document.querySelector(".dropdown-menu");
 
   if (profileBtn && dropdownMenu) {
+    // Toggle dropdown on button click
     profileBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       dropdownMenu.classList.toggle("show");
@@ -12,6 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
       if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove("show");
+      }
+    });
+
+    // Close dropdown when pressing Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
         dropdownMenu.classList.remove("show");
       }
     });
@@ -147,16 +155,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle logout
   const logoutLink = document.querySelector(
-    '.dropdown-menu a[href="login.html"]'
+    ".dropdown-item[href='login.html']"
   );
   if (logoutLink) {
     logoutLink.addEventListener("click", function (e) {
       e.preventDefault();
-      // Clear localStorage
-      localStorage.removeItem("token");
-      localStorage.removeItem("userData");
-      localStorage.removeItem("currentStore");
-      // Redirect to login
+      // Clear any stored data
+      localStorage.removeItem("selectedStore");
+      localStorage.removeItem("user");
+      // Redirect to login page
       window.location.href = "login.html";
     });
   }
