@@ -24,9 +24,8 @@ module.exports = (app) => {
   app.use(
     cors({
       origin: [
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
         "https://final-project-m-a-r-i-n.onrender.com",
+        "http://localhost:5000",
       ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],

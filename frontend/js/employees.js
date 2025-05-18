@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentView = "grid";
   let editingEmployeeId = null;
   let currentImageData = null;
-  const API_URL = "http://localhost:3000/api"; // Update this with your actual API URL
+  const API_URL = "https://final-project-m-a-r-i-n.onrender.com/api"; // Updated API URL for Render deployment
 
   // Event Listeners
   addEmployeeBtn.addEventListener("click", openModal);
@@ -45,48 +45,36 @@ document.addEventListener("DOMContentLoaded", function () {
   if (imagePreview && profileImage) {
     profileImage.addEventListener("change", function (e) {
       const file = e.target.files[0];
-      if (file) {
-        if (!file.type.match("image.*")) {
-          showNotification("Please select an image file", "error");
-          return;
-        }
+      if (!file) return;
 
-        if (file.size > 5 * 1024 * 1024) {
-          showNotification("Image size should be less than 5MB", "error");
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          currentImageData = e.target.result;
-          updateImagePreview(currentImageData);
-        };
-        reader.readAsDataURL(file);
+      // Check if file is an image
+      if (!file.type.startsWith("image/")) {
+        showNotification("Please select an image file", "error");
+        return;
       }
+
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification("Image size should be less than 5MB", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        currentImageData = e.target.result;
+        updateImagePreview(currentImageData);
+      };
+      reader.onerror = function () {
+        showNotification("Error reading image file", "error");
+      };
+      reader.readAsDataURL(file);
     });
   }
 
-  function updateImagePreview(imageData) {
-    const imagePreview = document.getElementById("imagePreview");
-    const icon = imagePreview.querySelector("i");
-    const text = imagePreview.querySelector(".upload-text");
-
-    let img = imagePreview.querySelector("img");
-    if (!img) {
-      img = document.createElement("img");
-      imagePreview.appendChild(img);
-    }
-
-    img.src = imageData;
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "50%";
-
-    // Hide icon and text
-    if (icon) icon.style.display = "none";
-    if (text) text.style.display = "none";
-  }
+  // Image Upload Click Handler
+  imageUpload.addEventListener("click", function () {
+    profileImage.click();
+  });
 
   // Search handler
   searchInput.addEventListener("input", handleSearch);
@@ -95,13 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
   viewToggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => handleViewToggle(btn));
   });
-
-  // Image Upload Handling
-  imageUpload.addEventListener("click", function () {
-    profileImage.click();
-  });
-
-  profileImage.addEventListener("change", handleImageUpload);
 
   // Functions
   async function fetchEmployees() {
@@ -198,31 +179,26 @@ document.addEventListener("DOMContentLoaded", function () {
     resetImagePreview();
   }
 
-  function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-      // Check if file is an image
-      if (!file.type.match("image.*")) {
-        showNotification("Please select an image file", "error");
-        return;
-      }
+  function updateImagePreview(imageData) {
+    const imagePreview = document.getElementById("imagePreview");
+    const icon = imagePreview.querySelector("i");
+    const text = imagePreview.querySelector(".upload-text");
 
-      // Check file size (limit to 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        showNotification("Image size should be less than 5MB", "error");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        currentImageData = e.target.result;
-        imagePreview.innerHTML = `<img src="${currentImageData}" alt="Profile Preview">`;
-      };
-      reader.onerror = function () {
-        showNotification("Error reading image file", "error");
-      };
-      reader.readAsDataURL(file);
+    let img = imagePreview.querySelector("img");
+    if (!img) {
+      img = document.createElement("img");
+      imagePreview.appendChild(img);
     }
+
+    img.src = imageData;
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "50%";
+
+    // Hide icon and text
+    if (icon) icon.style.display = "none";
+    if (text) text.style.display = "none";
   }
 
   function showNotification(message, type = "success") {
@@ -393,45 +369,3 @@ function resetImagePreview() {
   }
   currentImageData = null;
 }
-
-// Make handleImageUpload globally available
-window.handleImageUpload = function (input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  // Check if file is an image
-  if (!file.type.startsWith("image/")) {
-    showNotification("Please select an image file", "error");
-    return;
-  }
-
-  // Check file size (limit to 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    showNotification("Image size should be less than 5MB", "error");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const imagePreview = document.getElementById("imagePreview");
-    const icon = imagePreview.querySelector("i");
-    const text = imagePreview.querySelector(".upload-text");
-
-    // Create or update image element
-    let img = imagePreview.querySelector("img");
-    if (!img) {
-      img = document.createElement("img");
-      imagePreview.appendChild(img);
-    }
-    img.src = e.target.result;
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "50%";
-
-    // Hide icon and text
-    if (icon) icon.style.display = "none";
-    if (text) text.style.display = "none";
-  };
-  reader.readAsDataURL(file);
-};

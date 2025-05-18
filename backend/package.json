@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "echo 'Building backend...'"
+    "build": "echo 'Building backend...'",
+    "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

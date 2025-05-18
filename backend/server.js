@@ -46,6 +46,7 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const supportTicketRoutes = require("./routes/supportTicketRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
 
 // Connect to MongoDB Atlas
 connectDB()
@@ -68,6 +69,7 @@ function startServer() {
   app.use("/api/dashboard", dashboardRoutes);
   app.use("/api/settings", settingsRoutes);
   app.use("/api/support", supportTicketRoutes);
+  app.use("/api/employees", employeeRoutes);
 
   // Static file serving for frontend - Move this after API routes
   app.use(express.static(path.join(__dirname, "../frontend")));
