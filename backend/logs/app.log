@@ -163,3 +163,5 @@
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T06:01:21.416Z"}
 {"level":"info","message":"MongoDB connected successfully","timestamp":"2025-05-18T06:01:22.518Z"}
 {"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T06:01:23.221Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T06:52:59.433Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T06:53:05.152Z"}
