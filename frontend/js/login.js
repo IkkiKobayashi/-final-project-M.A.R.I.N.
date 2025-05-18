@@ -1,3 +1,5 @@
+import config from "./config.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
 
@@ -17,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.innerHTML =
         '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${config.apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
