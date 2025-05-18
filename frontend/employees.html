@@ -195,7 +195,7 @@
     <div class="employee-modal" id="employeeModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Add New Employee</h2>
+          <h2 class="modal-title">Add Employee</h2>
           <button class="close-modal-btn">&times;</button>
         </div>
         <form class="employee-form" id="employeeForm">
@@ -206,12 +206,6 @@
           <div class="form-group">
             <label for="employeeEmail">Email</label>
             <input type="email" id="employeeEmail" name="email" required />
-            <div class="account-creation-note">
-              <i class="fas fa-info-circle"></i>
-              <span
-                >This email will be used for the employee's account login</span
-              >
-            </div>
           </div>
           <div class="form-group">
             <label for="employeeRole">Role</label>
@@ -240,26 +234,6 @@
               type="date"
               id="employeeJoinedDate"
               name="joinedDate"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="accountPassword">Account Password</label>
-            <input
-              type="password"
-              id="accountPassword"
-              name="accountPassword"
-              placeholder="Set password for employee account"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm the password"
               required
             />
           </div>

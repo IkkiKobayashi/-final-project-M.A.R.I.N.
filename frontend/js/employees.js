@@ -18,10 +18,11 @@ document.addEventListener("DOMContentLoaded", function () {
   profileImage.removeAttribute("required");
 
   // State
-  let employees = JSON.parse(localStorage.getItem("employees")) || [];
+  let employees = [];
   let currentView = "grid";
   let editingEmployeeId = null;
   let currentImageData = null;
+  const API_URL = "http://localhost:3000/api"; // Update this with your actual API URL
 
   // Event Listeners
   addEmployeeBtn.addEventListener("click", openModal);
@@ -103,43 +104,41 @@ document.addEventListener("DOMContentLoaded", function () {
   profileImage.addEventListener("change", handleImageUpload);
 
   // Functions
-  function saveEmployee() {
+  async function fetchEmployees() {
+    try {
+      const response = await fetch(`${API_URL}/employees`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch employees");
+      }
+
+      const data = await response.json();
+      employees = data;
+      renderEmployees();
+    } catch (error) {
+      showNotification(error.message, "error");
+    }
+  }
+
+  async function saveEmployee() {
     const name = document.getElementById("employeeName").value;
     const email = document.getElementById("employeeEmail").value;
     const role = document.getElementById("employeeRole").value;
     const phone = document.getElementById("employeePhone").value;
     const department = document.getElementById("employeeDepartment").value;
     const joinedDate = document.getElementById("employeeJoinedDate").value;
-    const accountPassword = document.getElementById("accountPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
 
     // Validate required fields
-    if (
-      !name ||
-      !email ||
-      !role ||
-      !phone ||
-      !department ||
-      !joinedDate ||
-      !accountPassword ||
-      !confirmPassword
-    ) {
+    if (!name || !email || !role || !phone || !department || !joinedDate) {
       showNotification("Please fill in all required fields", "error");
       return;
     }
 
-    // Validate passwords
-    if (accountPassword !== confirmPassword) {
-      showNotification("Passwords do not match", "error");
-      return;
-    }
-    if (accountPassword.length < 8) {
-      showNotification("Password must be at least 8 characters long", "error");
-      return;
-    }
-
-    const employee = {
-      id: editingEmployeeId || Date.now().toString(),
+    const employeeData = {
       name,
       email,
       role,
@@ -147,41 +146,46 @@ document.addEventListener("DOMContentLoaded", function () {
       department,
       joinedDate,
       profileImage: currentImageData || "img/user img/store admin.jpg",
-      account: {
-        email: email, // Using the same email for login
-        password: accountPassword,
-        role: role,
-      },
     };
 
-    if (editingEmployeeId) {
-      const index = employees.findIndex((emp) => emp.id === editingEmployeeId);
-      if (index !== -1) {
-        // Preserve the existing image if no new image was uploaded
-        if (!currentImageData) {
-          employee.profileImage = employees[index].profileImage;
-        }
-        employees[index] = employee;
-      }
-    } else {
-      employees.push(employee);
-    }
+    try {
+      const url = editingEmployeeId
+        ? `${API_URL}/employees/${editingEmployeeId}`
+        : `${API_URL}/employees`;
 
-    localStorage.setItem("employees", JSON.stringify(employees));
-    showNotification("Employee saved successfully!");
-    closeModal();
-    renderEmployees();
+      const method = editingEmployeeId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(employeeData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save employee");
+      }
+
+      showNotification("Employee saved successfully!");
+      closeModal();
+      fetchEmployees();
+    } catch (error) {
+      showNotification(error.message, "error");
+    }
   }
 
   function openModal(employee = null) {
     employeeModal.classList.add("active");
+    document.querySelector(".modal-title").textContent = employee
+      ? "Edit Employee"
+      : "Add Employee";
     if (employee) {
-      editingEmployeeId = employee.id;
-      document.querySelector(".modal-title").textContent = "Edit Employee";
+      editingEmployeeId = employee._id;
       populateForm(employee);
     } else {
       editingEmployeeId = null;
-      document.querySelector(".modal-title").textContent = "Add New Employee";
       employeeForm.reset();
       resetImagePreview();
     }
@@ -286,17 +290,30 @@ document.addEventListener("DOMContentLoaded", function () {
     renderEmployees();
   }
 
-  function deleteEmployee(id) {
+  async function deleteEmployee(id) {
     if (confirm("Are you sure you want to delete this employee?")) {
-      employees = employees.filter((emp) => emp.id !== id);
-      localStorage.setItem("employees", JSON.stringify(employees));
-      renderEmployees();
-      showNotification("Employee deleted successfully");
+      try {
+        const response = await fetch(`${API_URL}/employees/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete employee");
+        }
+
+        showNotification("Employee deleted successfully");
+        fetchEmployees();
+      } catch (error) {
+        showNotification(error.message, "error");
+      }
     }
   }
 
   function editEmployee(id) {
-    const employee = employees.find((emp) => emp.id === id);
+    const employee = employees.find((emp) => emp._id === id);
     if (employee) {
       openModal(employee);
     }
@@ -319,8 +336,8 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="employee-card">
         <div class="employee-image">
           <img src="${employee.profileImage}" alt="${
-          employee.name
-        }" onerror="this.src='assets/profile-placeholder.jpg'">
+            employee.name
+          }" onerror="this.src='assets/profile-placeholder.jpg'">
         </div>
         <div class="employee-info">
           <h3>${employee.name}</h3>
@@ -335,11 +352,11 @@ document.addEventListener("DOMContentLoaded", function () {
           ).toLocaleDateString()}</p>
         </div>
         <div class="employee-actions">
-          <button class="edit-btn" onclick="editEmployee('${employee.id}')">
+          <button class="edit-btn" onclick="editEmployee('${employee._id}')">
             <i class="fas fa-edit"></i>
             <span>Edit</span>
           </button>
-          <button class="delete-btn" onclick="deleteEmployee('${employee.id}')">
+          <button class="delete-btn" onclick="deleteEmployee('${employee._id}')">
             <i class="fas fa-trash"></i>
             <span>Delete</span>
           </button>
@@ -354,8 +371,8 @@ document.addEventListener("DOMContentLoaded", function () {
   window.editEmployee = editEmployee;
   window.deleteEmployee = deleteEmployee;
 
-  // Initial render
-  renderEmployees();
+  // Initial fetch of employees
+  fetchEmployees();
 });
 
 // Function to reset image preview
