@@ -5,7 +5,7 @@
   "scripts": {
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "build": "cd frontend && npm run build && cd ../backend && mkdir -p public && cp -r ../frontend/dist/* public/ && npm run build",
-    "start": "cd backend && node server.js"
+    "start": "cd backend && PORT=5000 node server.js"
   },
   "author": "MARIN Team",
   "license": "ISC"
