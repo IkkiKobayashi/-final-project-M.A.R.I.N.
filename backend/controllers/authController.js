@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const path = require("path");
 
 // Login user
 exports.login = async (req, res) => {
@@ -79,6 +80,17 @@ exports.signup = async (req, res) => {
       });
     }
 
+    // Handle profile image
+    let profileImagePath = "img/user img/store admin.jpg"; // Default image
+    if (req.file) {
+      // Get the relative path for storage
+      const relativePath = path.relative(
+        path.join(__dirname, "../uploads"),
+        req.file.path
+      );
+      profileImagePath = relativePath.replace(/\\/g, "/"); // Convert Windows path to URL format
+    }
+
     // Create new user with admin role
     const user = new User({
       fullName,
@@ -87,6 +99,7 @@ exports.signup = async (req, res) => {
       password,
       phone,
       location,
+      profileImage: profileImagePath,
       role: "admin", // Set role as admin for signup
     });
 
@@ -109,6 +122,7 @@ exports.signup = async (req, res) => {
         username: user.username,
         phone: user.phone,
         location: user.location,
+        profileImage: user.profileImage,
         role: user.role,
       },
     });

@@ -115,6 +115,44 @@
               />
             </div>
           </div>
+          <div class="form-group profile-image-group">
+            <label for="profileImage">
+              <i class="fas fa-camera"></i>
+              Profile Image
+            </label>
+            <div class="profile-image-upload">
+              <div class="image-preview" id="imagePreview">
+                <div class="placeholder-icon" id="profilePlaceholder">
+                  <!-- SVG avatar icon -->
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="36"
+                      stroke="#222"
+                      stroke-width="4"
+                      fill="white"
+                    />
+                    <circle cx="40" cy="34" r="14" fill="#222" />
+                    <path
+                      d="M20 62c0-8.837 8.059-16 18-16s18 7.163 18 16"
+                      fill="#222"
+                    />
+                  </svg>
+                </div>
+                <div class="upload-icon">
+                  <i class="fas fa-camera"></i>
+                </div>
+              </div>
+              <input
+                type="file"
+                id="profileImage"
+                name="profileImage"
+                accept="image/*"
+                class="profile-image-input"
+              />
+            </div>
+          </div>
           <div class="form-group">
             <label for="confirmPassword">
               <i class="fas fa-lock"></i>

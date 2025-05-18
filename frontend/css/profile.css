@@ -326,3 +326,20 @@
   align-items: center;
   justify-content: center;
 }
+
+.placeholder-icon {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.placeholder-icon svg {
+  width: 80px;
+  height: 80px;
+  display: block;
+}

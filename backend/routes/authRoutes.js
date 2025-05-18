@@ -8,10 +8,11 @@ const User = require("../models/User");
 const { auth } = require("../middleware/auth");
 const emailService = require("../services/emailService");
 const authController = require("../controllers/authController");
+const upload = require("../middleware/upload");
 
 // Auth routes
-router.post("/register", authController.signup);
-router.post("/signup", authController.signup);
+router.post("/register", upload.single("profileImage"), authController.signup);
+router.post("/signup", upload.single("profileImage"), authController.signup);
 router.post("/login", authController.login);
 router.post("/refresh-token", authController.refreshToken);
 router.post("/logout", auth, authController.logout);

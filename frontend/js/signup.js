@@ -9,6 +9,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const confirmPasswordInput = document.getElementById("confirmPassword");
   const phoneInput = document.getElementById("phone");
   const locationInput = document.getElementById("location");
+  const profileImageInput = document.getElementById("profileImage");
+  const previewImg = document.getElementById("previewImg");
+  const imagePreview = document.getElementById("imagePreview");
+  const profilePlaceholder = document.getElementById("profilePlaceholder");
+
+  // Handle profile image preview
+  profileImageInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // Create image element if it doesn't exist
+        let img = imagePreview.querySelector("img");
+        if (!img) {
+          img = document.createElement("img");
+          imagePreview.appendChild(img);
+        }
+        img.src = e.target.result;
+        imagePreview.classList.add("has-image");
+        profilePlaceholder.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   const validateForm = () => {
     const fullName = fullNameInput.value.trim();
@@ -18,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmPassword = confirmPasswordInput.value;
     const phone = phoneInput.value.trim();
     const location = locationInput.value.trim();
+    const profileImage = profileImageInput.files[0];
 
     if (
       !fullName ||
@@ -48,6 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!phoneRegex.test(phone)) {
       throw new Error("Please enter a valid phone number");
     }
+
+    if (profileImage && profileImage.size > 5 * 1024 * 1024) {
+      throw new Error("Image size should be less than 5MB");
+    }
   };
 
   signupForm.addEventListener("submit", async (e) => {
@@ -60,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmPassword = confirmPasswordInput.value;
     const phone = phoneInput.value.trim();
     const location = locationInput.value.trim();
+    const profileImage = profileImageInput.files[0];
 
     try {
       validateForm();
@@ -68,19 +98,21 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.disabled = true;
       submitButton.textContent = "Creating account...";
 
+      // Create FormData object for file upload
+      const formData = new FormData();
+      formData.append("fullName", fullName);
+      formData.append("email", email);
+      formData.append("username", username);
+      formData.append("password", password);
+      formData.append("phone", phone);
+      formData.append("location", location);
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
       const response = await fetch(`${config.apiUrl}/api/auth/signup`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          username,
-          password,
-          phone,
-          location,
-        }),
+        body: formData, // Send as FormData instead of JSON
       });
 
       // Log the raw response for debugging
