@@ -56,13 +56,33 @@ class EmployeeController {
   // Create employee
   static async createEmployee(req, res) {
     try {
-      const { name, email, role, department, phone, joinedDate, profileImage } =
-        req.body;
+      const {
+        name,
+        email,
+        role,
+        department,
+        phone,
+        joinedDate,
+        profileImage,
+        store,
+      } = req.body;
+
+      // Validate store
+      if (!store) {
+        return res.status(400).json({ message: "Store ID is required" });
+      }
+
+      // Validate user's store access
+      if (req.user.role !== "admin" && req.user.store?.toString() !== store) {
+        return res
+          .status(403)
+          .json({ message: "Not authorized to add employees to this store" });
+      }
 
       // Check if email already exists in the store
       const existingEmployee = await Employee.findOne({
         email,
-        store: req.user.store,
+        store,
       });
 
       if (existingEmployee) {
@@ -79,7 +99,7 @@ class EmployeeController {
         phone,
         joinedDate: joinedDate || new Date(),
         profileImage: profileImage || "img/user img/store admin.jpg",
-        store: req.user.store,
+        store,
       });
 
       await employee.save();
@@ -106,10 +126,17 @@ class EmployeeController {
           phone: employee.phone,
           joinedDate: employee.joinedDate,
           profileImage: employee.profileImage,
+          store: employee.store,
         },
       });
     } catch (error) {
       console.error("Error creating employee:", error);
+      if (error.name === "ValidationError") {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: Object.values(error.errors).map((err) => err.message),
+        });
+      }
       res.status(400).json({ message: error.message });
     }
   }

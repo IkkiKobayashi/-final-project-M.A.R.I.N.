@@ -200,3 +200,5 @@
 {"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T10:57:06.839Z"}
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T11:07:23.118Z"}
 {"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T11:07:33.035Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T11:11:40.461Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T11:11:46.762Z"}

@@ -119,6 +119,16 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Get store ID from localStorage
+    const storeId = localStorage.getItem("storeId");
+    if (!storeId) {
+      showNotification(
+        "Store ID not found. Please select a store first.",
+        "error"
+      );
+      return;
+    }
+
     const employeeData = {
       name,
       email,
@@ -127,6 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
       department,
       joinedDate,
       profileImage: currentImageData || "img/user img/store admin.jpg",
+      store: storeId,
     };
 
     try {
@@ -136,23 +147,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const method = editingEmployeeId ? "PUT" : "POST";
 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showNotification(
+          "Authentication token not found. Please log in again.",
+          "error"
+        );
+        return;
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(employeeData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save employee");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save employee");
       }
 
       showNotification("Employee saved successfully!");
       closeModal();
       fetchEmployees();
     } catch (error) {
+      console.error("Error saving employee:", error);
       showNotification(error.message, "error");
     }
   }
