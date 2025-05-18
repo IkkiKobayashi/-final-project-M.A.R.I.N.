@@ -34,18 +34,6 @@ This system is designed to simplify inventory management by providing real-time 
 
 - Notifies users when stock falls below set thresholds or when items are near expiration.
 
-**Report Generation**
-
-- Provides downloadable inventory summaries, usage trends, and restocking recommendations.
-
-**Activity Logging**
-
-- Records all user actions (add/edit/delete) with timestamps for accountability and auditing.
-
-**Role-Based Access Control**
-
-- Assigns permissions based on user roles (Admin, Manager, Staff) to limit access and editing rights.
-
 **Multi-Store Management**
 
 - Allows management of multiple stores, each with its own inventory, employees, and activity logs.
