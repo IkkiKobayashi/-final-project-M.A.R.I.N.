@@ -1,3 +1,5 @@
+import config from "./config.js";
+
 document.addEventListener("DOMContentLoaded", function () {
   // View Toggle Functionality
   const toggleButtons = document.querySelectorAll(".toggle-btn");
@@ -95,7 +97,7 @@ async function fetchAndDisplayProducts() {
 
     console.log("Fetching products for store:", currentStore.id);
     const response = await fetch(
-      `http://localhost:5000/api/products?storeId=${currentStore.id}`,
+      `${config.apiUrl}/api/products?storeId=${currentStore.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
