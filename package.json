@@ -1,13 +1,12 @@
 {
   "name": "marin",
   "version": "1.0.0",
-  "description": "M.A.R.I.N Inventory Management System",
+  "description": "MARIN - Management & Automation for Resourceful Inventory Navigation",
   "scripts": {
-    "start": "cd backend && npm install && node server.js",
-    "build": "cd frontend && npm install && npm run build",
-    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build",
+    "start": "cd backend && node server.js"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "author": "MARIN Team",
+  "license": "ISC"
 }
