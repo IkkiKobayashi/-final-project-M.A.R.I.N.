@@ -37,6 +37,7 @@ router.put(
 );
 
 router.delete("/:id", checkRole(["admin"]), storeController.deleteStore);
+
 router.patch(
   "/:id/inventory",
   checkRole(["admin", "manager"]),

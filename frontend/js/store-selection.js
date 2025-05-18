@@ -184,6 +184,7 @@ const deleteStore = async (storeId) => {
         throw new Error("No authentication token found");
       }
 
+      console.log("Attempting to delete store:", storeId);
       const response = await fetch(
         `http://localhost:5000/api/stores/${storeId}`,
         {
@@ -195,13 +196,19 @@ const deleteStore = async (storeId) => {
         }
       );
 
+      const data = await response.json();
+      console.log("Delete response:", data);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete store");
+        throw new Error(data.message || data.error || "Failed to delete store");
       }
 
-      await fetchStores();
+      if (!data.success) {
+        throw new Error(data.message || "Failed to delete store");
+      }
+
       showNotification("Store deleted successfully!");
+      await fetchStores(); // Refresh the store list
     } catch (error) {
       console.error("Error deleting store:", error);
       if (error.message === "No authentication token found") {

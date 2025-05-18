@@ -1,6 +1,17 @@
 const Store = require("../models/Store");
 const Product = require("../models/Product");
+const SupportTicket = require("../models/SupportTicket");
+const Settings = require("../models/Settings");
+const Inventory = require("../models/Inventory");
+const Dashboard = require("../models/Dashboard");
+const ActivityLog = require("../models/ActivityLog");
+const mongoose = require("mongoose");
 const { ErrorHandler } = require("../utils/errorHandler");
+
+// Helper function to validate MongoDB ObjectId
+const isValidObjectId = (id) => {
+  return mongoose.Types.ObjectId.isValid(id);
+};
 
 exports.getStores = async (req, res) => {
   try {
@@ -25,6 +36,13 @@ exports.getStores = async (req, res) => {
 
 exports.getStoreById = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid store ID format",
+      });
+    }
+
     const store = await Store.findById(req.params.id).populate("owner");
     if (!store) {
       return next(ErrorHandler.notFoundError("Store not found"));
@@ -82,6 +100,13 @@ exports.createStore = async (req, res) => {
 
 exports.updateStore = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid store ID format",
+      });
+    }
+
     const store = await Store.findById(req.params.id);
     if (!store) {
       return next(ErrorHandler.notFoundError("Store not found"));
@@ -111,37 +136,108 @@ exports.updateStore = async (req, res, next) => {
 
 exports.deleteStore = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid store ID format",
+      });
+    }
+
+    console.log("Starting store deletion process for store ID:", req.params.id);
+
+    // First check if store exists
     const store = await Store.findById(req.params.id);
     if (!store) {
+      console.log("Store not found with ID:", req.params.id);
       return res.status(404).json({
         success: false,
         message: "Store not found",
       });
     }
 
-    // Delete all products associated with this store
-    await Product.deleteMany({ store: req.params.id });
+    console.log("Found store:", store.name);
 
-    // Now delete the store
-    await Store.findByIdAndDelete(req.params.id);
+    try {
+      // Delete the store first
+      console.log("Attempting to delete store:", req.params.id);
+      const deletedStore = await Store.deleteOne({ _id: req.params.id });
 
-    res.status(200).json({
-      success: true,
-      message: "Store and associated products deleted successfully",
-      data: store,
-    });
+      if (deletedStore.deletedCount === 0) {
+        throw new Error("Failed to delete store - no documents deleted");
+      }
+
+      console.log("Store deleted successfully");
+
+      // Then delete all related documents
+      console.log("Deleting related documents for store:", req.params.id);
+
+      const deletePromises = [
+        Product.deleteMany({ store: req.params.id }),
+        SupportTicket.deleteMany({ store: req.params.id }),
+        Settings.deleteMany({ store: req.params.id }),
+        Inventory.deleteMany({ store: req.params.id }),
+        Dashboard.deleteMany({ store: req.params.id }),
+        ActivityLog.deleteMany({ store: req.params.id }),
+      ];
+
+      const results = await Promise.allSettled(deletePromises);
+
+      // Log results
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          console.log(
+            `Successfully deleted related documents for index ${index}`
+          );
+        } else {
+          console.error(
+            `Failed to delete related documents for index ${index}:`,
+            result.reason
+          );
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Store deleted successfully",
+        data: {
+          store: store,
+          deletedCount: deletedStore.deletedCount,
+        },
+      });
+    } catch (deleteError) {
+      console.error("Error during store deletion:", {
+        error: deleteError.message,
+        stack: deleteError.stack,
+        storeId: req.params.id,
+      });
+      throw deleteError;
+    }
   } catch (error) {
-    console.error("Store deletion error:", error);
-    res.status(500).json({
+    console.error("Store deletion error:", {
+      error: error.message,
+      stack: error.stack,
+      storeId: req.params.id,
+      name: error.name,
+      code: error.code,
+    });
+
+    return res.status(500).json({
       success: false,
       message: "Failed to delete store",
-      error: error.message,
+      error: error.message || "Database operation failed",
     });
   }
 };
 
 exports.updateStoreInventory = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid store ID format",
+      });
+    }
+
     const store = await Store.findById(req.params.id);
     if (!store) {
       return res.status(404).json({ message: "Store not found" });

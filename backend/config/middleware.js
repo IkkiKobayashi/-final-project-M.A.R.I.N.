@@ -19,13 +19,13 @@ module.exports = (app) => {
   // CORS configuration
   app.use(
     cors({
-      origin:
-        process.env.NODE_ENV === "development"
-          ? "*"
-          : ["http://localhost:5500", "http://127.0.0.1:5500"], // Allow all origins in development
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-      allowedHeaders: ["Content-Type", "Authorization"],
+      origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+      exposedHeaders: ["Content-Range", "X-Content-Range"],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
     })
   );
 
