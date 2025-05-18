@@ -42,7 +42,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Image Upload Handling
-  if (imagePreview && profileImage) {
+  if (imageUpload && imagePreview && profileImage) {
+    // Handle click on the image upload area
+    imageUpload.addEventListener("click", function () {
+      profileImage.click();
+    });
+
+    // Handle file selection
     profileImage.addEventListener("change", function (e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -70,11 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
       reader.readAsDataURL(file);
     });
   }
-
-  // Image Upload Click Handler
-  imageUpload.addEventListener("click", function () {
-    profileImage.click();
-  });
 
   // Search handler
   searchInput.addEventListener("input", handleSearch);
