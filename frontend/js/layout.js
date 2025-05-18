@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Profile dropdown functionality
+  const profileBtn = document.querySelector(".profile-btn");
+  const dropdownMenu = document.querySelector(".dropdown-menu");
+
+  if (profileBtn && dropdownMenu) {
+    profileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("show");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove("show");
+      }
+    });
+  }
+
   // Profile picture synchronization functionality
   function updateProfilePicture(imageUrl) {
     // Update profile picture in the admin dropdown

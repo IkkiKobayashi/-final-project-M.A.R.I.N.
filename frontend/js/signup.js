@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirmPassword");
+  const phoneInput = document.getElementById("phone");
+  const locationInput = document.getElementById("location");
 
   const validateForm = () => {
     const fullName = fullNameInput.value.trim();
@@ -14,8 +16,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
+    const phone = phoneInput.value.trim();
+    const location = locationInput.value.trim();
 
-    if (!fullName || !email || !username || !password || !confirmPassword) {
+    if (
+      !fullName ||
+      !email ||
+      !username ||
+      !password ||
+      !confirmPassword ||
+      !phone ||
+      !location
+    ) {
       throw new Error("Please fill in all fields");
     }
 
@@ -31,6 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!emailRegex.test(email)) {
       throw new Error("Please enter a valid email address");
     }
+
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    if (!phoneRegex.test(phone)) {
+      throw new Error("Please enter a valid phone number");
+    }
   };
 
   signupForm.addEventListener("submit", async (e) => {
@@ -41,6 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
+    const phone = phoneInput.value.trim();
+    const location = locationInput.value.trim();
 
     try {
       validateForm();
@@ -59,6 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
           email,
           username,
           password,
+          phone,
+          location,
         }),
       });
 

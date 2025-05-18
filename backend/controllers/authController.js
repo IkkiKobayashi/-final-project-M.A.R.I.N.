@@ -66,7 +66,7 @@ exports.logout = (req, res) => {
 // Signup user
 exports.signup = async (req, res) => {
   try {
-    const { fullName, email, username, password } = req.body;
+    const { fullName, email, username, password, phone, location } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -85,6 +85,8 @@ exports.signup = async (req, res) => {
       email,
       username,
       password,
+      phone,
+      location,
       role: "admin", // Set role as admin for signup
     });
 
@@ -105,6 +107,8 @@ exports.signup = async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         username: user.username,
+        phone: user.phone,
+        location: user.location,
         role: user.role,
       },
     });
