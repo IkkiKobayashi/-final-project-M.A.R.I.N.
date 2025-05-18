@@ -10,24 +10,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Update profile information
-  updateProfileInfo(userData);
+  try {
+    // Fetch latest user data from backend
+    const response = await fetch(`${config.apiUrl}/api/users/${userData.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  // Add event listeners for profile picture upload
-  setupProfilePictureUpload();
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data");
+    }
+
+    const updatedUserData = await response.json();
+
+    // Update localStorage with latest data
+    localStorage.setItem("user", JSON.stringify(updatedUserData));
+
+    // Update profile information
+    updateProfileInfo(updatedUserData);
+
+    // Add event listeners for profile picture upload
+    setupProfilePictureUpload();
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    showNotification("Failed to load profile data", "error");
+  }
 });
 
 function updateProfileInfo(userData) {
   // Update profile picture
   const profilePicture = document.getElementById("profilePicture");
   if (userData.profileImage) {
-    profilePicture.style.backgroundImage = `url(${userData.profileImage})`;
+    profilePicture.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
     profilePicture.classList.remove("placeholder");
   }
 
   // Update name
   const profileName = document.getElementById("profileName");
-  profileName.value = userData.fullName || "";
+  profileName.value = userData.name || "";
 
   // Update role
   const roleValue = document.querySelector(".role-value");
@@ -40,33 +61,20 @@ function updateProfileInfo(userData) {
   const profilePhone = document.getElementById("profilePhone");
   profilePhone.value = userData.phone || "";
 
-  // Update location (address)
-  const profileLocation = document.getElementById("profileLocation");
-  profileLocation.value = userData.address || "";
-
-  // Update joined date
-  const joinedDate = document.querySelector(
-    ".detail-item:last-child .non-editable-field span"
-  );
-  if (userData.joinedDate) {
-    const date = new Date(userData.joinedDate);
-    joinedDate.textContent = date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
+  // Update address
+  const profileAddress = document.getElementById("profileAddress");
+  profileAddress.value = userData.address || "";
 
   // Update header profile picture
   const headerProfileImg = document.querySelector(".profile-btn .profile-img");
   if (userData.profileImage) {
-    headerProfileImg.style.backgroundImage = `url(${userData.profileImage})`;
+    headerProfileImg.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
     headerProfileImg.classList.remove("placeholder");
   }
 
   // Update header name
   const headerName = document.querySelector(".profile-btn span");
-  headerName.textContent = userData.fullName || "Admin";
+  headerName.textContent = userData.name || "Admin";
 }
 
 function setupProfilePictureUpload() {
