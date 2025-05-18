@@ -1,23 +1,25 @@
-const User = require("../models/User");
+const Employee = require("../models/Employee");
 const ActivityLog = require("../models/ActivityLog");
 
 class EmployeeController {
   // Get all employees
   static async getAllEmployees(req, res) {
     try {
-      let query = { role: { $ne: "admin" } };
+      let query = {};
 
       // If manager, only show employees from their store
       if (req.user.role === "manager") {
         query.store = req.user.store;
       }
 
-      const employees = await User.find(query)
-        .select("-password")
-        .populate("store", "name address");
+      const employees = await Employee.find(query).populate(
+        "store",
+        "name address"
+      );
 
       res.json(employees);
     } catch (error) {
+      console.error("Error fetching employees:", error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -25,9 +27,10 @@ class EmployeeController {
   // Get single employee
   static async getEmployee(req, res) {
     try {
-      const employee = await User.findById(req.params.id)
-        .select("-password")
-        .populate("store", "name address");
+      const employee = await Employee.findById(req.params.id).populate(
+        "store",
+        "name address"
+      );
 
       if (!employee) {
         return res.status(404).json({ message: "Employee not found" });
@@ -45,6 +48,7 @@ class EmployeeController {
 
       res.json(employee);
     } catch (error) {
+      console.error("Error fetching employee:", error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -55,25 +59,27 @@ class EmployeeController {
       const { name, email, role, department, phone, joinedDate, profileImage } =
         req.body;
 
-      // Check if email already exists
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ message: "Email already registered" });
+      // Check if email already exists in the store
+      const existingEmployee = await Employee.findOne({
+        email,
+        store: req.user.store,
+      });
+
+      if (existingEmployee) {
+        return res
+          .status(400)
+          .json({ message: "Email already registered in this store" });
       }
 
-      // Generate temporary password
-      const tempPassword = Math.random().toString(36).slice(-8);
-
-      const employee = new User({
+      const employee = new Employee({
         name,
         email,
-        password: tempPassword,
         role: role || "employee",
         department,
         phone,
         joinedDate: joinedDate || new Date(),
         profileImage: profileImage || "img/user img/store admin.jpg",
-        store: req.user.store, // Use the store from the authenticated user
+        store: req.user.store,
       });
 
       await employee.save();
@@ -112,9 +118,8 @@ class EmployeeController {
   static async updateEmployee(req, res) {
     try {
       const updates = { ...req.body };
-      delete updates.password; // Prevent password update through this route
+      const employee = await Employee.findById(req.params.id);
 
-      const employee = await User.findById(req.params.id);
       if (!employee) {
         return res.status(404).json({ message: "Employee not found" });
       }
@@ -157,9 +162,14 @@ class EmployeeController {
           name: employee.name,
           email: employee.email,
           role: employee.role,
+          department: employee.department,
+          phone: employee.phone,
+          joinedDate: employee.joinedDate,
+          profileImage: employee.profileImage,
         },
       });
     } catch (error) {
+      console.error("Error updating employee:", error);
       res.status(400).json({ message: error.message });
     }
   }
@@ -167,7 +177,8 @@ class EmployeeController {
   // Delete employee
   static async deleteEmployee(req, res) {
     try {
-      const employee = await User.findById(req.params.id);
+      const employee = await Employee.findById(req.params.id);
+
       if (!employee) {
         return res.status(404).json({ message: "Employee not found" });
       }
@@ -188,7 +199,7 @@ class EmployeeController {
         store: employee.store,
       };
 
-      await employee.remove();
+      await employee.deleteOne();
 
       // Log activity
       const activity = new ActivityLog({
@@ -203,6 +214,7 @@ class EmployeeController {
 
       res.json({ message: "Employee deleted successfully" });
     } catch (error) {
+      console.error("Error deleting employee:", error);
       res.status(500).json({ message: error.message });
     }
   }
