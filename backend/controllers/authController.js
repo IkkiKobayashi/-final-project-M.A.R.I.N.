@@ -7,9 +7,12 @@ const path = require("path");
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log("Login attempt for username:", username);
 
-    // Check if user exists by username instead of email
+    // Check if user exists by username
     const user = await User.findOne({ username });
+    console.log("User found:", user ? "Yes" : "No");
+
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -19,6 +22,8 @@ exports.login = async (req, res) => {
 
     // Check password
     const isMatch = await user.comparePassword(password);
+    console.log("Password match:", isMatch ? "Yes" : "No");
+
     if (!isMatch) {
       return res.status(400).json({
         success: false,
@@ -45,6 +50,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
       message: error.message,
