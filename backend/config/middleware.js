@@ -26,8 +26,7 @@ module.exports = (app) => {
       origin: [
         "http://127.0.0.1:5500",
         "http://localhost:5500",
-        "https://marin-frontend.onrender.com",
-        "https://marin.onrender.com",
+        "https://final-project-m-a-r-i-n.onrender.com",
       ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],

@@ -19,15 +19,30 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.innerHTML =
         '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
+      console.log(
+        "Attempting to login with API URL:",
+        `${config.apiUrl}/api/auth/login`
+      );
+
       const response = await fetch(`${config.apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+      }).catch((error) => {
+        console.error("Network error:", error);
+        throw new Error(`Network error: ${error.message}`);
       });
 
+      console.log("Response status:", response.status);
+      console.log(
+        "Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       const data = await response.json();
+      console.log("Response data:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
