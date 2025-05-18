@@ -1,3 +1,5 @@
+import config from "./config.js";
+
 // DOM Elements
 const viewToggle = document.querySelector(".view-toggle");
 const productsView = document.querySelector(".products-view");
@@ -181,7 +183,7 @@ async function saveProductWithImage(formData, imageData) {
 
     console.log("Sending product data to server:", productData);
 
-    const response = await fetch("http://localhost:5000/api/products", {
+    const response = await fetch(`${config.apiUrl}/api/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -234,6 +236,7 @@ async function saveProductWithImage(formData, imageData) {
     showNotification(error.message || "Failed to save product", "error");
   }
 }
+
 // Add this function for error notifications
 function showNotification(message, type = "success") {
   const notification = document.createElement("div");
@@ -261,7 +264,7 @@ async function logActivity(userId, userName, action, entityType, description) {
       timestamp: new Date().toISOString(),
     };
 
-    const response = await fetch("http://localhost:5000/api/activities", {
+    const response = await fetch(`${config.apiUrl}/api/activities`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -332,7 +335,7 @@ async function deleteProduct(productId, productName) {
 
         // Call the backend API to delete the product
         const response = await fetch(
-          `http://localhost:5000/api/products/${productId}`,
+          `${config.apiUrl}/api/products/${productId}`,
           {
             method: "DELETE",
             headers: {
@@ -609,7 +612,7 @@ async function fetchAndDisplayProducts() {
 
     console.log("Fetching products for store:", currentStore.id);
     const response = await fetch(
-      `http://localhost:5000/api/products?storeId=${currentStore.id}`,
+      `${config.apiUrl}/api/products?storeId=${currentStore.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -674,7 +677,7 @@ async function fetchAndDisplayProducts() {
     }
   } catch (error) {
     console.error("Error fetching products:", error);
-    showNotification(error.message || "Failed to load products", "error");
+    showNotification("Failed to load products: " + error.message, "error");
 
     productsView.innerHTML = `
       <div class="error-state">
