@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Create FormData object for file upload
       const formData = new FormData();
-      formData.append("fullName", fullName);
+      formData.append("name", fullName);
       formData.append("email", email);
       formData.append("username", username);
       formData.append("password", password);
