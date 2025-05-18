@@ -6,8 +6,19 @@ const path = require("path");
 // Login user
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    // Handle both JSON and FormData
+    const username = req.body.username;
+    const password = req.body.password;
+
     console.log("Login attempt for username:", username);
+
+    if (!username || !password) {
+      console.log("Missing username or password");
+      return res.status(400).json({
+        success: false,
+        message: "Username and password are required",
+      });
+    }
 
     // Check if user exists by username
     const user = await User.findOne({ username });
@@ -74,6 +85,13 @@ exports.logout = (req, res) => {
 exports.signup = async (req, res) => {
   try {
     const { name, email, username, password, phone, address } = req.body;
+    console.log("Signup attempt with data:", {
+      name,
+      email,
+      username,
+      phone,
+      address,
+    });
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -81,7 +99,9 @@ exports.signup = async (req, res) => {
     });
 
     if (existingUser) {
+      console.log("User already exists:", existingUser.username);
       return res.status(400).json({
+        success: false,
         message: "User with this email or username already exists",
       });
     }
@@ -100,8 +120,8 @@ exports.signup = async (req, res) => {
     // Create new user with admin role
     const user = new User({
       name,
-      email,
       username,
+      email,
       password,
       phone,
       address,
@@ -109,7 +129,9 @@ exports.signup = async (req, res) => {
       role: "admin", // Set role as admin for signup
     });
 
+    console.log("Creating new user:", { name, username, email });
     await user.save();
+    console.log("User created successfully");
 
     // Create token
     const token = jwt.sign(
@@ -124,8 +146,8 @@ exports.signup = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
         username: user.username,
+        email: user.email,
         phone: user.phone,
         address: user.address,
         profileImage: user.profileImage,
@@ -133,6 +155,7 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Signup error:", error);
     res.status(500).json({
       success: false,
       message: error.message,
