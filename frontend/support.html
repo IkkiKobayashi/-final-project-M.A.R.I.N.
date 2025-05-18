@@ -13,20 +13,51 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/info-pages.css" />
+    <style>
+      .back-to-dashboard {
+        background: linear-gradient(45deg, #0d6efd, #0a58ca);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .back-to-dashboard:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(45deg, #0a58ca, #084298);
+        color: white;
+      }
+      .back-to-dashboard i {
+        margin-right: 8px;
+        transition: transform 0.3s ease;
+      }
+      .back-to-dashboard:hover i {
+        transform: translateX(-3px);
+      }
+    </style>
   </head>
   <body>
     <header class="info-page-header">
-      <div class="container">
-        <div class="d-flex align-items-center">
-          <img
-            src="img/store logo/Marin LOGO.png"
-            alt="MARIN Logo"
-            class="logo"
-          />
-          <h1>M.A.R.I.N</h1>
-          <a href="dashboard.html" class="btn btn-primary ms-auto"
-            >Back to Dashboard</a
-          >
+      <div class="container-fluid px-4">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-items-center">
+              <img
+                src="img/store logo/Marin LOGO.png"
+                alt="MARIN Logo"
+                class="logo"
+              />
+              <h1>M.A.R.I.N</h1>
+            </div>
+          </div>
+          <div class="col text-end">
+            <a href="dashboard.html" class="btn back-to-dashboard">
+              <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+          </div>
         </div>
       </div>
     </header>
