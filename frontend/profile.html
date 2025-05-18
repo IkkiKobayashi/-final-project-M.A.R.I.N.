@@ -134,10 +134,10 @@
                 <div class="profile-name">
                   <input
                     type="text"
-                    value="John Doe"
                     class="editable-field"
                     id="profileName"
                     placeholder="Enter your name"
+                    readonly
                   />
                 </div>
                 <div class="profile-status">
@@ -159,7 +159,6 @@
                   <div class="editable-field-container">
                     <input
                       type="email"
-                      value="john.doe@example.com"
                       class="editable-field"
                       id="profileEmail"
                       placeholder="Enter your email"
@@ -172,7 +171,6 @@
                   <div class="editable-field-container">
                     <input
                       type="tel"
-                      value="+1 (555) 123-4567"
                       class="editable-field"
                       id="profilePhone"
                       placeholder="Enter your phone number"
@@ -181,27 +179,13 @@
                   </div>
                 </div>
                 <div class="detail-item">
-                  <label>Department</label>
+                  <label>Address</label>
                   <div class="editable-field-container">
                     <input
                       type="text"
-                      value="Management"
-                      class="editable-field"
-                      id="profileDepartment"
-                      placeholder="Enter your department"
-                      readonly
-                    />
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <label>Location</label>
-                  <div class="editable-field-container">
-                    <input
-                      type="text"
-                      value="New York, USA"
                       class="editable-field"
                       id="profileLocation"
-                      placeholder="Enter your location"
+                      placeholder="Enter your address"
                       readonly
                     />
                   </div>
@@ -209,7 +193,7 @@
                 <div class="detail-item">
                   <label>Joined Date</label>
                   <div class="non-editable-field">
-                    <span>January 1, 2024</span>
+                    <span>Loading...</span>
                   </div>
                 </div>
               </div>
@@ -258,6 +242,6 @@
       </main>
     </div>
     <script src="js/layout.js"></script>
-    <script src="js/profile.js"></script>
+    <script type="module" src="js/profile.js"></script>
   </body>
 </html>

@@ -1,76 +1,149 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Profile picture upload functionality
+import config from "./config.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Get user data from localStorage
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  if (!userData || !token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Update profile information
+  updateProfileInfo(userData);
+
+  // Add event listeners for profile picture upload
+  setupProfilePictureUpload();
+});
+
+function updateProfileInfo(userData) {
+  // Update profile picture
+  const profilePicture = document.getElementById("profilePicture");
+  if (userData.profileImage) {
+    profilePicture.style.backgroundImage = `url(${userData.profileImage})`;
+    profilePicture.classList.remove("placeholder");
+  }
+
+  // Update name
+  const profileName = document.getElementById("profileName");
+  profileName.value = userData.fullName || "";
+
+  // Update role
+  const roleValue = document.querySelector(".role-value");
+  roleValue.textContent = userData.role || "Admin";
+
+  // Update contact details
+  const profileEmail = document.getElementById("profileEmail");
+  profileEmail.value = userData.email || "";
+
+  const profilePhone = document.getElementById("profilePhone");
+  profilePhone.value = userData.phone || "";
+
+  // Update location (address)
+  const profileLocation = document.getElementById("profileLocation");
+  profileLocation.value = userData.address || "";
+
+  // Update joined date
+  const joinedDate = document.querySelector(
+    ".detail-item:last-child .non-editable-field span"
+  );
+  if (userData.joinedDate) {
+    const date = new Date(userData.joinedDate);
+    joinedDate.textContent = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  // Update header profile picture
+  const headerProfileImg = document.querySelector(".profile-btn .profile-img");
+  if (userData.profileImage) {
+    headerProfileImg.style.backgroundImage = `url(${userData.profileImage})`;
+    headerProfileImg.classList.remove("placeholder");
+  }
+
+  // Update header name
+  const headerName = document.querySelector(".profile-btn span");
+  headerName.textContent = userData.fullName || "Admin";
+}
+
+function setupProfilePictureUpload() {
   const profilePictureInput = document.getElementById("profilePictureInput");
   const profilePicture = document.getElementById("profilePicture");
 
-  profilePictureInput.addEventListener("change", function (e) {
+  profilePictureInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Add loading state
-      profilePicture.classList.add("loading");
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        // Remove loading state and update image
-        profilePicture.classList.remove("loading");
-        profilePicture.src = e.target.result;
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification("Image size should be less than 5MB", "error");
+      return;
+    }
 
-        // Add a smooth transition effect
-        profilePicture.style.opacity = "0";
-        setTimeout(() => {
-          profilePicture.style.opacity = "1";
-        }, 100);
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      showNotification("Please upload an image file", "error");
+      return;
+    }
 
-        // Here you would typically upload the image to your server
-        // and update the user's profile picture in the database
-      };
-      reader.readAsDataURL(file);
+    try {
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      const response = await fetch(`${config.apiUrl}/api/users/profile-image`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile picture");
+      }
+
+      // Update profile picture
+      profilePicture.style.backgroundImage = `url(${data.profileImage})`;
+      profilePicture.classList.remove("placeholder");
+
+      // Update header profile picture
+      const headerProfileImg = document.querySelector(
+        ".profile-btn .profile-img"
+      );
+      headerProfileImg.style.backgroundImage = `url(${data.profileImage})`;
+      headerProfileImg.classList.remove("placeholder");
+
+      // Update user data in localStorage
+      const userData = JSON.parse(localStorage.getItem("user"));
+      userData.profileImage = data.profileImage;
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      showNotification("Profile picture updated successfully", "success");
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      showNotification(
+        error.message || "Failed to update profile picture",
+        "error"
+      );
     }
   });
+}
 
-  // Load user data from server (mock data for now)
-  function loadUserData() {
-    // Add loading state to all fields
-    const fields = document.querySelectorAll(
-      ".editable-field, .non-editable-field"
-    );
-    fields.forEach((field) => field.classList.add("loading"));
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+        <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+        <span>${message}</span>
+    `;
+  document.body.appendChild(notification);
 
-    // Simulate loading delay
-    setTimeout(() => {
-      // In a real application, you would fetch this data from your server
-      const mockUserData = {
-        name: "John Doe",
-        status: "active",
-        role: "Admin",
-        email: "john.doe@example.com",
-        phone: "+1 (555) 123-4567",
-        department: "Management",
-        location: "New York, USA",
-        joinedDate: "January 1, 2024",
-      };
-
-      // Populate fields with user data
-      document.getElementById("profileName").value = mockUserData.name;
-      document.getElementById("profileStatus").value = mockUserData.status;
-      document.querySelector(".role-value").textContent = mockUserData.role;
-      document.getElementById("profileEmail").value = mockUserData.email;
-      document.getElementById("profilePhone").value = mockUserData.phone;
-      document.getElementById("profileDepartment").value =
-        mockUserData.department;
-      document.getElementById("profileLocation").value = mockUserData.location;
-      document.querySelector(".non-editable-field span").textContent =
-        mockUserData.joinedDate;
-
-      // Add initial status class to dropdown
-      const statusDropdown = document.getElementById("profileStatus");
-      statusDropdown.classList.add("status-active");
-
-      // Remove loading state
-      fields.forEach((field) => field.classList.remove("loading"));
-    }, 1000);
-  }
-
-  // Load user data when the page loads
-  loadUserData();
-});
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}

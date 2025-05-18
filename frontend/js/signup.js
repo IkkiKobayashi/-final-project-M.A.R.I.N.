@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirmPassword");
   const phoneInput = document.getElementById("phone");
-  const locationInput = document.getElementById("location");
+  const addressInput = document.getElementById("address");
   const profileImageInput = document.getElementById("profileImage");
   const previewImg = document.getElementById("previewImg");
   const imagePreview = document.getElementById("imagePreview");
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
     const phone = phoneInput.value.trim();
-    const location = locationInput.value.trim();
+    const address = addressInput.value.trim();
     const profileImage = profileImageInput.files[0];
 
     if (
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       !password ||
       !confirmPassword ||
       !phone ||
-      !location
+      !address
     ) {
       throw new Error("Please fill in all fields");
     }
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
     const phone = phoneInput.value.trim();
-    const location = locationInput.value.trim();
+    const address = addressInput.value.trim();
     const profileImage = profileImageInput.files[0];
 
     try {
@@ -105,14 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.append("username", username);
       formData.append("password", password);
       formData.append("phone", phone);
-      formData.append("location", location);
+      formData.append("address", address);
       if (profileImage) {
         formData.append("profileImage", profileImage);
       }
 
       const response = await fetch(`${config.apiUrl}/api/auth/signup`, {
         method: "POST",
-        body: formData, // Send as FormData instead of JSON
+        body: formData,
       });
 
       // Log the raw response for debugging
