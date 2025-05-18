@@ -18,6 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
   profileImageInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification("Image size should be less than 5MB", "error");
+        profileImageInput.value = "";
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        showNotification("Please upload an image file", "error");
+        profileImageInput.value = "";
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         // Create image element if it doesn't exist
@@ -27,6 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
           imagePreview.appendChild(img);
         }
         img.src = e.target.result;
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
         imagePreview.classList.add("has-image");
         profilePlaceholder.style.display = "none";
       };
@@ -136,6 +153,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (data.success) {
+        // Store user data in localStorage
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: data.user.id,
+            name: data.user.name,
+            username: data.user.username,
+            email: data.user.email,
+            phone: data.user.phone,
+            address: data.user.address,
+            profileImage: data.user.profileImage,
+            role: data.user.role,
+          })
+        );
+        localStorage.setItem("token", data.token);
+
         showNotification(
           "Account created successfully! Please log in.",
           "success"

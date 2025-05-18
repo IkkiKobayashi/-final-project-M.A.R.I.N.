@@ -202,3 +202,12 @@
 {"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T11:07:33.035Z"}
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T11:11:40.461Z"}
 {"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T11:11:46.762Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T14:11:46.135Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T14:11:46.273Z"}
+{"error":{"code":"ECONNREFUSED","message":"querySrv ECONNREFUSED _mongodb._tcp.cluster0.nyv8wir.mongodb.net","stack":"Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.nyv8wir.mongodb.net\n    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:293:17)"},"level":"error","message":"MongoDB connection error:","timestamp":"2025-05-18T14:11:46.359Z"}
+{"level":"info","message":"Retrying connection... Attempt 3/5","timestamp":"2025-05-18T14:11:46.396Z"}
+{"error":{"code":"ECONNREFUSED","message":"querySrv ECONNREFUSED _mongodb._tcp.cluster0.nyv8wir.mongodb.net","stack":"Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.nyv8wir.mongodb.net\n    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:293:17)"},"level":"error","message":"MongoDB connection error:","timestamp":"2025-05-18T14:11:46.450Z"}
+{"level":"info","message":"Retrying connection... Attempt 4/5","timestamp":"2025-05-18T14:11:46.477Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T14:12:02.249Z"}
+{"level":"info","message":"Database indexes created successfully","timestamp":"2025-05-18T14:12:08.760Z"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2025-05-18T14:12:29.574Z"}

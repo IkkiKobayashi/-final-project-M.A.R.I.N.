@@ -121,4 +121,25 @@ document.addEventListener("DOMContentLoaded", () => {
   manageStoreBtn.addEventListener("click", () => {
     window.location.href = "store-selection.html";
   });
+
+  function updateHeaderProfile() {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      // Update header profile picture
+      const headerProfileImg = document.querySelector(
+        ".profile-btn .profile-img"
+      );
+      if (userData.profileImage) {
+        headerProfileImg.style.backgroundImage = `url(${config.apiUrl}/${userData.profileImage})`;
+        headerProfileImg.classList.remove("placeholder");
+      }
+
+      // Update header name
+      const headerName = document.querySelector(".profile-btn span");
+      headerName.textContent = userData.name || "Admin";
+    }
+  }
+
+  // Call updateHeaderProfile when the page loads
+  document.addEventListener("DOMContentLoaded", updateHeaderProfile);
 });
