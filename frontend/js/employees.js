@@ -120,7 +120,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Get store ID from localStorage
-    const storeId = localStorage.getItem("storeId");
+    let storeId = localStorage.getItem("storeId");
+
+    // If storeId is not found, try to get it from currentStore
+    if (!storeId) {
+      const currentStore = localStorage.getItem("currentStore");
+      if (currentStore) {
+        try {
+          const storeInfo = JSON.parse(currentStore);
+          storeId = storeInfo.id;
+        } catch (e) {
+          console.error("Error parsing currentStore:", e);
+        }
+      }
+    }
+
     if (!storeId) {
       showNotification(
         "Store ID not found. Please select a store first.",

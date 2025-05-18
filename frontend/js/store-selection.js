@@ -166,6 +166,7 @@ const navigateToStore = async (storeId) => {
       };
       localStorage.setItem("currentStore", JSON.stringify(storeInfo));
       localStorage.setItem("selectedStore", JSON.stringify(storeInfo)); // Keep for backward compatibility
+      localStorage.setItem("storeId", store._id); // Add this line to store the ID separately
       window.location.href = "dashboard.html";
     }
   } catch (error) {
