@@ -1,3 +1,5 @@
+import config from "./config.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signupForm");
   const fullNameInput = document.getElementById("fullName");
@@ -13,20 +15,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
-    if (!fullName || fullName.length < 2) {
-      throw new Error("Full name must be at least 2 characters long");
+    if (!fullName || !email || !username || !password || !confirmPassword) {
+      throw new Error("Please fill in all fields");
     }
-    if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      throw new Error("Please enter a valid email address");
-    }
-    if (!username || username.length < 3) {
-      throw new Error("Username must be at least 3 characters long");
-    }
-    if (!password || password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
-    }
+
     if (password !== confirmPassword) {
       throw new Error("Passwords do not match");
+    }
+
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters long");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error("Please enter a valid email address");
     }
   };
 
@@ -46,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.disabled = true;
       submitButton.textContent = "Creating account...";
 
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
+      const response = await fetch(`${config.apiUrl}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,28 +83,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (data.success) {
-        // Show success message modal
-        const modal = document.createElement("div");
-        modal.className = "success-modal";
-        modal.innerHTML = `
-          <div class="modal-content">
-            <h2><i class="fas fa-check-circle"></i> Success!</h2>
-            <p>Your account has been created successfully.</p>
-            <button onclick="window.location.href='login.html'" class="success-btn">
-              Go to Login
-            </button>
-          </div>
-        `;
-        document.body.appendChild(modal);
-
-        // Clear the form
-        signupForm.reset();
+        showNotification(
+          "Account created successfully! Please log in.",
+          "success"
+        );
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 2000);
       } else {
         throw new Error(data.message || "Failed to create account");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message || "Error creating account. Please try again.");
+      showNotification(error.message || "Failed to create account", "error");
     } finally {
       const submitButton = signupForm.querySelector('button[type="submit"]');
       submitButton.disabled = false;
@@ -109,3 +103,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Notification function
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
