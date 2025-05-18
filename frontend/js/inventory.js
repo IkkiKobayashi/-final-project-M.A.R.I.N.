@@ -476,12 +476,15 @@ function updateStock(productId, action, quantity) {
   }
 
   // Fetch the current product data from the backend first
-  fetch(`http://localhost:5000/api/products/${productId}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      "Content-Type": "application/json",
-    },
-  })
+  fetch(
+    `https://final-project-m-a-r-i-n.onrender.com/api/products/${productId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    }
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to fetch product data");
@@ -501,14 +504,17 @@ function updateStock(productId, action, quantity) {
       }
 
       // Update the product on the backend
-      return fetch(`http://localhost:5000/api/products/${productId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
+      return fetch(
+        `https://final-project-m-a-r-i-n.onrender.com/api/products/${productId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(product),
+        }
+      );
     })
     .then((response) => {
       if (!response.ok) {
