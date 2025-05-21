@@ -1,8 +1,6 @@
 <div align="center">
   <h1>M.A.R.I.N - 
  Management & Analytics Resource Inventory Network</h1>
-  <h1>M.A.R.I.N - 
- Management & Analytics Resource Inventory Network</h1>
 </div>
 
 <div align="center">
