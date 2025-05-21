@@ -1,4 +1,5 @@
-# M.A.R.I.N - Management & Analytics Resource Inventory Network
+# M.A.R.I.N
+Management & Analytics Resource Inventory Network
 
 <div align="center">
   <img src="logo/Logo.jpg" alt="MARIN Logo" width="200" height="auto" />
