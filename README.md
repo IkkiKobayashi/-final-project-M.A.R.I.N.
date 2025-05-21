@@ -137,7 +137,8 @@ npm start
 <div align="center">
   <sub>Built with ❤️ by the MARIN Team</sub>
 </div>
-
+---
+=-
 <div align="center">
   <img src="https://github.com/user-attachments/assets/077da23f-2663-4ba0-974e-ddbf460a9085" alt="MARIN Eyes" width="300" />
 </div>
