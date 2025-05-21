@@ -1,6 +1,8 @@
 <div align="center">
   <h1>M.A.R.I.N - 
  Management & Analytics Resource Inventory Network</h1>
+  <h1>M.A.R.I.N - 
+ Management & Analytics Resource Inventory Network</h1>
 </div>
 
 <div align="center">
@@ -139,5 +141,5 @@ npm start
 </div>
 
 <div align="center">
-  <img src="https://media.tenor.com/2roX3uxz_68AAAAC/marin-kitagawa-kitagawa-marin.gif" alt="Marin Kitagawa GIF" width="300" />
+  <iframe src="https://assets.pinterest.com/ext/embed.html?id=12736811441988655" height="293" width="345" frameborder="0" scrolling="no" ></iframe>
 </div>
