@@ -136,5 +136,5 @@ npm start
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the MARIN Team</sub>
+  <sub>Built with ❤️ by the M.A.R.I.N Team</sub>
 </div>
