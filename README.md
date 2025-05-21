@@ -141,6 +141,6 @@ npm start
 </div>
 
 <div align="center">
-  <img src="logo/MARIN.gifgif" alt="MARIN Eyes Animation" width="300" />
+  <img src="logo/MARIN.gifgif" width="300" />
 </div>
 
