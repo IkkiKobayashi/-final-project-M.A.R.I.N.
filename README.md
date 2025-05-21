@@ -141,5 +141,6 @@ npm start
 </div>
 
 <div align="center">
-  <iframe src="https://assets.pinterest.com/ext/embed.html?id=12736811441988655" height="293" width="345" frameborder="0" scrolling="no" ></iframe>
+  <img src="logo/MARIN.gifgif" alt="MARIN Eyes Animation" width="300" />
 </div>
+
