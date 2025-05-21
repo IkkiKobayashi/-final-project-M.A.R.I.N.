@@ -139,6 +139,6 @@ npm start
 </div>
 
 <div align="center">
-  <img src="logo/MARIN.gif" alt="MARIN Eyes" width="300" />
+  <img src="https://raw.githubusercontent.com/yourusername/MARIN/main/logo/MARIN.gif" alt="MARIN Eyes" width="300" />
 </div>
 
