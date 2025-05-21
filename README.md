@@ -1,8 +1,7 @@
 <div align="center">
-  <h1>M.A.R.I.N -
-    Management & Analytics Resource Inventory Network</h1>
+  <h1>M.A.R.I.N - 
+ Management & Analytics Resource Inventory Network</h1>
 </div>
-
 
 <div align="center">
   <img src="logo/Logo.jpg" alt="MARIN Logo" width="200" height="auto" />
@@ -136,5 +135,9 @@ npm start
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the M.A.R.I.N Team</sub>
+  <sub>Built with ❤️ by the MARIN Team</sub>
+</div>
+
+<div align="center">
+  <img src="https://media.tenor.com/2roX3uxz_68AAAAC/marin-kitagawa-kitagawa-marin.gif" alt="Marin Kitagawa GIF" width="300" />
 </div>
