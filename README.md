@@ -129,10 +129,6 @@ npm start
 - **Phase 5 (Week 15)**: ✅ 100% Complete
 - **Phase 6 (Week 16)**: ✅ 100% Complete
 
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/MARIN/issues).
-
 ---
 
 <div align="center">
