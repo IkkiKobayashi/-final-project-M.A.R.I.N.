@@ -1,8 +1,9 @@
 <div align="center">
-  <h1>M.A.R.I.N - Management & Analytics Resource Inventory Network</h1>
+  <h1>M.A.R.I.N 
+    Management & Analytics Resource Inventory Network</h1>
 </div>
 
-// ... existing code ...
+
 <div align="center">
   <img src="logo/Logo.jpg" alt="MARIN Logo" width="200" height="auto" />
   <h3>Management & Automation for Resourceful Inventory Navigation</h3>
