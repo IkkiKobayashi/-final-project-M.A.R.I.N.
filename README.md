@@ -56,13 +56,6 @@ M.A.R.I.N is a robust inventory management system designed to streamline busines
 - Secure authentication system
 - Activity logging and audit trails
 
-### 📊 Analytics & Reporting
-
-- Real-time sales analytics
-- Inventory turnover reports
-- Custom report generation
-- Data visualization dashboards
-
 ## 🚀 Getting Started
 
 ### Prerequisites
